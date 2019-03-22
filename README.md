@@ -18,7 +18,10 @@ var app=M.server();
 app.listen(8888);
 
 app.get("/getById",(req,res)=>{
-    return "ok";
+    
+    console.log(req.params);
+    
+    res.send("ok");
 }
  ```
  
