@@ -27,21 +27,21 @@
     "name": "Minglie"
   },
   "bugs": {
-    "url": "https://github.com/minglie/Ming_nodeJS/issues"
+    "url": "https://github.com/minglie/ming_node/issues"
   },
   "bundleDependencies": false,
   "deprecated": false,
   "description": "easyNode",
-  "homepage": "https://github.com/minglie/Ming_nodeJS#readme",
+  "homepage": "https://github.com/minglie/ming_node#readme",
   "keywords": [
     "easyNode"
   ],
   "license": "MIT",
-  "main": "M_node.js",
+  "main": "index.js",
   "name": "ming_node",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/minglie/Ming_nodeJS.git"
+    "url": "git+https://github.com/minglie/ming_node.git"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
