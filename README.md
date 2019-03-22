@@ -4,7 +4,7 @@
  >  ming_node是一个快速搭建web服务,接口测试,日常脚本编写的一个工具集
  
  
- #ming_mock安装
+#ming_mock安装
  ```sh
  $ npm install ming_mock
  ```
