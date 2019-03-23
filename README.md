@@ -22,7 +22,7 @@ app.get("/getById",(req,res)=>{
     console.log(req.params);
     
     res.send("ok");
-}
+})
  ```
  
  
