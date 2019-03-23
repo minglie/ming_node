@@ -28,5 +28,5 @@ app.get("/getById",(req,res)=>{
  
 #ming_mock的使用详情,请到ming_node的主页查看
 
-https://minglie.github.io/src/openSourcePage/ming_node/index.html
+https://minglie.github.io/os/ming_node/
  
