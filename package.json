@@ -32,7 +32,7 @@
   "bundleDependencies": false,
   "deprecated": false,
   "description": "easyNode",
-  "homepage": "https://minglie.github.io/src/openSourcePage/ming_node/index.html",
+  "homepage": "https://minglie.github.io/os/ming_node/",
   "keywords": [
     "easyNode"
   ],
@@ -46,5 +46,5 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "version": "0.1.4"
+  "version": "0.1.5"
 }
