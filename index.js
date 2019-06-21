@@ -2,8 +2,8 @@
  * File : index.js
  * By : Minglie
  * QQ: 934031452
- * Version :V0.1.5
- * Date :2019.03.24
+ * Version :V0.1.6
+ * Date :2019.06.20
  */
 var http=require('http');
 var https=require('https');
@@ -14,12 +14,13 @@ var path=require('path');
 var child_process = require('child_process');
 var privateObj={};//本文件私有对象
 var M={};
+M.sessions={}//保存session
 M.con_display_status_enable=1;//是否显示响应状态码
-M.cooks="JSESSIONID="+"6E202D5A022EBD62705AA436EC54963B";//请求携带的cook
+M.cookie="JSESSIONID="+"6E202D5A022EBD62705AA436EC54963B";//请求携带的cook
 M.host="http://127.0.0.1:7001";
 M.log_file_enable=true;//将日志输出到文件
 M.log_console_enable=true;//将日志输出到控制台
-M.log_path="C:M.log";//输出日志文件路径
+M.log_path="./M.log";//输出日志文件路径
 M.map_path="./M_map.json";//输出日志文件路径
 M.log_display_time=true;//日志是否显示当前时间
 /**
@@ -30,7 +31,7 @@ M.get=function(url,callback,data,headers) {
     else {
         headers = {
             'Content-Type': 'application/json',
-            'Cookie': M.cooks
+            'Cookie': M.cookie
         }
     }
     var getData="";
@@ -63,7 +64,6 @@ M.get=function(url,callback,data,headers) {
             }
         }
         //console.log('HEADERS:'+JSON.stringify(res.headers));
-
         res.setEncoding('utf-8');
         res.on('data',function(chunk){
             html+=chunk;
@@ -96,7 +96,7 @@ M.post=function(url,callback,data,headers) {
         headers = {
             'Content-Type':'application/x-www-form-urlencoded; ' +
             'charset=UTF-8',
-            'Cookie': M.cooks,
+            'Cookie': M.cookie,
             'Content-Length':Buffer.byteLength(postData)
         }
     }
@@ -145,7 +145,7 @@ M.postJson=function(url,callback,data,headers) {
         headers = {
             'Content-Type':'application/json; ' +
             'charset=UTF-8',
-            'Cookie': M.cooks
+            'Cookie': M.cookie
         }
     }
     var options={
@@ -384,6 +384,37 @@ M.mkdir=function(dirpath, dirname) {
         }
     }
 }
+/**
+ *文件夹拷贝
+ */
+M.copyDir=function(src,dst){
+    let paths = fs.readdirSync(src); //同步读取当前目录
+    paths.forEach(function(path){
+        var _src=src+'/'+path;
+        var _dst=dst+'/'+path;
+        fs.stat(_src,function(err,stats){  //stats  该对象 包含文件属性
+            if(err)throw err;
+            if(stats.isFile()){ //如果是个文件则拷贝
+                let  readable=fs.createReadStream(_src);//创建读取流
+                let  writable=fs.createWriteStream(_dst);//创建写入流
+                readable.pipe(writable);
+            }else if(stats.isDirectory()){ //是目录则 递归
+                privateObj.checkDirectory(_src,_dst,M.copyDir);
+            }
+        });
+    });
+}
+
+privateObj.checkDirectory=function(src,dst,callback){
+    fs.access(dst, fs.constants.F_OK, (err) => {
+        if(err){
+            fs.mkdirSync(dst);
+            callback(src,dst);
+        }else{
+            callback(src,dst);
+        }
+    });
+};
 
 M.readFile=function(file){
     return fs.readFileSync(file,"utf-8");
@@ -624,6 +655,10 @@ M.getHumpObj=function (obj) {
     return result;
 }
 
+M.randomStr=function () {
+   return  (Math.random().toString(36)+new Date().getTime()).slice(2);
+}
+
 /**
  * 异常处理钩子
  * @param e
@@ -679,7 +714,29 @@ M.server=function(){
             return method=="get" && isRest;
         }
 
-
+        req.ip=req.headers['x-forwarded-for'] ||
+            req.connection.remoteAddress ||
+            req.socket.remoteAddress ||
+            req.connection.socket.remoteAddress;
+        //请求cookies封装
+        req.cookies=querystring.parse(req.headers['cookie'],"; ");
+        //设置浏览器cookies
+        res.cookie=function(key,value,cfg){
+            let o={}
+            o[key]=value;
+            let r_cookie= Object.assign(o,cfg)
+            res.setHeader("Set-Cookie", querystring.stringify(r_cookie," ;"));
+        }
+        Object.defineProperty(req,'session',{
+            set:function(o){
+                let sessionValue=req.cookies.sessionid||M.randomStr();
+                res.cookie("sessionid",sessionValue)
+                M.sessions[sessionValue]=o;
+            },
+            get:function(){
+                return M.sessions[req.cookies.sessionid]
+            }
+        })
         //扩充res一个send方法
         res.send=function(data){
             res.setHeader("Access-Control-Allow-Origin", "*");
@@ -939,7 +996,6 @@ M.sleep=function(numberMillis){
             return;
     }
 }
-
 /**
  * ----------------------其他工具函数END--------------------------------------------
  */
