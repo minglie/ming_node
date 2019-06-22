@@ -2,7 +2,6 @@
  * File : index.js
  * By : Minglie
  * QQ: 934031452
- * Version :V1.0.0
  * Date :2019.06.22
  */
 var http=require('http');
