@@ -2,8 +2,8 @@
  * File : index.js
  * By : Minglie
  * QQ: 934031452
- * Version :V0.1.6
- * Date :2019.06.20
+ * Version :V1.0.0
+ * Date :2019.06.22
  */
 var http=require('http');
 var https=require('https');
@@ -21,7 +21,8 @@ M.host="http://127.0.0.1:7001";
 M.log_file_enable=true;//将日志输出到文件
 M.log_console_enable=true;//将日志输出到控制台
 M.log_path="./M.log";//输出日志文件路径
-M.map_path="./M_map.json";//输出日志文件路径
+M.map_path="./M_map.json";//全局作用域路径
+M.database_path="./M_database.json";//文件型数据库路径
 M.log_display_time=true;//日志是否显示当前时间
 /**
  * ----------------------客户端START--------------------------------------------
@@ -417,7 +418,11 @@ privateObj.checkDirectory=function(src,dst,callback){
 };
 
 M.readFile=function(file){
-    return fs.readFileSync(file,"utf-8");
+    if(fs.existsSync(file)){
+        return fs.readFileSync(file,"utf-8");
+    }else {
+        return;
+    }
 }
 M.writeFile=function(file,str){
     fs.writeFileSync(file, str);
@@ -425,14 +430,16 @@ M.writeFile=function(file,str){
 M.appendFile=function(file,str){
     fs.appendFileSync(file, str);
 }
-
+/**
+  文件型数据库第一层封装
+ */
 M.getObjByFile=function(file){
-    data=fs.readFileSync(file,"utf-8")
+    data=M.readFile(file)||"[]"
     var obj=JSON.parse(data.toString());
     return obj;
 }
 M.writeObjToFile=function(file,obj){
-    fs.writeFileSync(file, JSON.stringify(obj));
+    M.writeFile(file, JSON.stringify(obj));
 }
 
 M.addObjToFile=function(file,obj){
@@ -444,11 +451,17 @@ M.addObjToFile=function(file,obj){
     }
 }
 M.deleteObjByIdFile=function(file,id){
+    let ids=[];
+    if(!Array.isArray(id)){
+        ids.push(id)
+    }else {
+        ids=id;
+    }
     var d=M.getObjByFile(file);
-    for(var i=0;i<d.length;i++){
-        if(d[i].id==id){
+    for(let i=0;i<d.length;i++){
+        if(ids.indexOf(d[i].id)>=0){
             d.splice(i,1);
-            break;
+            if(ids.length==1)break;
         }
     }
     M.writeObjToFile(file,d);
@@ -456,7 +469,7 @@ M.deleteObjByIdFile=function(file,id){
 
 M.updateObjByIdFile=function(file,obj){
     var d=M.getObjByFile(file);
-    for(var i=0;i<d.length;i++){
+    for(let i=0;i<d.length;i++){
         if(d[i].id==obj.id){
             d.splice(i,1,obj);
             break;
@@ -464,8 +477,69 @@ M.updateObjByIdFile=function(file,obj){
     }
     M.writeObjToFile(file,d);
 }
-
-
+M.getObjByIdFile=function(file,id){
+    var d=M.getObjByFile(file);
+    for(let i=0;i<d.length;i++){
+        if(d[i].id==id){
+           return d[i];
+        }
+    }
+}
+M.listAllObjByPropFile=function(file,o){
+    let r_list=[];
+    let o_key=Object.keys(o)[0];
+    let o_val=o[o_key]
+    var d=M.getObjByFile(file);
+    for(let i=0;i<d.length;i++){
+        if(d[i][o_key]==o_val){
+            r_list.push(d[i]);
+        }
+    }
+    return r_list;
+}
+/**
+ * 文件型数据库第二层封装
+ */
+M.add=function (obj) {
+    obj.id=M.randomStr();
+    M.addObjToFile(M.database_path,obj);
+    return obj;
+}
+M.update=function (obj) {
+    M.updateObjByIdFile(M.database_path,obj);
+}
+M.deleteById=function (id) {
+    M.deleteObjByIdFile(M.database_path,id);
+}
+M.deleteAll=function () {
+    M.writeObjToFile(M.database_path,[]);
+}
+M.getById=function (id) {
+     return M.getObjByIdFile(M.database_path,id);
+}
+M.listAll=function () {
+    return M.getObjByFile(M.database_path);
+}
+M.listByProp=function (o) {
+    return M.listAllObjByPropFile(M.database_path,o);
+}
+M.listByPage=function (startPage,limit,caseObj) {
+    if(startPage<=0)startPage=1;
+    let rows;
+    if(caseObj){
+        rows=M.listByProp(caseObj);
+    }else {
+        rows= M.listAll();
+    }
+    let total=rows.length;
+    rows=rows.splice((startPage-1)*limit,limit)
+    return {rows,total}
+}
+/**
+ * 全局作用域
+ * @param k
+ * @param v
+ */
 M.setAttribute=function (k,v) {
     let a={}
     a[k]=v;
@@ -484,8 +558,6 @@ M.setAttribute=function (k,v) {
 M.getAttribute=function (k) {
     return M.getObjByFile(M.map_path)[k];
 }
-
-
 /**
  *逐行读取文件
  */
