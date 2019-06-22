@@ -547,6 +547,7 @@ M.setAttribute=function (k,v) {
     let preObj;
     try{
         preObj=M.getObjByFile(M.map_path);
+        if(Array.isArray(preObj))preObj={};
     }catch(e){
         preObj={};
     }
