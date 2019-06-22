@@ -457,10 +457,28 @@ M.deleteObjByIdFile=function(file,id){
         ids=id;
     }
     var d=M.getObjByFile(file);
-    for(let i=0;i<d.length;i++){
-        if(ids.indexOf(d[i].id)>=0){
-            d.splice(i,1);
+    var d1=M.getObjByFile(file);
+    let d_num=0;
+    for(let i=0;i<d1.length;i++){
+        if(ids.indexOf(d1[i].id)>=0){
+            d.splice(i-d_num,1);
+            d_num++;
             if(ids.length==1)break;
+        }
+    }
+    M.writeObjToFile(file,d);
+}
+
+M.deleteObjByPropFile=function(file,o){
+    let o_key=Object.keys(o)[0];
+    let o_val=o[o_key]
+    var d=M.getObjByFile(file);
+    var d1=M.getObjByFile(file);
+    let d_num=0;
+    for(let i=0;i<d1.length;i++){
+        if(d1[i][o_key]==o_val){
+            d.splice(i-d_num,1);
+            d_num++;
         }
     }
     M.writeObjToFile(file,d);
@@ -512,6 +530,9 @@ M.deleteById=function (id) {
 }
 M.deleteAll=function () {
     M.writeObjToFile(M.database_path,[]);
+}
+M.deleteByProp=function (o) {
+    M.deleteObjByPropFile(M.database_path,o);
 }
 M.getById=function (id) {
      return M.getObjByIdFile(M.database_path,id);
