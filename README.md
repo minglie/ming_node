@@ -23,7 +23,9 @@ app.get("/getById",(req,res)=>{
 
 
  ```
-#ming_node快速mock前端接口     
+ 
+#ming_node快速mock前端接口
+     
  ```javascript
 var M=require("ming_node");
 var app=M.server();
