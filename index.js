@@ -612,6 +612,9 @@ M.readCsvLine=function(file,callback){
 
 
 M.log=function(...params){
+    if(Array.isArray(params[0]) ||typeof params[0] == 'object' ){
+        params=[JSON.stringify(params[0])]
+    }
     if(M.log_file_enable || M.log_console_enable){
         let r="";
         if(M.log_display_time){
