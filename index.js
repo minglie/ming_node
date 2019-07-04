@@ -528,8 +528,12 @@ M.update=function (obj) {
 M.deleteById=function (id) {
     M.deleteObjByIdFile(M.database_path,id);
 }
-M.deleteAll=function () {
-    M.writeObjToFile(M.database_path,[]);
+M.deleteAll=function (o) {
+    if(o){
+        M.deleteObjByPropFile(M.database_path,o);
+    }else {
+        M.writeObjToFile(M.database_path,[]);
+    }
 }
 M.deleteByProp=function (o) {
     M.deleteObjByPropFile(M.database_path,o);
@@ -537,8 +541,12 @@ M.deleteByProp=function (o) {
 M.getById=function (id) {
      return M.getObjByIdFile(M.database_path,id);
 }
-M.listAll=function () {
-    return M.getObjByFile(M.database_path);
+M.listAll=function (o) {
+    if(o){
+        return M.listAllObjByPropFile(M.database_path,o);
+    }else {
+        return M.getObjByFile(M.database_path);
+    }
 }
 M.listByProp=function (o) {
     return M.listAllObjByPropFile(M.database_path,o);
