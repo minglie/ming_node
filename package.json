@@ -1,8 +1,8 @@
 {
   "_from": "ming_node",
-  "_id": "ming_node@0.1.5",
+  "_id": "ming_node@1.0.4",
   "_inBundle": false,
-  "_integrity": "sha512-xp9oOreHvoltQLCtcYleB75t2mIKPQWMh7w84HwJfaXSXFC+ABcmReipVyosZvdkTpeWVtkWiczPfWrk9XHu4A==",
+  "_integrity": "sha512-3gRhlJi3pU+Whc17awyOxUdHY+eHgLpnj8HCSbjXCi7gBDU7PT/i/euq3t2YAqeg/xV2IRgnnCvtXrHtRsNk5A==",
   "_location": "/ming_node",
   "_phantomChildren": {},
   "_requested": {
@@ -19,10 +19,10 @@
     "#USER",
     "/"
   ],
-  "_resolved": "https://registry.npmjs.org/ming_node/-/ming_node-0.1.5.tgz",
-  "_shasum": "388278143657d6e386d32ea7c367a2ae0c84947e",
+  "_resolved": "https://registry.npmjs.org/ming_node/-/ming_node-1.0.4.tgz",
+  "_shasum": "bb49755dee7793706a892a20c4153e149f6c12d1",
   "_spec": "ming_node",
-  "_where": "C:\\Users\\Administrator\\Desktop\\ww",
+  "_where": "C:\\Users\\Administrator\\Desktop\\dd",
   "author": {
     "name": "Minglie"
   },
@@ -46,5 +46,5 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "version": "1.0.5"
+  "version": "1.0.10"
 }
