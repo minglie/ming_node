@@ -1051,7 +1051,11 @@ privateObj.staticServer=function (req,res,staticPath) {
                 );
                 res.end(); /*结束响应*/
             }else{ /*返回这个文件*/
-                res.writeHead(200,{"Content-Type":""+(privateObj.staticMime[extname]||'text/html')+";charset='utf-8'"});
+                res.setHeader("Access-Control-Allow-Origin", "*");
+                res.setHeader("Access-Control-Allow-Headers", "X-Requested-With");
+                res.setHeader("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
+                res.setHeader("X-Powered-By",' 3.2.1')
+                res.writeHead(200,{"Content-Type":""+(privateObj.staticMime[extname]||'text/html')+";charset='utf-8'",});
                 res.write(data);
                 res.end(); /*结束响应*/
             }
