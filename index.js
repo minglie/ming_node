@@ -2,7 +2,7 @@
  * File : index.js
  * By : Minglie
  * QQ: 934031452
- * Date :2019.07.04
+ * Date :2019.07.23
  */
 var http=require('http');
 var https=require('https');
@@ -14,7 +14,7 @@ var child_process = require('child_process');
 var privateObj={};//本文件私有对象
 var M={};
 M.sessions={}//保存session
-M.con_display_status_enable=1;//是否显示响应状态码
+M.con_display_status_enable=false;//是否显示响应状态码
 M.cookie="JSESSIONID="+"6E202D5A022EBD62705AA436EC54963B";//请求携带的cook
 M.host="http://127.0.0.1:7001";
 M.log_file_enable=true;//将日志输出到文件
@@ -269,19 +269,6 @@ M.beforeLogData=function (res,desc) {
     console.log("-----"+desc+"-----"+res.req.path+"-------------");
 }
 
-/**
- *对返回结果做校验
- */
-M.ValicateData=function (data) {
-    var result=JSON.parse(data);
-    if(result.success){
-        console.log("-----测试通过-----");
-        return true;
-    }else{
-        console.log("-----测试失败-----");
-        return false;
-    }
-}
 
 /**
  *打印结果后钩子
@@ -1083,6 +1070,19 @@ M.exec=function(comand){
 
     })
     return promise;
+}
+
+M.getMyIp=function(){
+  var interfaces = require('os').networkInterfaces();
+  for(var devName in interfaces){
+      var iface = interfaces[devName];
+      for(var i=0;i<iface.length;i++){
+          var alias = iface[i];
+          if(alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal){
+              return alias.address;
+          }
+      }
+  }
 }
 
 /**
