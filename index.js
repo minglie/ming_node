@@ -2,7 +2,7 @@
  * File : index.js
  * By : Minglie
  * QQ: 934031452
- * Date :2019.07.23
+ * Date :2019.08.4
  */
 var http=require('http');
 var https=require('https');
@@ -818,16 +818,18 @@ M.server=function(){
             let r_cookie= Object.assign(o,cfg)
             res.setHeader("Set-Cookie", querystring.stringify(r_cookie," ;"));
         }
-        Object.defineProperty(req,'session',{
-            set:function(o){
-                let sessionValue=req.cookies.sessionid||M.randomStr();
-                res.cookie("sessionid",sessionValue)
-                M.sessions[sessionValue]=o;
-            },
-            get:function(){
-                return M.sessions[req.cookies.sessionid]
-            }
-        })
+        if(req.session){
+            Object.defineProperty(req,'session',{
+                set:function(o){
+                    let sessionValue=req.cookies.sessionid||M.randomStr();
+                    res.cookie("sessionid",sessionValue)
+                    M.sessions[sessionValue]=o;
+                },
+                get:function(){
+                    return M.sessions[req.cookies.sessionid]
+                }
+            })
+        }
         //扩充res一个send方法
         res.send=function(data){
             res.setHeader("Access-Control-Allow-Origin", "*");
