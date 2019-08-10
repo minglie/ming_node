@@ -2,7 +2,7 @@
  * File : index.js
  * By : Minglie
  * QQ: 934031452
- * Date :2019.08.4
+ * Date :2019.08.10
  */
 var http=require('http');
 var https=require('https');
@@ -11,6 +11,8 @@ var querystring=require('querystring');
 var fs=require('fs');
 var path=require('path');
 var child_process = require('child_process');
+var EventEmitter = require('events').EventEmitter;
+var event = new EventEmitter();
 var privateObj={};//本文件私有对象
 var M={};
 M.sessions={}//保存session
@@ -1053,6 +1055,41 @@ privateObj.staticServer=function (req,res,staticPath) {
         res.writeHead(302, {'Content-Type': 'image/x-icon; charset=utf-8','Location':"https://q.qlogo.cn/g?b=qq&nk=934031452&s=100"});
         res.end();
     }
+}
+
+/*SSE SERVER */
+M.sseServer=function(){
+    let app=function(req,res){
+        console.log("SSEServer connect success")
+        res.writeHead(200, {
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+            'Access-Control-Allow-Origin': '*',
+        });
+        event.on('sseSendMsg', function(r){
+            res.write('event: slide\n'); // 事件类型
+            res.write(`id: ${+new Date()}\n`); // 消息 ID
+            res.write(`data: ${r}\n`); // 消息数据
+            res.write('retry: 10000\n'); // 重连时间
+            res.write('\n\n'); // 消息结束
+        })
+        // 发送注释保持长连接
+        setInterval(() => {
+            res.write(': \n\n');
+        }, 12000);
+
+    };
+    app.send=function(msg){
+        event.emit('sseSendMsg',msg);
+    }
+    app.listen=function (port){
+        let serverObj=http.createServer(app).listen(port);
+        app.serverObj=serverObj;
+        console.log("SSE Server listen on port:"+port);
+        return app;
+    }
+    return app;
 }
 
 /**
