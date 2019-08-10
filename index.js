@@ -1067,6 +1067,7 @@ M.sseServer=function(){
             'Connection': 'keep-alive',
             'Access-Control-Allow-Origin': '*',
         });
+        event.removeAllListeners("sseSendMsg")
         event.on('sseSendMsg', function(r){
             res.write('event: slide\n'); // 事件类型
             res.write(`id: ${+new Date()}\n`); // 消息 ID
