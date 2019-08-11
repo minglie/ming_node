@@ -74,7 +74,7 @@ var app=M.server();
 app.listen(8888);
 
 app.get("/setSession",(req,res)=>{
-    //打印请求id
+    //打印请求ip与cookie
     console.log(req.ip,req.cookies)
     //设置session
     req.session={ss:55}
@@ -89,6 +89,64 @@ app.get("/getSession",(req,res)=>{
     res.send("ok");
 })
 ```
+ 
+#使用ming_node搭建前端学习环境
+
+##后端代码
+ ```javascript
+ var M=require("ming_node");
+ var app=M.server();
+ app.listen(8888);
+ app.get("/",async (req,res)=>{ 
+    app.redirect("/index.html",req,res)
+ })
+ app.get("/pagelist",async (req,res)=>{ 
+     let s= await M.exec("dir static /b")
+     res.send(M.result(s))
+ })
+ ```
+ ##前端代码
+  ```html
+ <!DOCTYPE html>
+ <html>
+ <head>
+     <meta charset="utf-8">
+     <title>index</title>
+     <script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+ </head>
+ 
+ <body>
+     <div id="app">
+         <h1>网页列表</h1>
+         <div v-for="file in list">
+             <a :href="file">{{ file }}</a> <br /> <br />
+         </div>
+     </div>
+     <script type="text/javascript">
+         new Vue({
+             el: '#app',
+             data() {
+                 return {
+                     list: null
+                 }
+             },
+             mounted() {
+                 M_this = this;
+                 fetch('/pagelist').then(function (response) {
+                     return response.json();
+                 }).then(function (response) {
+                     let list = response.data.split("\n");
+                     list = list.filter((d) => (d.indexOf(".html") >= 0))
+                     console.log(list)
+                     M_this.list = list
+                 });
+             }
+ 
+         })
+     </script>
+ </body>
+ </html>
+  ```
  
 #ming_node的使用详情,请到ming_node的主页查看
 

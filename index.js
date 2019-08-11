@@ -2,7 +2,7 @@
  * File : index.js
  * By : Minglie
  * QQ: 934031452
- * Date :2019.08.10
+ * Date :2019.08.11
  */
 var http=require('http');
 var https=require('https');
@@ -18,6 +18,8 @@ var M={};
 M.sessions={}//保存session
 M.con_display_status_enable=false;//是否显示响应状态码
 M.cookie="JSESSIONID="+"6E202D5A022EBD62705AA436EC54963B";//请求携带的cook
+M.reqComQueryparams=undefined;//请求的公共的查询参数
+M.reqComHeaders=undefined;//请求的公共请求头
 M.host="http://127.0.0.1:7001";
 M.log_file_enable=true;//将日志输出到文件
 M.log_console_enable=true;//将日志输出到控制台
@@ -28,14 +30,22 @@ M.log_display_time=true;//日志是否显示当前时间
 /**
  * ----------------------客户端START--------------------------------------------
  */
-M.get=function(url,callback,data,headers) {
-    if(headers){}
-    else {
-        headers = {
-            'Content-Type': 'application/json',
-            'Cookie': M.cookie
-        }
+//解析对象或函数返回值
+privateObj.getFunctionOrObjResult=function (objOrFunc,obj) {
+    let c1;
+    if(!objOrFunc){
+        return obj;
     }
+    if(typeof objOrFunc=="function"){
+        c1=objOrFunc();
+    }else {
+        c1=objOrFunc;
+    }
+    return Object.assign(c1,obj);
+}
+
+//将对象追加到url上
+privateObj.appendDataToUrl=function (url,data) {
     var getData="";
     if(data){
         getData=querystring.stringify(data);
@@ -46,7 +56,32 @@ M.get=function(url,callback,data,headers) {
             getData="?"+getData;
         }
     }
+    let r=url+getData;
+    return r;
+}
 
+
+M.get=function(url,callback,data,headers) {
+    if(headers){}
+    else {
+        headers = {
+            'Content-Type': 'application/json',
+            'Cookie': M.cookie
+        }
+    }
+    var getData="";
+    if(data || M.reqComQueryparams){
+        data=privateObj.getFunctionOrObjResult(M.reqComQueryparams,data)
+        getData=querystring.stringify(data);
+        //url携带参数了
+        if(url.indexOf("?")>0){
+            getData="&"+getData;
+        }else{
+            getData="?"+getData;
+        }
+    }
+    //合并请求头
+    headers=privateObj.getFunctionOrObjResult(M.reqComHeaders,headers)
     var html='';
     var urlObj=url_module.parse(url)
     var options={
@@ -82,7 +117,7 @@ M.get=function(url,callback,data,headers) {
 }
 
 M.post=function(url,callback,data,headers) {
-
+    url=privateObj.appendDataToUrl(url,M.reqComQueryparams);
     var html='';
     var urlObj=url_module.parse(url)
     //发送 http Post 请求
@@ -102,6 +137,9 @@ M.post=function(url,callback,data,headers) {
             'Content-Length':Buffer.byteLength(postData)
         }
     }
+    //合并请求头
+    headers=privateObj.getFunctionOrObjResult(M.reqComHeaders,headers)
+
     var options={
         hostname:urlObj.hostname,
         port:urlObj.port,
@@ -139,6 +177,7 @@ M.post=function(url,callback,data,headers) {
 
 
 M.postJson=function(url,callback,data,headers) {
+    url=privateObj.appendDataToUrl(url,M.reqComQueryparams);
     var html='';
     var urlObj=url_module.parse(url)
     //发送 http Post 请求
@@ -150,6 +189,8 @@ M.postJson=function(url,callback,data,headers) {
             'Cookie': M.cookie
         }
     }
+    //合并请求头
+    headers=privateObj.getFunctionOrObjResult(M.reqComHeaders,headers)
     var options={
         hostname:urlObj.hostname,
         port:urlObj.port,
@@ -876,7 +917,7 @@ M.server=function(){
                                     }catch (e) {
                                     }
                                 }
-                                req.params = postData;
+                                req.params = Object.assign(postData,url_module.parse(req.url,true).query) ;
                                 G._begin(req,res);
                                 if(!res.alreadySend)G['_'+method][pathname](req,res); /*执行方法*/
                             })
