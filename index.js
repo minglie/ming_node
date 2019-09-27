@@ -262,7 +262,7 @@ M.require=function(url){
         if(url.startsWith("https")){
             ht="https";
         }
-        let promise=new Promise(function (resolve, reject) {
+        let promise=new Promise(function (reslove, reject) {
             require(ht).get(url,function(req,res){
                 var d='';
                 req.on('data',(data)=>{d+=data;});
