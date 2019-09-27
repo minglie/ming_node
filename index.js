@@ -2,7 +2,7 @@
  * File : index.js
  * By : Minglie
  * QQ: 934031452
- * Date :2019.08.11
+ * Date :2019.9.28
  */
 var http=require('http');
 var https=require('https');
@@ -256,6 +256,25 @@ M.getHttps= function(url,callback,data){
     });
 }
 
+
+M.require=function(url){
+    var promise = new Promise(function(reslove,reject){  
+        M.get(url,function (d) {
+                let r="";
+                try{
+                    r=JSON.parse(d)
+                }catch(e){
+                    try{
+                        r=eval(d); 
+                    }catch(e1){
+                        r=d;
+                    } 
+                }
+                reslove(r);
+        });       
+    })
+    return promise;
+}
 /**
  *下载图片
  */
