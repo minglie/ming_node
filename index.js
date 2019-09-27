@@ -258,23 +258,32 @@ M.getHttps= function(url,callback,data){
 
 
 M.require=function(url){
-    var promise = new Promise(function(reslove,reject){  
-        M.get(url,function (d) {
-                let r="";
-                try{
-                    r=JSON.parse(d)
-                }catch(e){
+        let ht="http";
+        if(url.startsWith("https")){
+            ht="https";
+        }
+        let promise=new Promise(function (resolve, reject) {
+            require(ht).get(url,function(req,res){
+                var d='';
+                req.on('data',(data)=>{d+=data;});
+                req.on('end',()=>{
+                    let r="";
                     try{
-                        r=eval(d); 
-                    }catch(e1){
-                        r=d;
-                    } 
-                }
-                reslove(r);
-        });       
-    })
+                        r=JSON.parse(d)
+                    }catch(e){
+                        try{
+                            r=eval(d); 
+                        }catch(e1){
+                            r=d;
+                        } 
+                    }
+                    reslove(r);
+                });
+                req.on('error',(e)=>reject(e.message));
+    })});
     return promise;
 }
+
 /**
  *下载图片
  */

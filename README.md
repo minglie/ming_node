@@ -89,7 +89,31 @@ app.get("/getSession",(req,res)=>{
     res.send("ok");
 })
 ```
- 
+#ming_node  彻底的单文件化 
+```javascript
+async function Myrequire(url) {
+    return new Promise(function (resolve, reject) {
+        require('https').get(url,function(req,res){
+            var d='';
+            req.on('data',(data)=>{d+=data;});
+            req.on('end',()=>{let r=eval(d);resolve(r);});
+            req.on('error',(e)=>{reject(e.message);});
+        });
+})};
++async function(){
+    M=await Myrequire("https://raw.githubusercontent.com/minglie/ming_node/master/index.js");
+    var app=M.server();
+    app.listen(8888);
+    app.get("/getById",async (req,res)=>{ 
+        console.log(req.params);
+        MM=await M.require("https://raw.githubusercontent.com/minglie/ming_node/master/index.js")
+        console.log(MM.cookie);
+        res.send(MM.cookie);
+    })
+ }();
+
+```
+
 #使用ming_node搭建前端学习环境
 
 ##后端代码
