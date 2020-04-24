@@ -91,86 +91,20 @@ app.get("/getSession",(req,res)=>{
 ```
 #ming_node  彻底的单文件化 
 ```javascript
-async function Myrequire(url) {
-    return new Promise(function (resolve, reject) {
-        require('https').get(url,function(req,res){
-            var d='';
-            req.on('data',(data)=>{d+=data;});
-            req.on('end',()=>{let r=eval(d);resolve(r);});
-            req.on('error',(e)=>{reject(e.message);});
-        });
-})};
 +async function(){
-    M=await Myrequire("https://raw.githubusercontent.com/minglie/ming_node/master/index.js");
-    var app=M.server();
+    M =await new Promise((v)=>require('https').get("https://minglie.github.io/js/ming_node.js",(q)=>{d='';q.on('data',(a)=>d+=a);q.on('end',()=>v(eval(d)))}))
+  var app=M.server();
     app.listen(8888);
-    app.get("/getById",async (req,res)=>{ 
-        console.log(req.params);
-        MM=await M.require("https://raw.githubusercontent.com/minglie/ming_node/master/index.js")
-        console.log(MM.cookie);
-        res.send(MM.cookie);
+    app.get("/",async (req,res)=>{ 
+       app.redirect("/index.html",req,res)
     })
- }();
-
+}();
 ```
+#基于ming_node 的mockServer
 
-#使用ming_node搭建前端学习环境
-
-##后端代码
- ```javascript
- var M=require("ming_node");
- var app=M.server();
- app.listen(8888);
- app.get("/",async (req,res)=>{ 
-    app.redirect("/index.html",req,res)
- })
- app.get("/pagelist",async (req,res)=>{ 
-     let s= await M.exec("dir static /b")
-     res.send(M.result(s))
- })
+ ```sh
+curl https://minglie.gitee.io/mingpage/static/share_edit.js > index.js && node index.js
  ```
- ##前端代码
-  ```html
- <!DOCTYPE html>
- <html>
- <head>
-     <meta charset="utf-8">
-     <title>index</title>
-     <script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
- </head>
- 
- <body>
-     <div id="app">
-         <h1>网页列表</h1>
-         <div v-for="file in list">
-             <a :href="file">{{ file }}</a> <br /> <br />
-         </div>
-     </div>
-     <script type="text/javascript">
-         new Vue({
-             el: '#app',
-             data() {
-                 return {
-                     list: null
-                 }
-             },
-             mounted() {
-                 M_this = this;
-                 fetch('/pagelist').then(function (response) {
-                     return response.json();
-                 }).then(function (response) {
-                     let list = response.data.split("\n");
-                     list = list.filter((d) => (d.indexOf(".html") >= 0))
-                     console.log(list)
-                     M_this.list = list
-                 });
-             }
- 
-         })
-     </script>
- </body>
- </html>
-  ```
  
 #ming_node的使用详情,请到ming_node的主页查看
 
