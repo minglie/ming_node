@@ -3,7 +3,7 @@
  * By : Minglie
  * QQ: 934031452
  * Date :2019.9.28
- * version :1.6.0
+ * version :1.7.0
  */
 var http = require('http');
 var https = require('https');
