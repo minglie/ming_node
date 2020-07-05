@@ -100,6 +100,24 @@ app.get("/getSession",(req,res)=>{
     })
 }();
 ```
+
+#ming_node  支持代理 回调 promise 的http简易客户端
+```javascript
++async function(){
+    M =await new Promise((v)=>require('https').get("https://minglie.github.io/js/ming_node.js",(q)=>{d='';q.on('data',(a)=>d+=a);q.on('end',()=>v(eval(d)))}))
+  var app=M.server();
+    app.listen(8888);
+    app.get("/",async (req,res)=>{ 
+       app.redirect("/index.html",req,res)
+    })
+}();
+```
+
+
+
+
+
+
 #基于ming_node 的mockServer
 
  ```sh
