@@ -23,55 +23,16 @@ app.get("/getById",(req,res)=>{
 
 
  ```
- 
-#ming_node快速mock前端接口
-     
- ```javascript
-var M=require("ming_node");
-var app=M.server();
-app.listen(8888);
 
-app.post("/add",(req,res)=>{
-    r=M.add(req.params)
-    res.send(M.result(r));
-})
-
-app.get("/delete",(req,res)=>{
-    M.deleteById(req.params.id)
-    res.send(M.result("ok"));
-})
-
-app.post("/update",(req,res)=>{
-    M.update(req.params)
-    res.send(M.result("ok"));
-})
-
-app.get("/getById",(req,res)=>{
-    r=M.getById(req.params.id)
-    res.send(M.result(r));
-})
-
-app.get("/listAll",(req,res)=>{
-    r=M.listAll()
-    res.send(M.result(r));
-})
-
-app.get("/listByParentId",(req,res)=>{
-    r=M.listByProp({parentId:req.params.parentId})
-    res.send(M.result(r));
-})
-
-app.get("/listByPage",(req,res)=>{
-    r=M.listByPage(req.params.startPage,req.params.limit)
-    res.send(M.result(r));
-}) 
- 
-```
 #ming_node  cookie与session的处理  
 ```javascript
 var M=require("ming_node");
 var app=M.server();
 app.listen(8888);
+// 请求钩子
+app.begin((req,res)=>{console.log("req ",req.url)})
+// 响应钩子
+app.end((d)=>{console.log("res ",d)})
 
 app.get("/setSession",(req,res)=>{
     //打印请求ip与cookie
@@ -138,9 +99,6 @@ M.post("http://baidu.com/a?age=44",{name:"ls"}).then(d=>{
 
 ```
 
-
-
-
 #ming_node  接口测试demo
 
 ```javascript
@@ -175,12 +133,12 @@ async function main(){
 
 ```
 
-#基于ming_node 的mockServer
 
- ```sh
-curl https://minglie.gitee.io/mingpage/static/share_edit.js > index.js && node index.js
- ```
- 
+#基于ming_node 的 ming_api_mock
+
+
+
+
 #ming_node的使用详情,请到ming_node的主页查看
 
 https://minglie.github.io/os/ming_node/

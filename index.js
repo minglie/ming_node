@@ -3,7 +3,7 @@
  * By : Minglie
  * QQ: 934031452
  * Date :2019.9.28
- * version :1.7.0
+ * version :1.8.0
  */
 var http = require('http');
 var https = require('https');
@@ -964,9 +964,7 @@ M.server = function () {
         }
         //是否为rest请求
         req.isGetRestRequest = function () {
-            var method = req.method.toLowerCase();
             if (Object.keys(G._rest).length == 0) return false;
-
             var isRest = false;
             for (let i = 0; i < Object.keys(G._rest).length; i++) {
                 if (pathname.startsWith(Object.keys(G._rest)[i])) {
@@ -974,7 +972,7 @@ M.server = function () {
                     break;
                 }
             }
-            return method == "get" && isRest;
+            return  isRest;
         }
 
         req.ip = req.headers['x-forwarded-for'] ||
@@ -1028,8 +1026,33 @@ M.server = function () {
                 if (!res.alreadySend) privateObj.staticServer(req, res, G["_views"]);
 
             } else {
+                //为req加个params用于存放请求参数
+                req.params={};
+                var mapingPath = "";
+                //如果是rest风格的请求,为其封装请求参数
+                if (req.isGetRestRequest()) {
+                    for (let i = 0; i < Object.keys(G._rest).length; i++) {
+                        if (pathname.startsWith(Object.keys(G._rest)[i])) {
+                            pathname = Object.keys(G._rest)[i];
+                            mapingPath = G._rest[pathname];
+                        }
+                    }
+                    var realPathName = url_module.parse(req.url).pathname;
+                    if (!realPathName.endsWith('/')) {
+                        realPathName = realPathName + '/';
+                    }
+                    let s1 = realPathName;
+                    let s2 = mapingPath;
+                    s1 = s1.substring(s2.indexOf(":") - 1, s1.length - 1).split("/").slice(1)
+                    s2 = s2.substring(s2.indexOf(":") - 1, s2.length - 1).split("/:").slice(1)
+                    for (let i = 0; i < s2.length; i++) { req.params[s2[i]] = s1[i]; }
+                } 
+                /**
+                 * 加queryParam参数
+                 */
+                req.params=Object.assign(req.params,url_module.parse(req.url, true).query) ;
 
-                if ((method == "get" || method == "post") && (G['_' + method][pathname] || req.isGetRestRequest())) {
+                if ((method == "get" || method == "post") && (G['_' + method][pathname])) {
                     if (method == 'post') { /*执行post请求*/
                         var postStr = '';
                         req.on('data', function (chunk) {
@@ -1046,34 +1069,11 @@ M.server = function () {
                                 } catch (e) {
                                 }
                             }
-                            req.params = Object.assign(postData, url_module.parse(req.url, true).query);
+                            req.params = Object.assign(req.params,postData);
                             G._begin(req, res);
                             if (!res.alreadySend) G['_' + method][pathname](req, res); /*执行方法*/
                         })
                     } else if (method == "get") { /*执行get请求*/
-
-                        var mapingPath = "";
-                        //如果是rest风格的get请求,为其封装请求参数
-                        if (req.isGetRestRequest()) {
-                            for (let i = 0; i < Object.keys(G._rest).length; i++) {
-                                if (pathname.startsWith(Object.keys(G._rest)[i])) {
-                                    pathname = Object.keys(G._rest)[i];
-                                    mapingPath = G._rest[pathname];
-                                }
-                            }
-                            var realPathName = url_module.parse(req.url).pathname;
-                            if (!realPathName.endsWith('/')) {
-                                realPathName = realPathName + '/';
-                            }
-                            let s1 = realPathName;
-                            let s2 = mapingPath;
-                            s1 = s1.substring(s2.indexOf(":") - 1, s1.length - 1).split("/").slice(1)
-                            s2 = s2.substring(s2.indexOf(":") - 1, s2.length - 1).split("/:").slice(1)
-                            req.params = {};
-                            for (let i = 0; i < s2.length; i++) { req.params[s2[i]] = s1[i]; }
-                        } else {
-                            req.params = url_module.parse(req.url, true).query;
-                        }
                         G._begin(req, res);
                         if (!res.alreadySend) G['_' + method][pathname](req, res); /*执行方法*/
                     }
@@ -1131,8 +1131,28 @@ M.server = function () {
      */
     app.post = function (url, callback) {
         url = M.formatUrl(url);
+        var realUrl = url;
+        if (url.indexOf(":") > 0) {
+            url = url.substr(0, url.indexOf(":"));
+            G._rest[url] = realUrl;
+        }
         G._post[url] = callback;
     }
+
+    
+    /**
+     *注册任意请求方法的请求
+     */
+    app.mapping = function (url, callback) {
+        url = M.formatUrl(url);
+        var realUrl = url;
+        if (url.indexOf(":") > 0) {
+            url = url.substr(0, url.indexOf(":"));
+            G._rest[url] = realUrl;
+        }
+        G._mapping[url] = callback;
+    }
+
 
     M.formatUrl = function (url) {
         if (!url.endsWith('/')) {
@@ -1157,14 +1177,6 @@ M.server = function () {
     app.redirect = function (url, req, res) {
         res.writeHead(302, { 'Content-Type': 'text/html; charset=utf-8', 'Location': url });
         res.end();
-    }
-
-    /**
-     *注册任意请求方法的请求
-     */
-    app.mapping = function (url, callback) {
-        url = M.formatUrl(url);
-        G._mapping[url] = callback;
     }
 
     app.set = function (k, v) {
