@@ -20,8 +20,6 @@ app.get("/getById",(req,res)=>{
     console.log(req.params);
     res.send("ok");
 })
-
-
  ```
 
 #ming_node  cookie与session的处理  
@@ -66,20 +64,21 @@ app.get("/getSession",(req,res)=>{
 
 ```javascript
 M=require("ming_node")
-
 //代理配置
 M.httpProxy={
     host: '127.0.0.1', // 代理 IP
     port: 8888, // 代理端口
 }
-
 //请求之前拦截器
 M.httpBefore = (d) => {console.log(d);  return d }
 //请求之后拦截器
 M.httpEnd = (d) => { console.log("rrrrrr",d)}
-
 //公共 Queryparams
 M.reqComQueryparams={userId:123456}
+//公共 请求头
+M.reqComHeaders={"Content-Type":"application/json"}
+//请求cookie,也可以放到M.reqComHeaders里
+M.cookie = "JSESSIONID=" + "6E202D5A022EBD62705AA436EC54963B";
 
 //get请求
 M.get("http://baidu.com/pagelist",{name:"zs"}).then(d=>{
@@ -136,8 +135,7 @@ async function main(){
 
 #基于ming_node 的 ming_api_mock
 
-
-
+https://www.yuque.com/docs/share/fc8547e1-e815-4e50-817c-4829e3c76442?# 《ming_api_mock》
 
 #ming_node的使用详情,请到ming_node的主页查看
 
