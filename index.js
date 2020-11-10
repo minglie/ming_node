@@ -2,8 +2,8 @@
  * File : index.js
  * By : Minglie
  * QQ: 934031452
- * Date :2019.9.28
- * version :1.8.0
+ * Date :2020.11.10
+ * version :1.8.2
  */
 var http = require('http');
 var https = require('https');
@@ -988,7 +988,7 @@ M.server = function () {
             let r_cookie = Object.assign(o, cfg)
             res.setHeader("Set-Cookie", querystring.stringify(r_cookie, " ;"));
         }
-        if (req.session) {
+        if (true) {
             Object.defineProperty(req, 'session', {
                 set: function (o) {
                     let sessionValue = req.cookies.sessionid || M.randomStr();
@@ -997,7 +997,8 @@ M.server = function () {
                 },
                 get: function () {
                     return M.sessions[req.cookies.sessionid]
-                }
+                } , 
+                configurable:true
             })
         }
         //扩充res一个send方法
