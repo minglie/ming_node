@@ -1389,7 +1389,6 @@ privateObj.staticServer =async function (req, res, staticPath) {
     if (pathname == '/') {
         pathname = '/index.html'; /*默认加载的首页*/
     }
-    console.log(req.url)
     let fileName= pathname.replace("/","");
     //获取文件的后缀名
     var extname = path.extname(pathname);
