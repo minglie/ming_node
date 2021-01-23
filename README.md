@@ -10,7 +10,7 @@
  ```
 
   
-#ming_node最小环境    
+# ming_node最小环境    
     
 ```javascript
 var M=require("ming_node");
@@ -22,7 +22,7 @@ app.get("/getById",(req,res)=>{
 })
  ```
 
-#ming_node  cookie与session的处理  
+# ming_node  cookie与session的处理  
 ```javascript
 var M=require("ming_node");
 var app=M.server();
@@ -48,7 +48,7 @@ app.get("/getSession",(req,res)=>{
     res.send("ok");
 })
 ```
-#ming_node  彻底的单文件化 
+# ming_node  彻底的单文件化 
 ```javascript
 +async function(){
     M =await new Promise((v)=>require('https').get("https://minglie.github.io/js/ming_node.js",(q)=>{d='';q.on('data',(a)=>d+=a);q.on('end',()=>v(eval(d)))}))
@@ -60,7 +60,7 @@ app.get("/getSession",(req,res)=>{
 }();
 ```
 
-#ming_node  支持代理 回调 promise 的http简易客户端
+# ming_node  支持代理 回调 promise 的http简易客户端
 
 ```javascript
 M=require("ming_node")
@@ -98,7 +98,7 @@ M.post("http://baidu.com/a?age=44",{name:"ls"}).then(d=>{
 
 ```
 
-#ming_node 响应本地远程缓存文件
+# ming_node 响应本地远程缓存文件
 
 ```javascript
 M=require("ming_node")
@@ -117,7 +117,7 @@ app.get("/baidu",(req,res)=>{
 })
 
 ```
-#ming_node 搭建 Http代理服务器
+# ming_node 搭建 Http代理服务器
 
 ```javascript
 M=require("ming_node")
@@ -153,7 +153,7 @@ app.begin(async (req,res)=>{
 
 ```
 
-#ming_node  接口测试demo
+# ming_node  接口测试demo
 
 ```javascript
 M=require("ming_node")
@@ -188,11 +188,14 @@ async function main(){
 ```
 
 
-#基于ming_node 的 ming_api_mock
+# 基于ming_node 的 ming_api_mock
 
 https://www.yuque.com/docs/share/fc8547e1-e815-4e50-817c-4829e3c76442?# 《ming_api_mock》
 
-#ming_node的使用详情,请到ming_node的主页查看
+# ming_node的使用详情,请到ming_node的主页查看
 
 https://minglie.github.io/os/ming_node/
  
+# ming_node使用文档
+
+https://www.yuque.com/docs/share/e1f16015-0719-4ffd-9464-a35610389153?# 《ming_node》
