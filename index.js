@@ -2,8 +2,8 @@
  * File : index.js
  * By : Minglie
  * QQ: 934031452
- * Date :2020.11.10
- * version :1.8.2
+ * Date :2019.9.28
+ * version :1.9.0
  */
 var http = require('http');
 var https = require('https');
@@ -31,8 +31,16 @@ M.log_display_time = true;//日志是否显示当前时间
 M.httpProxy = {};// http 代理配置
 M.httpBefore = (d) => { return d }
 M.httpEnd = (d) => { }
-
-
+//全局缓存map
+M._globle_cacheMap={}
+//远程静态资源路径
+M.remoteStaticPath="https://minglie.gitee.io/mingpage/static";
+M.remoteStaticPathEnable=true;
+//代理服务器配置
+M.proxyHost="http://127.0.0.1:8888"
+M.proxyHost=""
+//启用静态资源代理
+M.enableProxyStatucResource=true;
 
 /**
  * ----------------------客户端START--------------------------------------------
@@ -796,6 +804,89 @@ M.log = function (...params) {
     }
 }
 
+
+
+
+M.getSqlite=function(dbName){
+	if(M.sqlite){
+		return M.sqlite;
+	}
+    var SQLite3 = require('sqlite3').verbose();
+    var Db = new SQLite3.Database(dbName||"ming_autotest.db");
+    Db.doSql=function doSql(sql){
+        var promise = new Promise(function(reslove,reject){
+            if(Db.display_sql_enable) {
+                M.log(sql)
+            }
+            if(sql.indexOf("select")>-1){
+                Db.all(sql,
+                    function(err, result) {
+                        if (err) {
+                            M.log(err);
+                            reject(err);
+                        } else {
+                            reslove(result);
+                        }
+                    });
+            }else{
+                Db.run(sql,
+                    function(err) {
+                        if(err){
+                            // M.log(err);
+                            reject(err);
+                        }
+                        reslove(null);
+                    });
+            }
+        })
+        return promise;
+    }
+    M.sqlite=Db;
+    return Db;
+}
+
+///////////////////////////////
+
+
+M.getMySql=function(dbConfig){
+	if(M.mysql){
+        return  M.mysql;
+	}
+    var mysql  = require('mysql');
+    let  defaultDbConfig={
+            "host"     : dbConfig.host|| "localhost",
+            "user"     : dbConfig.user||"root",
+            "password" : dbConfig.password||"123456",
+            "port"     : dbConfig.usporter|| "3306",
+            "database" : dbConfig.database||"miapi",
+            multipleStatements: true,
+            dateStrings : true ,
+            timezone: "08:00"
+    }
+    var Db = {};
+    console.log("connect mysql",defaultDbConfig)
+    var pool = mysql.createPool(defaultDbConfig);
+    Db.doSql=function(sql,params){
+        var promise = new Promise(function(reslove,reject){      
+            pool.getConnection(function(err, connection){
+                connection.query( sql,params, function(err, rows){
+                    if(err) {
+                        console.error(err);
+                        reject(err);
+                    }else{
+                        reslove(rows);
+                    }
+                });
+                
+                connection.release();
+              });
+        })
+        return promise;
+    }
+    M.mysql=Db;
+    return Db;
+}
+
 /**
  * ----------------------Sql CRUD  START-------------------------------------------
  */
@@ -1003,6 +1094,7 @@ M.server = function () {
         }
         //扩充res一个send方法
         res.send = function (data) {
+            res.alreadySend = true;
             res.setHeader("Access-Control-Allow-Origin", "*");
             res.setHeader("Access-Control-Allow-Headers", "X-Requested-With");
             res.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
@@ -1010,8 +1102,35 @@ M.server = function () {
             res.setHeader("Content-Type", "application/json;charset=utf-8");
             res.end(data);
             G._end(data);
-            res.alreadySend = true;
         }
+         //扩充res一个renderByUrl方法
+         res.renderUrl =async function (url) {
+            res.alreadySend = true;
+            let text= await M.getRemoteCacheByUrl(url)
+            var pathname = url_module.parse(req.url).pathname;   /*获取url的值*/
+            //获取文件的后缀名
+            var extname = path.extname(pathname);
+            res.writeHead(200, { "Content-Type": "" + (privateObj.staticMime[extname] || 'text/html') + ";charset='utf-8'", });
+            res.write(text);
+            res.end();
+        }
+        //扩充res一个renderJs方法
+        res.renderJs = function (text) {
+            res.alreadySend = true;
+            res.writeHead(200, { "Content-Type":"application/javascript" });
+            res.write(text);
+            res.end();
+           
+        }
+         //扩充res一个renderHtml方法
+         res.renderHtml = function (text) {
+            res.alreadySend = true;
+            res.writeHead(200, { "Content-Type": "text/html;charset='utf-8'" });
+            res.write(text);
+            res.end();
+        }
+
+
         try {
             //获取路由
             var pathname = url_module.parse(req.url).pathname;
@@ -1192,14 +1311,104 @@ M.server = function () {
 
     return app;
 }
+/**
+ * 代理服务器start
+ */
+M.getAxiosConfig=async (req)=>{
+    return new Promise((resolve,reject) => {
+    let axiosConfig={}
+    axiosConfig.url=M.proxyHost+req.url
+    axiosConfig.method=req.method.toLocaleLowerCase();
+    axiosConfig.headers=req.headers
+    let postStr = '';
+    req.on('data', function (chunk) {
+        postStr += chunk;  
+    })
+    req.on('end', function (err, chunk) {
+        req.body = postStr;  /*表示拿到post的值*/
+        postData = "";
+        try {
+            if(req.body.indexOf("=")==-1){
+                postData = JSON.parse(req.body);
+            }else{
+                postData = url_module.parse("?" + req.body, true).query;
+            }
+        } catch (e) {
+        }
+        axiosConfig.data=postData;
+        axiosConfig.body=req.body;
+        resolve(axiosConfig)
+     })
+   })
+}
 
-privateObj.staticServer = function (req, res, staticPath) {
+M.axios = function (axiosConfig) {
+    axiosConfig.headers.host="";
+    var urlObj = url_module.parse(axiosConfig.url)
+    var options = {
+        hostname: urlObj.hostname,
+        port: urlObj.port,
+        path: urlObj.path,
+        method: axiosConfig.method.toLocaleUpperCase(),
+        headers: axiosConfig.headers
+    }
+    let reqHttp = http;
+    if (axiosConfig.url.startsWith("https")) {
+        reqHttp = https;
+    }
+    var html = '';
+    return new Promise((resolve, reject) => {
+        var req = reqHttp.request(options, function (res) {
+            options = M.httpBefore(options);
+            if (options == false) {
+                return;
+            }
+            res.setEncoding('utf-8');
+            res.on('data', function (chunk) {
+                html += chunk;
+            });
+            res.on('end', function () {
+                M.httpEnd(html);
+                resolve(html);
+            });
+
+        });
+        req.on('error', function (err) {
+            console.error(err);
+        });
+        req.write(axiosConfig.body);
+        req.end();
+    })
+}
+/**
+ * 代理服务器end
+ */
+privateObj.staticServer =async function (req, res, staticPath) {
+    if (res.alreadySend) return;
     var pathname = url_module.parse(req.url).pathname;   /*获取url的值*/
     if (pathname == '/') {
         pathname = '/index.html'; /*默认加载的首页*/
     }
+    console.log(req.url)
+    let fileName= pathname.replace("/","");
     //获取文件的后缀名
     var extname = path.extname(pathname);
+
+    if(fileName.startsWith("__default_")){
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "X-Requested-With");
+        res.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
+        res.setHeader("X-Powered-By", ' 3.2.1')
+        res.writeHead(200, { "Content-Type": "" + (privateObj.staticMime[extname] || 'text/html') + ";charset='utf-8'", });
+        res.write(M.__default_file[fileName]);
+        res.end(); /*结束响应*/
+        return;
+    }
+    if( M.remoteStaticPathEnable && req.url.endsWith("remote=true")){
+        if (!res.alreadySend)await res.renderUrl(M.remoteStaticPath+pathname)
+        return;
+    }
+
     if (pathname != '/favicon.ico') {  /*过滤请求favicon.ico*/
         //文件操作获取 static下面的index.html
         fs.readFile(staticPath + '/' + pathname, function (err, data) {
@@ -1818,11 +2027,53 @@ privateObj.staticMime = {
     ".z": "application/x-compress",
     ".zac": "application/x-zaurus-zac",
     ".zip": "application/zip",
-    ".json": "application/json"
+    ".json": "application/json",
+    ".go": "application/go",
+    ".properties": "application/properties",
+    ".yaml": "application/yaml",
+    ".bat": "application/bat",
+    ".sh": "application/sh",
+    ".vue": "application/vue",
+    ".less": "application/less",
+    ".sass": "application/sass",
+    ".csv": "application/csv",
+    ".lua": "application/lua",
+    ".apex": "application/apex",
+    ".azcli": "application/azcli",
+    ".clojure": "application/clojure",
+    ".coffee": "application/coffee",
+    ".cs": "application/cs",
+    ".csp": "application/csp",
+    ".dockerfile": "application/dockerfile",
+    ".fsharp": "application/fsharp",
+    ".handlebars": "text/plain",
+    ".ini": "text/plain",
+    ".md": "text/plain",
+    ".perl": "text/plain",
+    ".php": "text/plain",
+    ".py": "text/plain",
+    ".redis": "text/plain",
+    ".conf": "text/conf",
+    ".sql": "text/sql"
 }
 
 M.test = function () {
     console.log(privateObj.staticMime[".jssson"] || "aa")
+}
+
+M.getRemoteCacheByUrl=async function(url){
+    if(url in M._globle_cacheMap){
+        return M._globle_cacheMap[url];
+    }
+    let text="";
+    if(url.startsWith("file:")){
+        text= M.readFile(url.substring(5));
+    }else{
+        text=await M.get(url);
+    }
+    console.log("req remote url:",url);
+    M._globle_cacheMap[url]=text;
+    return text;
 }
 
 M.init = function () {
@@ -1885,6 +2136,3 @@ M.init = function () {
 M.init();
 
 module.exports = M;
-
-
-
