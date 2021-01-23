@@ -5,7 +5,7 @@
     ming_node是用于快速构建web服务与接口测试的工具库,使用方法与express非常类似,并且ming_node只有一个文件,ming_node可以随用随扔而又让人不感到可惜,ming_node的web服务部分是参照express来写的.
 # 安装
 ## 更新日志
-最新稳定版本：v1.8.2
+最新稳定版本：v1.9.1
 项目主页 [GitHub](https://minglie.github.io/os/ming_node/)
 每个版本的更新日志 [GitHub](https://github.com/minglie/ming_node/releases)
 项目地址 [GitHub](https://github.com/minglie/ming_node)
@@ -245,6 +245,32 @@ M.getUpdateObjSql(tableName,obj,caseObj)
 M.getSelectObjSql(tableName,obj)
 
 ```
+
+
+```
+# Db操作
+ming_node对Db进行动态加载,使用前需要安装mysql或sqlite3
+## mysql
+```json
+M = require("ming_node");
+myDbconfig={
+    //  "host"     : "127.0.0.1",
+    //         "user"     : "root",
+    //         "password" : "123456",
+    //         "port"     : "3306",
+       
+     "database" : "miapi"
+}
+Db=M.getMySql(myDbconfig);
+Db.doSql(`select 1`).then(d=>console.log(d))
+```
+## sqllite3
+```json
+M = require("ming_node");
+Db=M.getSqlite("ming_autotest.db");
+Db.doSql(`select 1`).then(d=>console.log(d))
+```
+
 # hook函数
     ming_node内置了大量的hook函数,用于在处于特定场景下,让外部来定义执行的行为，实际上服务接口的注册也属于hook函数，在特定的场景下这些hook函数才会被执行到
 ```javascript
@@ -525,6 +551,65 @@ app.post(`/upload`,  (req,res) =>{
 ![image.png](https://ming-bucket-01.oss-cn-beijing.aliyuncs.com/yuque/1553357865829-c7b3538d-2715-47db-8b61-3069fc8bea2d.png#align=left&display=inline&height=597&margin=%5Bobject%20Object%5D&name=image.png&originHeight=597&originWidth=1036&size=99564&status=done&style=none&width=1036)
 
 
+
+##  响应本地远程缓存文件
+```javascript
+M=require("ming_node")
+var app=M.server();
+app.listen(8888);
+app.get("/baidu",(req,res)=>{ 
+    console.log(req.params);
+    //响应html文本
+   // res.renderHtml("hello woed")
+   //响应js文本
+    //res.renderJs("alert(5)")
+    //响应本地文件
+    //res.renderUrl("file:D:/G/ming_node/test/test.html");
+    //响应百度首页
+    res.renderUrl("https://www.baidu.com/index.html");
+})
+```
+# 代理服务器
+```javascript
+M=require("ming_node")
+var app=M.server();
+app.listen(9999);
+M.proxyHost="http://127.0.0.1:8888"
+M.proxyHost=""
+//启用静态资源代理
+M.enableProxyStatucResource=true;
+//忽略代理的地址
+ignoreUrlList=["/","/favicon.ico"]
+
+app.begin(async (req,res)=>{
+    if(ignoreUrlList.indexOf(req.url)>-1||req.url.startsWith("/_")||req.url.startsWith("/.")){
+        return;
+    }
+    if(req.isStaticRequest()){
+        if(M.enableProxyStatucResource){
+            res.renderUrl(M.proxyHost+req.url);
+        }
+        return;
+    }
+    res.alreadySend = true;
+    //转换为axios格式
+    let axiosConfig=await M.getAxiosConfig(req);
+    console.log("====>",JSON.stringify(axiosConfig))
+    //发出请求
+    let result=await M.axios(axiosConfig)
+    console.log("<======",result)
+    console.log("---------------------------")
+    res.send(result);
+})
+```
+# 本地静态资源转发
+    本地请求"./a.js?remote=true"  的静态资源会转发到 [https://minglie.gitee.io/mingpage](https://minglie.gitee.io/mingpage)/a.js
+
+
+**M.remoteStaticPathEnable=false则关闭转发**
+```json
+M.remoteStaticPath="https://minglie.gitee.io/mingpage";
+```
 
 
 # cookie,session的处理
