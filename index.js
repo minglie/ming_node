@@ -786,6 +786,59 @@ M.readCsvLine = function (file, callback) {
 
 
 
+M.geFileList= function(path)
+{
+    //遍历读取文件
+    function readFile(path,filesList,targetObj)
+    {
+       files = fs.readdirSync(path);//需要用到同步读取
+       files.forEach(walk);
+       function walk(file)
+       {  
+            states = fs.statSync(path+'/'+file);         
+            if(states.isDirectory())
+            {
+                var item ;
+                if(targetObj["children"])
+                {
+                    item ={name:file,children:[],value:path+'/'+file};
+                    targetObj["children"].push(item);
+                }
+                else
+                {
+                   item = {name:file,children:[],value:path+'/'+file};
+                   filesList.push(item);
+                }
+
+                readFile(path+'/'+file,filesList,item);
+            }
+            else
+            {   
+                //创建一个对象保存信息
+                var obj = new Object();
+                obj.size = states.size;//文件大小，以字节为单位
+                obj.name = file;//文件名
+                obj.path = path+'/'+file; //文件绝对路径
+
+                if(targetObj["children"])
+                {
+                   var item = {name:file,value:obj.path}
+                   targetObj["children"].push(item);
+                }
+                else
+                {
+                    var item = {name:file,value:obj.path};
+                    filesList.push(item);
+                }
+            }     
+        }
+    }
+       var filesList = [];
+       var targetObj = {};
+       readFile(path,filesList,targetObj);
+       return filesList;
+}
+
 M.log = function (...params) {
     if (Array.isArray(params[0]) || typeof params[0] == 'object') {
         params = [JSON.stringify(params[0])]
@@ -1111,7 +1164,7 @@ M.server = function () {
             //获取文件的后缀名
             var extname = path.extname(pathname);
             res.writeHead(200, { "Content-Type": "" + (privateObj.staticMime[extname] || 'text/html') + ";charset='utf-8'", });
-            res.write(text);
+            res.write(text.toString());
             res.end();
         }
         //扩充res一个renderJs方法
