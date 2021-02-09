@@ -39,9 +39,6 @@ M.remoteStaticPathEnable=true;
 //代理服务器配置
 M.proxyHost="http://127.0.0.1:8888"
 M.proxyHost=""
-//启用静态资源代理
-M.enableProxyStatucResource=true;
-
 /**
  * ----------------------客户端START--------------------------------------------
  */
@@ -786,7 +783,7 @@ M.readCsvLine = function (file, callback) {
 
 
 
-M.geFileList= function(path)
+M.getFileList= function(path)
 {
     //遍历读取文件
     function readFile(path,filesList,targetObj)
@@ -1148,23 +1145,40 @@ M.server = function () {
         //扩充res一个send方法
         res.send = function (data) {
             res.alreadySend = true;
-            res.setHeader("Access-Control-Allow-Origin", "*");
-            res.setHeader("Access-Control-Allow-Headers", "X-Requested-With");
+            let isString=  "[object String]"===Object.prototype.toString.call(data)
+            if(!isString){
+                data=JSON.stringify(data);
+            } 
+            let requestOrigin="*";
+            if(req.headers["origin"]){
+                requestOrigin=req.headers["origin"];
+            }
+            let requestHeaders="X-Requested-With";
+            if(req.headers['access-control-request-headers']){
+                requestHeaders=req.headers['access-control-request-headers'];
+            }
+            res.setHeader("Access-Control-Allow-Origin", requestOrigin);
+            res.setHeader("Access-Control-Allow-Headers", requestHeaders);
             res.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
+            res.setHeader("Access-Control-Allow-Credentials","true");
             res.setHeader("X-Powered-By", ' 3.2.1')
             res.setHeader("Content-Type", "application/json;charset=utf-8");
             res.end(data);
             G._end(data);
         }
-         //扩充res一个renderByUrl方法
-         res.renderUrl =async function (url) {
+        //扩充res一个renderByUrl方法
+        res.renderUrl =async function (url) {
             res.alreadySend = true;
             let text= await M.getRemoteCacheByUrl(url)
-            var pathname = url_module.parse(req.url).pathname;   /*获取url的值*/
+            let isString=  "[object String]"===Object.prototype.toString.call(text)
+            if(!isString){
+                text=JSON.stringify(text);
+            } 
+            var pathname = url_module.parse(url).pathname;   /*获取url的值*/
             //获取文件的后缀名
             var extname = path.extname(pathname);
             res.writeHead(200, { "Content-Type": "" + (privateObj.staticMime[extname] || 'text/html') + ";charset='utf-8'", });
-            res.write(text.toString());
+            res.write(text);
             res.end();
         }
         //扩充res一个renderJs方法
