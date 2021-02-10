@@ -198,6 +198,23 @@ M.getAttribute(K)
 //可以按行读取file的内容,callback的参数就是每一行的内容
 M.readLine(file, callback)
 ```
+## 递归遍历目录
+```bash
+r= M.getFileList("D:/G/gitee/ming_api_mock/plugins/ming_mock_injection/best_base_crud")
+```
+返回格式
+```json
+{
+    "name": "youhouway2",
+    "children": [
+        {
+            "name": "hook.js",
+            "value": "D:/G/gitee/ming_api_mock/plugins/ming_mock_injection/best_base_crud/youhouway2/hook.js"
+        }
+    ],
+    "value": "D:/G/gitee/ming_api_mock/plugins/ming_mock_injection/best_base_crud/youhouway2"
+}
+```
 ## CSV文件解析
 ```javascript
 //可以按行读取file的内容,callback的参数就是每一行的内容用逗号分割形成的数组
