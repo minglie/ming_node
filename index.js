@@ -907,7 +907,7 @@ M.getMySql=function(dbConfig){
             "host"     : dbConfig.host|| "localhost",
             "user"     : dbConfig.user||"root",
             "password" : dbConfig.password||"123456",
-            "port"     : dbConfig.usporter|| "3306",
+            "port"     : dbConfig.port|| "3306",
             "database" : dbConfig.database||"miapi",
             multipleStatements: true,
             dateStrings : true ,

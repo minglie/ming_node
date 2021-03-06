@@ -8,6 +8,9 @@
  ```sh
  $ npm i ming_node -D --registry=https://registry.npm.taobao.org
  ```
+# cdn
+
+https://unpkg.com/ming_node@1.9.3/index.js
 
   
 # ming_node最小环境    
