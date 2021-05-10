@@ -29,16 +29,19 @@ M.map_path = "./M_map.json";//全局作用域路径
 M.database_path = "./M_database.json";//文件型数据库路径
 M.log_display_time = true;//日志是否显示当前时间
 M.httpProxy = {};// http 代理配置
-M.httpBefore = (d) => { return d }
-M.httpEnd = (d) => { }
+M.httpBefore = (d) => {
+    return d
+}
+M.httpEnd = (d) => {
+}
 //全局缓存map
-M._globle_cacheMap={}
+M._globle_cacheMap = {}
 //远程静态资源路径
-M.remoteStaticPath="https://minglie.gitee.io/mingpage/static";
-M.remoteStaticPathEnable=true;
+M.remoteStaticPath = "https://minglie.gitee.io/mingpage/static";
+M.remoteStaticPathEnable = true;
 //代理服务器配置
-M.proxyHost="http://127.0.0.1:8888"
-M.proxyHost=""
+M.proxyHost = "http://127.0.0.1:8888"
+M.proxyHost = ""
 /**
  * ----------------------客户端START--------------------------------------------
  */
@@ -53,7 +56,7 @@ privateObj.getFunctionOrObjResult = function (objOrFunc, obj) {
     } else {
         c1 = objOrFunc;
     }
-    return Object.assign(obj,c1);
+    return Object.assign(obj, c1);
 }
 
 //将对象追加到url上
@@ -79,10 +82,11 @@ M.get = function (url, callback, data, headers) {
     } else {
         headers = data || {};
         data = callback;
-        callback = () => { };
+        callback = () => {
+        };
     }
-    if (headers) { }
-    else {
+    if (headers) {
+    } else {
         headers = {
             'Content-Type': 'application/json',
             'Cookie': M.cookie
@@ -113,7 +117,7 @@ M.get = function (url, callback, data, headers) {
     if (Object.keys(M.httpProxy).length > 0) {
         options.host = M.httpProxy.host;
         options.port = M.httpProxy.port;
-        options.path = url+getData;
+        options.path = url + getData;
         delete options.hostname;
     }
     let reqHttp = http;
@@ -165,7 +169,8 @@ M.post = function (url, callback, data, headers) {
     } else {
         headers = data || {};
         data = callback;
-        callback = () => { };
+        callback = () => {
+        };
     }
 
     url = privateObj.appendDataToUrl(url, M.reqComQueryparams);
@@ -178,8 +183,7 @@ M.post = function (url, callback, data, headers) {
         if (headers["Content-Type"] == "application/json") {
             postData = JSON.stringify(data);
         }
-    }
-    else {
+    } else {
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded; ' +
                 'charset=UTF-8',
@@ -255,7 +259,8 @@ M.postJson = function (url, callback, data, headers) {
     } else {
         headers = data || {};
         data = callback;
-        callback = () => { };
+        callback = () => {
+        };
     }
     url = privateObj.appendDataToUrl(url, M.reqComQueryparams);
     var html = '';
@@ -331,8 +336,6 @@ M.postJson = function (url, callback, data, headers) {
 }
 
 
-
-
 M.getHttps = function (url, callback, data) {
     var getData = "";
     if (data) {
@@ -370,7 +373,9 @@ M.require = function (url) {
     let promise = new Promise(function (reslove, reject) {
         require(ht).get(url, function (req, res) {
             var d = '';
-            req.on('data', (data) => { d += data; });
+            req.on('data', (data) => {
+                d += data;
+            });
             req.on('end', () => {
                 let r = "";
                 try {
@@ -506,13 +511,9 @@ M.template = function (str) {
 }
 
 
-
 /**
  * ----------------------客户端END--------------------------------------------
  */
-
-
-
 
 
 /**
@@ -594,7 +595,7 @@ M.appendFile = function (file, str) {
     fs.appendFileSync(file, str);
 }
 /**
-  文件型数据库第一层封装
+ 文件型数据库第一层封装
  */
 M.getObjByFile = function (file) {
     data = M.readFile(file) || "[]"
@@ -725,7 +726,7 @@ M.listByPage = function (startPage, limit, caseObj) {
     }
     let total = rows.length;
     rows = rows.splice((startPage - 1) * limit, limit)
-    return { rows, total }
+    return {rows, total}
 }
 /**
  * 全局作用域
@@ -782,58 +783,47 @@ M.readCsvLine = function (file, callback) {
 }
 
 
-
-M.getFileList= function(path)
-{
+M.getFileList = function (path) {
     //遍历读取文件
-    function readFile(path,filesList,targetObj)
-    {
-       files = fs.readdirSync(path);//需要用到同步读取
-       files.forEach(walk);
-       function walk(file)
-       {  
-            states = fs.statSync(path+'/'+file);         
-            if(states.isDirectory())
-            {
-                var item ;
-                if(targetObj["children"])
-                {
-                    item ={name:file,children:[],value:path+'/'+file};
+    function readFile(path, filesList, targetObj) {
+        files = fs.readdirSync(path);//需要用到同步读取
+        files.forEach(walk);
+
+        function walk(file) {
+            states = fs.statSync(path + '/' + file);
+            if (states.isDirectory()) {
+                var item;
+                if (targetObj["children"]) {
+                    item = {name: file, children: [], value: path + '/' + file};
                     targetObj["children"].push(item);
-                }
-                else
-                {
-                   item = {name:file,children:[],value:path+'/'+file};
-                   filesList.push(item);
+                } else {
+                    item = {name: file, children: [], value: path + '/' + file};
+                    filesList.push(item);
                 }
 
-                readFile(path+'/'+file,filesList,item);
-            }
-            else
-            {   
+                readFile(path + '/' + file, filesList, item);
+            } else {
                 //创建一个对象保存信息
                 var obj = new Object();
                 obj.size = states.size;//文件大小，以字节为单位
                 obj.name = file;//文件名
-                obj.path = path+'/'+file; //文件绝对路径
+                obj.path = path + '/' + file; //文件绝对路径
 
-                if(targetObj["children"])
-                {
-                   var item = {name:file,value:obj.path}
-                   targetObj["children"].push(item);
-                }
-                else
-                {
-                    var item = {name:file,value:obj.path};
+                if (targetObj["children"]) {
+                    var item = {name: file, value: obj.path}
+                    targetObj["children"].push(item);
+                } else {
+                    var item = {name: file, value: obj.path};
                     filesList.push(item);
                 }
-            }     
+            }
         }
     }
-       var filesList = [];
-       var targetObj = {};
-       readFile(path,filesList,targetObj);
-       return filesList;
+
+    var filesList = [];
+    var targetObj = {};
+    readFile(path, filesList, targetObj);
+    return filesList;
 }
 
 M.log = function (...params) {
@@ -855,22 +845,20 @@ M.log = function (...params) {
 }
 
 
-
-
-M.getSqlite=function(dbName){
-	if(M.sqlite){
-		return M.sqlite;
-	}
+M.getSqlite = function (dbName) {
+    if (M.sqlite) {
+        return M.sqlite;
+    }
     var SQLite3 = require('sqlite3').verbose();
-    var Db = new SQLite3.Database(dbName||"ming_autotest.db");
-    Db.doSql=function doSql(sql){
-        var promise = new Promise(function(reslove,reject){
-            if(Db.display_sql_enable) {
+    var Db = new SQLite3.Database(dbName || "ming_autotest.db");
+    Db.doSql = function doSql(sql) {
+        var promise = new Promise(function (reslove, reject) {
+            if (Db.display_sql_enable) {
                 M.log(sql)
             }
-            if(sql.indexOf("select")>-1){
+            if (sql.indexOf("select") > -1) {
                 Db.all(sql,
-                    function(err, result) {
+                    function (err, result) {
                         if (err) {
                             M.log(err);
                             reject(err);
@@ -878,10 +866,10 @@ M.getSqlite=function(dbName){
                             reslove(result);
                         }
                     });
-            }else{
+            } else {
                 Db.run(sql,
-                    function(err) {
-                        if(err){
+                    function (err) {
+                        if (err) {
                             // M.log(err);
                             reject(err);
                         }
@@ -891,49 +879,49 @@ M.getSqlite=function(dbName){
         })
         return promise;
     }
-    M.sqlite=Db;
+    M.sqlite = Db;
     return Db;
 }
 
 ///////////////////////////////
 
 
-M.getMySql=function(dbConfig){
-	if(M.mysql){
-        return  M.mysql;
-	}
-    var mysql  = require('mysql');
-    let  defaultDbConfig={
-            "host"     : dbConfig.host|| "localhost",
-            "user"     : dbConfig.user||"root",
-            "password" : dbConfig.password||"123456",
-            "port"     : dbConfig.port|| "3306",
-            "database" : dbConfig.database||"miapi",
-            multipleStatements: true,
-            dateStrings : true ,
-            timezone: "08:00"
+M.getMySql = function (dbConfig) {
+    if (M.mysql) {
+        return M.mysql;
+    }
+    var mysql = require('mysql');
+    let defaultDbConfig = {
+        "host": dbConfig.host || "localhost",
+        "user": dbConfig.user || "root",
+        "password": dbConfig.password || "123456",
+        "port": dbConfig.port || "3306",
+        "database": dbConfig.database || "miapi",
+        multipleStatements: true,
+        dateStrings: true,
+        timezone: "08:00"
     }
     var Db = {};
-    console.log("connect mysql",defaultDbConfig)
+    console.log("connect mysql", defaultDbConfig)
     var pool = mysql.createPool(defaultDbConfig);
-    Db.doSql=function(sql,params){
-        var promise = new Promise(function(reslove,reject){      
-            pool.getConnection(function(err, connection){
-                connection.query( sql,params, function(err, rows){
-                    if(err) {
+    Db.doSql = function (sql, params) {
+        var promise = new Promise(function (reslove, reject) {
+            pool.getConnection(function (err, connection) {
+                connection.query(sql, params, function (err, rows) {
+                    if (err) {
                         console.error(err);
                         reject(err);
-                    }else{
+                    } else {
                         reslove(rows);
                     }
                 });
-                
+
                 connection.release();
-              });
+            });
         })
         return promise;
     }
-    M.mysql=Db;
+    M.mysql = Db;
     return Db;
 }
 
@@ -1001,11 +989,9 @@ M.getSelectObjSql = function (tableName, obj) {
  */
 
 
-
 /**
  * ----------------------数据持久化读写END--------------------------------------------
  */
-
 
 
 /**
@@ -1014,17 +1000,18 @@ M.getSelectObjSql = function (tableName, obj) {
 /**
  *封装返回数据
  */
-M.result = function (data, success) {
+M.result = function (data, success,message) {
     var r = {};
     if (success == false) {
         r.code = 3003;
-        r.message = "操作失败";
+        r.message = message||"操作失败";
         r.success = success;
     } else {
         r.code = 3002;
-        r.message = "操作成功"
+        r.message = message||"操作成功"
         r.success = true;
     }
+    r.requestId=M.req.requestId;
     try {
         var obj = JSON.parse(data);
         if (typeof obj == 'object' && obj) {
@@ -1076,6 +1063,7 @@ M.err = function (e) {
 }
 
 
+
 M.server = function () {
     var G = this;   /*全局变量,也就是M*/
     //静态资源路径
@@ -1087,118 +1075,157 @@ M.server = function () {
     this._post = {};
     this._mapping = {};
     //用于模拟过滤器
-    this._begin = function () { }
+    this._begin = function () {
+    }
     //服务器响应后的钩子函数
-    this._end = function () { }
+    this._end = function () {
+    }
     //如果实现此函数,则只能有一个此服务
-    this._server = function () { };
+    this._server = function () {
+    };
     var app = function (req, res) {
-        //是否已经发送过了
-        res.alreadySend = false;
-        //是否为静态资源请求
-        req.isStaticRequest = function () {
-            if (req.url.indexOf("?") > 0) {
-                return privateObj.staticMime[path.extname(req.url.substr(0, req.url.indexOf("?")))];
-            } else {
-                return privateObj.staticMime[path.extname(req.url)];
-            }
-        }
-        //是否为rest请求
-        req.isGetRestRequest = function () {
-            if (Object.keys(G._rest).length == 0) return false;
-            var isRest = false;
-            for (let i = 0; i < Object.keys(G._rest).length; i++) {
-                if (pathname.startsWith(Object.keys(G._rest)[i])) {
-                    isRest = true;
-                    break;
+        try {
+            //是否已经发送过了
+            res.alreadySend = false;
+            req.requestId=M.randomStr();
+            M.req=req;
+            M.res=res;
+            //是否为静态资源请求
+            req.isStaticRequest = function () {
+                if (req.url.indexOf("?") > 0) {
+                    return privateObj.staticMime[path.extname(req.url.substr(0, req.url.indexOf("?")))];
+                } else {
+                    return privateObj.staticMime[path.extname(req.url)];
                 }
             }
-            return  isRest;
-        }
-
-        req.ip = req.headers['x-forwarded-for'] ||
-            req.connection.remoteAddress ||
-            req.socket.remoteAddress ||
-            req.connection.socket.remoteAddress;
-        //请求cookies封装
-        req.cookies = querystring.parse(req.headers['cookie'], "; ");
-        //设置浏览器cookies
-        res.cookie = function (key, value, cfg) {
-            let o = {}
-            o[key] = value;
-            let r_cookie = Object.assign(o, cfg)
-            res.setHeader("Set-Cookie", querystring.stringify(r_cookie, " ;"));
-        }
-        if (true) {
-            Object.defineProperty(req, 'session', {
-                set: function (o) {
-                    let sessionValue = req.cookies.sessionid || M.randomStr();
-                    res.cookie("sessionid", sessionValue)
-                    M.sessions[sessionValue] = o;
-                },
-                get: function () {
-                    return M.sessions[req.cookies.sessionid]
-                } , 
-                configurable:true
-            })
-        }
-        //扩充res一个send方法
-        res.send = function (data) {
-            res.alreadySend = true;
-            let isString=  "[object String]"===Object.prototype.toString.call(data)
-            if(!isString){
-                data=JSON.stringify(data);
-            } 
-            let requestOrigin="*";
-            if(req.headers["origin"]){
-                requestOrigin=req.headers["origin"];
+            //是否为rest请求
+            req.isGetRestRequest = function () {
+                if (Object.keys(G._rest).length == 0) return false;
+                var isRest = false;
+                for (let i = 0; i < Object.keys(G._rest).length; i++) {
+                    if (pathname.startsWith(Object.keys(G._rest)[i])) {
+                        isRest = true;
+                        break;
+                    }
+                }
+                return isRest;
             }
-            let requestHeaders="X-Requested-With";
-            if(req.headers['access-control-request-headers']){
-                requestHeaders=req.headers['access-control-request-headers'];
+
+            req.ip = req.headers['x-forwarded-for'] ||
+                req.connection.remoteAddress ||
+                req.socket.remoteAddress ||
+                req.connection.socket.remoteAddress;
+            //请求cookies封装
+            req.cookies = querystring.parse(req.headers['cookie'], "; ");
+            //设置浏览器cookies
+            res.cookie = function (key, value, cfg) {
+                let o = {}
+                o[key] = value;
+                let r_cookie = Object.assign(o, cfg)
+                res.setHeader("Set-Cookie", querystring.stringify(r_cookie, " ;"));
             }
-            res.setHeader("Access-Control-Allow-Origin", requestOrigin);
-            res.setHeader("Access-Control-Allow-Headers", requestHeaders);
-            res.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
-            res.setHeader("Access-Control-Allow-Credentials","true");
-            res.setHeader("X-Powered-By", ' 3.2.1')
-            res.setHeader("Content-Type", "application/json;charset=utf-8");
-            res.end(data);
-            G._end(data);
-        }
-        //扩充res一个renderByUrl方法
-        res.renderUrl =async function (url) {
-            res.alreadySend = true;
-            let text= await M.getRemoteCacheByUrl(url)
-            let isString=  "[object String]"===Object.prototype.toString.call(text)
-            if(!isString){
-                text=JSON.stringify(text);
-            } 
-            var pathname = url_module.parse(url).pathname;   /*获取url的值*/
-            //获取文件的后缀名
-            var extname = path.extname(pathname);
-            res.writeHead(200, { "Content-Type": "" + (privateObj.staticMime[extname] || 'text/html') + ";charset='utf-8'", });
-            res.write(text);
-            res.end();
-        }
-        //扩充res一个renderJs方法
-        res.renderJs = function (text) {
-            res.alreadySend = true;
-            res.writeHead(200, { "Content-Type":"application/javascript" });
-            res.write(text);
-            res.end();
-           
-        }
-         //扩充res一个renderHtml方法
-         res.renderHtml = function (text) {
-            res.alreadySend = true;
-            res.writeHead(200, { "Content-Type": "text/html;charset='utf-8'" });
-            res.write(text);
-            res.end();
-        }
+            if (true) {
+                Object.defineProperty(req, 'session', {
+                    set: function (o) {
+                        let sessionValue = req.cookies.sessionid || M.randomStr();
+                        res.cookie("sessionid", sessionValue)
+                        M.sessions[sessionValue] = o;
+                    },
+                    get: function () {
+                        return M.sessions[req.cookies.sessionid]
+                    },
+                    configurable: true
+                })
+            }
+            //扩充res一个send方法
+            res.send = function (data) {
+                res.alreadySend = true;
+                let isString = "[object String]" === Object.prototype.toString.call(data)
+                if (!isString) {
+                    data = JSON.stringify(data);
+                }
+                let requestOrigin = "*";
+                if (req.headers["origin"]) {
+                    requestOrigin = req.headers["origin"];
+                }
+                let requestHeaders = "X-Requested-With";
+                if (req.headers['access-control-request-headers']) {
+                    requestHeaders = req.headers['access-control-request-headers'];
+                }
+                res.setHeader("Access-Control-Allow-Origin", requestOrigin);
+                res.setHeader("Access-Control-Allow-Headers", requestHeaders);
+                res.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
+                res.setHeader("Access-Control-Allow-Credentials", "true");
+                res.setHeader("X-Powered-By", ' 3.2.1')
+                res.setHeader("Content-Type", "application/json;charset=utf-8");
+                res.end(data);
+                G._end(data);
+            }
+            //扩充res一个renderByUrl方法
+            res.renderUrl = async function (url) {
+                res.alreadySend = true;
+                let text = await M.getRemoteCacheByUrl(url)
+                let isString = "[object String]" === Object.prototype.toString.call(text)
+                if (!isString) {
+                    text = JSON.stringify(text);
+                }
+                var pathname = url_module.parse(url).pathname;   /*获取url的值*/
+                //获取文件的后缀名
+                var extname = path.extname(pathname);
+                res.writeHead(200, {"Content-Type": "" + (privateObj.staticMime[extname] || 'text/html') + ";charset='utf-8'",});
+                res.write(text);
+                res.end();
+            }
+
+            res.render = async function (url) {
+                res.alreadySend = true;
+                let text="";
+                if(!url.startsWith("http")&&!url.startsWith("file")){
+                    if(!url.startsWith("/")){
+                        url="/"+url;
+                    }
+                    url=G["_views"]+url;
+                    text = M.readFile(url);
+                }else {
+                    text = await M.getRemoteCacheByUrl(url)
+                }
+                let isString = "[object String]" === Object.prototype.toString.call(text)
+                if (!isString) {
+                    text = JSON.stringify(text);
+                }
+                var pathname = url_module.parse(url).pathname;   /*获取url的值*/
+                //获取文件的后缀名
+                var extname = path.extname(pathname);
+                res.writeHead(200, {"Content-Type": "" + (privateObj.staticMime[extname] || 'text/html') + ";charset='utf-8'",});
+                templateStr=""
+                    try {
+                        templateStr= M.template(text)
+                    }catch (e){
+                       M["_render_exception_handle"](e,req,res);
+                    }
+                    if(templateStr){
+                        text=templateStr;
+                    }
+                res.write(text);
+                res.end();
+            }
+            //扩充res一个renderJs方法
+            res.renderJs = function (text) {
+                res.alreadySend = true;
+                res.writeHead(200, {"Content-Type": "application/javascript"});
+                res.write(text);
+                res.end();
+
+            }
+            //扩充res一个renderHtml方法
+            res.renderHtml = function (text) {
+                res.alreadySend = true;
+                res.writeHead(200, {"Content-Type": "text/html;charset='utf-8'"});
+                res.write(text);
+                res.end();
+            }
 
 
-        try {
             //获取路由
             var pathname = url_module.parse(req.url).pathname;
             if (!pathname.endsWith('/')) {
@@ -1214,7 +1241,7 @@ M.server = function () {
 
             } else {
                 //为req加个params用于存放请求参数
-                req.params={};
+                req.params = {};
                 var mapingPath = "";
                 //如果是rest风格的请求,为其封装请求参数
                 if (req.isGetRestRequest()) {
@@ -1232,12 +1259,14 @@ M.server = function () {
                     let s2 = mapingPath;
                     s1 = s1.substring(s2.indexOf(":") - 1, s1.length - 1).split("/").slice(1)
                     s2 = s2.substring(s2.indexOf(":") - 1, s2.length - 1).split("/:").slice(1)
-                    for (let i = 0; i < s2.length; i++) { req.params[s2[i]] = s1[i]; }
-                } 
+                    for (let i = 0; i < s2.length; i++) {
+                        req.params[s2[i]] = s1[i];
+                    }
+                }
                 /**
                  * 加queryParam参数
                  */
-                req.params=Object.assign(req.params,url_module.parse(req.url, true).query) ;
+                req.params = Object.assign(req.params, url_module.parse(req.url, true).query);
 
                 if ((method == "get" || method == "post") && (G['_' + method][pathname])) {
                     if (method == 'post') { /*执行post请求*/
@@ -1256,7 +1285,7 @@ M.server = function () {
                                 } catch (e) {
                                 }
                             }
-                            req.params = Object.assign(req.params,postData);
+                            req.params = Object.assign(req.params, postData);
                             G._begin(req, res);
                             if (!res.alreadySend) G['_' + method][pathname](req, res); /*执行方法*/
                         })
@@ -1271,17 +1300,13 @@ M.server = function () {
                     } else {
                         G._begin(req, res);
                         if (!res.alreadySend) G._server(req, res);
-                        if (!res.alreadySend) res.end('no router');
+                        if (!res.alreadySend) G["_no_router_handle"](req,res);
                     }
                 }
             }
         } catch (e) {
             console.error(e);
-            if (!res.alreadySend) {
-                res.writeHead(500, { "Content-Type": "text/html;charset='utf-8'" });
-                res.write("服务器内部错误");
-                res.end(); /*结束响应*/
-            }
+            G["_gloable_exception_handle"](e,req,res);
         }
     }
 
@@ -1326,7 +1351,7 @@ M.server = function () {
         G._post[url] = callback;
     }
 
-    
+
     /**
      *注册任意请求方法的请求
      */
@@ -1362,13 +1387,59 @@ M.server = function () {
      *重定向
      */
     app.redirect = function (url, req, res) {
-        res.writeHead(302, { 'Content-Type': 'text/html; charset=utf-8', 'Location': url });
+        res.writeHead(302, {'Content-Type': 'text/html; charset=utf-8', 'Location': url});
         res.end();
     }
 
     app.set = function (k, v) {
         G["_" + k] = v;
     }
+
+
+    //全局异常钩子
+    app.set("gloable_exception_handle",(err,req,res)=>{
+        console.error(err.stack)
+        if (!res.alreadySend) {
+            res.writeHead(500, { "Content-Type": "text/html;charset='utf-8'" });
+            res.write("server err");
+            res.end();
+        }
+    })
+
+    //render异常钩子
+    app.set("render_exception_handle",(err,req,res)=>{
+        console.error(err.stack)
+    })
+
+    //没有对应接口时的处理器
+    app.set("no_router_handle",(req,res)=>{
+        res.end('no router')
+    })
+    //没有对应静态页的处理器
+    app.set("no_page_handle",(req,res)=>{
+        res.writeHead(404, { "Content-Type": "text/html;charset='utf-8'" });
+        res.write(`<!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                    <meta charset="UTF-8">
+                    <title>404</title>
+                    <style type="text/css">
+                    h1{
+                      font-size: 60px;
+                      color:blue;
+                    }
+                    </style>
+                    </head>
+                    <body>
+                    <h1>404</h1>
+                    <p>no page</p>
+                    </body>
+                    </html>`
+        );
+        res.end();
+    })
+
+
 
     app.listen = function (port) {
         http.createServer(app).listen(port);
@@ -1381,36 +1452,36 @@ M.server = function () {
 /**
  * 代理服务器start
  */
-M.getAxiosConfig=async (req)=>{
-    return new Promise((resolve,reject) => {
-    let axiosConfig={}
-    axiosConfig.url=M.proxyHost+req.url
-    axiosConfig.method=req.method.toLocaleLowerCase();
-    axiosConfig.headers=req.headers
-    let postStr = '';
-    req.on('data', function (chunk) {
-        postStr += chunk;  
-    })
-    req.on('end', function (err, chunk) {
-        req.body = postStr;  /*表示拿到post的值*/
-        postData = "";
-        try {
-            if(req.body.indexOf("=")==-1){
-                postData = JSON.parse(req.body);
-            }else{
-                postData = url_module.parse("?" + req.body, true).query;
+M.getAxiosConfig = async (req) => {
+    return new Promise((resolve, reject) => {
+        let axiosConfig = {}
+        axiosConfig.url = M.proxyHost + req.url
+        axiosConfig.method = req.method.toLocaleLowerCase();
+        axiosConfig.headers = req.headers
+        let postStr = '';
+        req.on('data', function (chunk) {
+            postStr += chunk;
+        })
+        req.on('end', function (err, chunk) {
+            req.body = postStr;  /*表示拿到post的值*/
+            postData = "";
+            try {
+                if (req.body.indexOf("=") == -1) {
+                    postData = JSON.parse(req.body);
+                } else {
+                    postData = url_module.parse("?" + req.body, true).query;
+                }
+            } catch (e) {
             }
-        } catch (e) {
-        }
-        axiosConfig.data=postData;
-        axiosConfig.body=req.body;
-        resolve(axiosConfig)
-     })
-   })
+            axiosConfig.data = postData;
+            axiosConfig.body = req.body;
+            resolve(axiosConfig)
+        })
+    })
 }
 
 M.axios = function (axiosConfig) {
-    axiosConfig.headers.host="";
+    axiosConfig.headers.host = "";
     var urlObj = url_module.parse(axiosConfig.url)
     var options = {
         hostname: urlObj.hostname,
@@ -1450,28 +1521,28 @@ M.axios = function (axiosConfig) {
 /**
  * 代理服务器end
  */
-privateObj.staticServer =async function (req, res, staticPath) {
+privateObj.staticServer = async function (req, res, staticPath) {
     if (res.alreadySend) return;
     var pathname = url_module.parse(req.url).pathname;   /*获取url的值*/
     if (pathname == '/') {
         pathname = '/index.html'; /*默认加载的首页*/
     }
-    let fileName= pathname.replace("/","");
+    let fileName = pathname.replace("/", "");
     //获取文件的后缀名
     var extname = path.extname(pathname);
 
-    if(fileName.startsWith("__default_")){
+    if (fileName.startsWith("__default_")) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "X-Requested-With");
         res.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
         res.setHeader("X-Powered-By", ' 3.2.1')
-        res.writeHead(200, { "Content-Type": "" + (privateObj.staticMime[extname] || 'text/html') + ";charset='utf-8'", });
+        res.writeHead(200, {"Content-Type": "" + (privateObj.staticMime[extname] || 'text/html') + ";charset='utf-8'",});
         res.write(M.__default_file[fileName]);
         res.end(); /*结束响应*/
         return;
     }
-    if( M.remoteStaticPathEnable && req.url.endsWith("remote=true")){
-        if (!res.alreadySend)await res.renderUrl(M.remoteStaticPath+pathname)
+    if (M.remoteStaticPathEnable && req.url.endsWith("remote=true")) {
+        if (!res.alreadySend) await res.renderUrl(M.remoteStaticPath + pathname)
         return;
     }
 
@@ -1479,38 +1550,22 @@ privateObj.staticServer =async function (req, res, staticPath) {
         //文件操作获取 static下面的index.html
         fs.readFile(staticPath + '/' + pathname, function (err, data) {
             if (err) {  /*么有这个文件*/
-                res.writeHead(404, { "Content-Type": "text/html;charset='utf-8'" });
-                res.write(`<!DOCTYPE html>
-                                <html lang="en">
-                                <head>
-                                    <meta charset="UTF-8">
-                                    <title>404</title>
-                                    <style type="text/css">
-                                        h1{
-                                            font-size: 60px;
-                                            color:blue;
-                                        }
-                                    </style>
-                                </head>
-                                <body>
-                                    <h1>404</h1>
-                                    <p>对不起，没有这个页面</p>
-                                </body>
-                                </html>`
-                );
-                res.end(); /*结束响应*/
+                G["_no_page_handle"](req,res);
             } else { /*返回这个文件*/
                 res.setHeader("Access-Control-Allow-Origin", "*");
                 res.setHeader("Access-Control-Allow-Headers", "X-Requested-With");
                 res.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
                 res.setHeader("X-Powered-By", ' 3.2.1')
-                res.writeHead(200, { "Content-Type": "" + (privateObj.staticMime[extname] || 'text/html') + ";charset='utf-8'", });
+                res.writeHead(200, {"Content-Type": "" + (privateObj.staticMime[extname] || 'text/html') + ";charset='utf-8'",});
                 res.write(data);
                 res.end(); /*结束响应*/
             }
         })
     } else {
-        res.writeHead(302, { 'Content-Type': 'image/x-icon; charset=utf-8', 'Location': "https://q.qlogo.cn/g?b=qq&nk=934031452&s=100" });
+        res.writeHead(302, {
+            'Content-Type': 'image/x-icon; charset=utf-8',
+            'Location': "https://q.qlogo.cn/g?b=qq&nk=934031452&s=100"
+        });
         res.end();
     }
 }
@@ -1585,10 +1640,10 @@ M.getMyIp = function () {
 
 /**
  *对象转JSON key不用引号括起来,因兼容性不好,所以去掉
-*/
+ */
 
 /**
-M.JSOM_Stringify=function(obj){
+ M.JSOM_Stringify=function(obj){
     return JSON.stringify(obj).replace(/"(\w+)"(\s*:\s*)/gis, '$1$2');
 }
  */
@@ -2127,18 +2182,18 @@ M.test = function () {
     console.log(privateObj.staticMime[".jssson"] || "aa")
 }
 
-M.getRemoteCacheByUrl=async function(url){
-    if(url in M._globle_cacheMap){
+M.getRemoteCacheByUrl = async function (url) {
+    if (url in M._globle_cacheMap) {
         return M._globle_cacheMap[url];
     }
-    let text="";
-    if(url.startsWith("file:")){
-        text= M.readFile(url.substring(5));
-    }else{
-        text=await M.get(url);
+    let text = "";
+    if (url.startsWith("file:")) {
+        text = M.readFile(url.substring(5));
+    } else {
+        text = await M.get(url);
     }
-    console.log("req remote url:",url);
-    M._globle_cacheMap[url]=text;
+    console.log("req remote url:", url);
+    M._globle_cacheMap[url] = text;
     return text;
 }
 
