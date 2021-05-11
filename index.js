@@ -1088,8 +1088,6 @@ M.server = function () {
             //是否已经发送过了
             res.alreadySend = false;
             req.requestId=M.randomStr();
-            M.req=req;
-            M.res=res;
             //是否为静态资源请求
             req.isStaticRequest = function () {
                 if (req.url.indexOf("?") > 0) {
@@ -1164,7 +1162,16 @@ M.server = function () {
             //扩充res一个renderByUrl方法
             res.renderUrl = async function (url) {
                 res.alreadySend = true;
-                let text = await M.getRemoteCacheByUrl(url)
+                let text="";
+                if(!url.startsWith("http")&&!url.startsWith("file")){
+                    if(!url.startsWith("/")){
+                        url="/"+url;
+                    }
+                    url=G["_views"]+url;
+                    text = M.readFile(url);
+                }else {
+                    text = await M.getRemoteCacheByUrl(url)
+                }
                 let isString = "[object String]" === Object.prototype.toString.call(text)
                 if (!isString) {
                     text = JSON.stringify(text);
@@ -1197,15 +1204,15 @@ M.server = function () {
                 //获取文件的后缀名
                 var extname = path.extname(pathname);
                 res.writeHead(200, {"Content-Type": "" + (privateObj.staticMime[extname] || 'text/html') + ";charset='utf-8'",});
-                templateStr=""
-                    try {
-                        templateStr= M.template(text)
-                    }catch (e){
-                       M["_render_exception_handle"](e,req,res);
-                    }
-                    if(templateStr){
-                        text=templateStr;
-                    }
+                let templateStr=""
+                try {
+                    templateStr= M.template(text)
+                }catch (e){
+                   M["_render_exception_handle"](e,req,res);
+                }
+                if(templateStr){
+                    text=templateStr;
+                }
                 res.write(text);
                 res.end();
             }
@@ -1234,12 +1241,12 @@ M.server = function () {
             // pathname.startsWith("/usr/")
             //获取请求的方式 get  post
             var method = req.method.toLowerCase();
-
             if (req.isStaticRequest()) {
                 G._begin(req, res);
                 if (!res.alreadySend) privateObj.staticServer(req, res, G["_views"]);
-
             } else {
+                M.req=req;
+                M.res=res;
                 //为req加个params用于存放请求参数
                 req.params = {};
                 var mapingPath = "";
@@ -1449,6 +1456,18 @@ M.server = function () {
 
     return app;
 }
+
+
+//异常捕获
+process.on('uncaughtException', function (err) {
+    M["_gloable_exception_handle"](err,M.req,M.res);
+});
+//监听Promise没有被捕获的失败函数
+process.on('unhandledRejection',function(err,promise){
+    M["_gloable_exception_handle"](err,M.req,M.res);
+});
+
+
 /**
  * 代理服务器start
  */

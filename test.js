@@ -10,10 +10,17 @@ app.set("no_page_handle",(req,res)=>{
     res.send("no router")
 })
 
-app.set("gloable_exception_handle",(err,req,res)=>{
-    console.error(err.stack)
-    res.send("系统错误")
+// app.set("gloable_exception_handle",(err,req,res)=>{
+//     console.error(err.stack)
+//     res.send("系统错误")
+// })
+
+app.get("/a", async (req,res)=>{
+    a=e/3
+    res.send("aa");
 })
+
+
 
 app.get("/render",(req,res)=>{
     a=777;
@@ -21,7 +28,7 @@ app.get("/render",(req,res)=>{
         name:"zs"
     }
     console.log(req.params.id)
-    res.render("/a.html");
+    res.renderUrl("/a.html");
 })
 
 
