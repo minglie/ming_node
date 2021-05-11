@@ -1313,7 +1313,7 @@ M.server = function () {
             }
         } catch (e) {
             console.error(e);
-            G["_gloable_exception_handle"](e,req,res);
+            M["_gloable_exception_handle"](e,req,res);
         }
     }
 
@@ -1399,14 +1399,14 @@ M.server = function () {
     }
 
     app.set = function (k, v) {
-        G["_" + k] = v;
+        M["_" + k] = v;
     }
 
 
     //全局异常钩子
     app.set("gloable_exception_handle",(err,req,res)=>{
         console.error(err.stack)
-        if (!res.alreadySend) {
+        if (res && !res.alreadySend) {
             res.writeHead(500, { "Content-Type": "text/html;charset='utf-8'" });
             res.write("server err");
             res.end();
@@ -1569,7 +1569,7 @@ privateObj.staticServer = async function (req, res, staticPath) {
         //文件操作获取 static下面的index.html
         fs.readFile(staticPath + '/' + pathname, function (err, data) {
             if (err) {  /*么有这个文件*/
-                G["_no_page_handle"](req,res);
+                M["_no_page_handle"](req,res);
             } else { /*返回这个文件*/
                 res.setHeader("Access-Control-Allow-Origin", "*");
                 res.setHeader("Access-Control-Allow-Headers", "X-Requested-With");
