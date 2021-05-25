@@ -905,6 +905,9 @@ M.getMySql = function (dbConfig) {
     console.log("connect mysql", defaultDbConfig)
     var pool = mysql.createPool(defaultDbConfig);
     Db.doSql = function (sql, params) {
+        if (Db.display_sql_enable) {
+            M.log(sql)
+        }
         var promise = new Promise(function (reslove, reject) {
             pool.getConnection(function (err, connection) {
                 connection.query(sql, params, function (err, rows) {
@@ -924,6 +927,165 @@ M.getMySql = function (dbConfig) {
     M.mysql = Db;
     return Db;
 }
+
+
+M.getMongoDB = function (dbConfig) {
+    if (M.mongoDb) {
+        return M.mongoDb;
+    }
+    var MongoDB=require('mongodb');
+    var MongoClient =MongoDB.MongoClient;
+    const ObjectID = MongoDB.ObjectID;
+
+    var Config={
+        dbUrl:  dbConfig.dbUrl|| 'mongodb://langjiewin.local:27017/',
+        dbName: dbConfig.dbName|| 'langjiesys'
+    };
+
+    class MingMongoClient{
+      static  connect(){  /*连接数据库*/
+            return new Promise((resolve,reject)=>{
+                if(!MingMongoClient.dbClient){         /*1、解决数据库多次连接的问题*/
+                    console.log("connect mongodb", Config)
+                    MongoClient.connect(Config.dbUrl,(err,client)=>{
+                        if(err){
+                            reject(err)
+                        }else{
+                            MingMongoClient.dbClient=client.db(Config.dbName);
+                            resolve(MingMongoClient.dbClient)
+                        }
+                    })
+                }else{
+                    resolve(MingMongoClient.dbClient);
+                }
+            })
+        }
+
+        static find(collectionName,json){
+            if(!json){
+                json=collectionName
+                collectionName= MingMongoClient.collectionName;
+            }
+            return new Promise((resolve,reject)=>{
+                MingMongoClient.connect().then((db)=>{
+                    var result=db.collection(collectionName).find(json);
+                    result.toArray(function(err,docs){
+                        if(err){
+                            reject(err);
+                            return;
+                        }
+                        resolve(docs);
+                    })
+
+                })
+            })
+        }
+        static update(collectionName,json1,json2){
+            if(!json2){
+                json1=collectionName
+                json2=json1;
+                collectionName= MingMongoClient.collectionName;
+            }
+            return new Promise((resolve,reject)=>{
+                MingMongoClient.connect().then((db)=>{
+                    db.collection(collectionName).updateOne(json1,{
+                        $set:json2
+                    },(err,result)=>{
+                        if(err){
+                            reject(err);
+                        }else{
+                            resolve(result);
+                        }
+                    })
+                })
+            })
+        }
+        static insert(collectionName,json){
+            if(!json){
+                json=collectionName
+                collectionName= MingMongoClient.collectionName;
+            }
+            return new  Promise((resolve,reject)=>{
+                MingMongoClient.connect().then((db)=>{
+                    db.collection(collectionName).insertOne(json,function(err,result){
+                        if(err){
+                            reject(err);
+                        }else{
+
+                            resolve(result);
+                        }
+                    })
+                })
+            })
+        }
+
+        static  insertMany(collectionName,json){
+            if(!json){
+                json=collectionName
+                collectionName= MingMongoClient.collectionName;
+            }
+            return new  Promise((resolve,reject)=>{
+                MingMongoClient.connect().then((db)=>{
+                    db.collection(collectionName).insertMany(json,function(err,result){
+                        if(err){
+                            reject(err);
+                        }else{
+
+                            resolve(result);
+                        }
+                    })
+                })
+            })
+        }
+
+        static remove(collectionName,json){
+            if(!json){
+                json=collectionName
+                collectionName= MingMongoClient.collectionName;
+            }
+            return new  Promise((resolve,reject)=>{
+                MingMongoClient.connect().then((db)=>{
+                    db.collection(collectionName).removeOne(json,function(err,result){
+                        if(err){
+                            reject(err);
+                        }else{
+
+                            resolve(result);
+                        }
+                    })
+                })
+            })
+        }
+
+        static  getById(collectionName,id){
+            if(!id){
+                id=collectionName
+                collectionName= MingMongoClient.collectionName;
+            }
+            return new  Promise((resolve,reject)=>{
+                MingMongoClient.connect().then((db)=>{
+                    var whereArgs = {
+                        _id: new ObjectID(id)
+                    };
+                    db.collection(collectionName).findOne(whereArgs,{},function(err,result){
+                        if(err){
+                            reject(err);
+                        }else{
+                            resolve(result);
+                        }
+                    })
+                })
+            })
+        }
+
+    }
+   let Db=MingMongoClient;
+    MingMongoClient.collectionName="test"
+    M.mongoDb=Db;
+    return Db;
+}
+
+
 
 /**
  * ----------------------Sql CRUD  START-------------------------------------------
@@ -1456,7 +1618,9 @@ M.server = function () {
 
     return app;
 }
-
+M["_gloable_exception_handle"]=(err)=>{
+    console.error(err)
+}
 
 //异常捕获
 process.on('uncaughtException', function (err) {
