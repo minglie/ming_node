@@ -36,6 +36,8 @@ M.httpEnd = (d) => {
 }
 //全局缓存map
 M._globle_cacheMap = {}
+//全局对象缓存
+M._globle_lib_cacheMap={}
 //远程静态资源路径
 M.remoteStaticPath = "https://minglie.gitee.io/mingpage/static";
 M.remoteStaticPathEnable = true;
@@ -393,6 +395,23 @@ M.require = function (url) {
         })
     });
     return promise;
+}
+
+M.import=async function (url,callback){
+    if(M._globle_lib_cacheMap[url]){
+        return M._globle_lib_cacheMap[url];
+    }
+    if(!callback){
+        let r=await  M.get(url)
+        r= eval(r)
+        M._globle_lib_cacheMap[url]=r;
+        return r
+    }else {
+        let r= callback()
+        M._globle_lib_cacheMap[url]=r;
+        return r
+    }
+
 }
 
 /**

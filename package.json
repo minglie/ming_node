@@ -46,5 +46,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "version": "1.9.8"
+  "version": "1.9.8",
+  "dependencies": {
+    "amqplib": "^0.8.0"
+  }
 }
