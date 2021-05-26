@@ -16,6 +16,7 @@ async function main(){
     const rpc = new AmqRpcUtil(rabitMqConfig);
 
     setTimeout(()=>{
+        //客户端调用
         rpc.call("getMemberList",{"AA":"ee"}).then(d=>{
             console.log(d)
         })

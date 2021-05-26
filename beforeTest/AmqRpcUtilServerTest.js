@@ -11,15 +11,15 @@ rabitMqConfig= {
 }
 
 
-
-
 async function main(){
     AmqRpcUtil=await  M.import("http://localhost:9999/AmqRpcUtil.js")
     const rpc = new AmqRpcUtil(rabitMqConfig);
+    //服务端监听
     rpc.callback("getMemberList",async params=>{
         console.log(params)
         return {"data":"ok"}
     })
+    //客户端调用
     setTimeout(()=>{
         rpc.call("getMemberList",{"AA":"ee"}).then(d=>{
             console.log(d)
