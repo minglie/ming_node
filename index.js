@@ -962,9 +962,9 @@ M.getMongoDB = function (dbConfig) {
     };
 
     class MingMongoClient{
-      static  connect(){  /*连接数据库*/
+      static  connect(){
             return new Promise((resolve,reject)=>{
-                if(!MingMongoClient.dbClient){         /*1、解决数据库多次连接的问题*/
+                if(!MingMongoClient.dbClient){
                     console.log("connect mongodb", Config)
                     MongoClient.connect(Config.dbUrl,(err,client)=>{
                         if(err){
