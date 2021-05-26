@@ -938,8 +938,8 @@ M.getMongoDB = function (dbConfig) {
     const ObjectID = MongoDB.ObjectID;
 
     var Config={
-        dbUrl:  dbConfig.dbUrl|| 'mongodb://langjiewin.local:27017/',
-        dbName: dbConfig.dbName|| 'langjiesys'
+        dbUrl:  dbConfig.dbUrl|| 'mongodb://localhost:27017/',
+        dbName: dbConfig.dbName|| 'miapi'
     };
 
     class MingMongoClient{
@@ -980,16 +980,16 @@ M.getMongoDB = function (dbConfig) {
                 })
             })
         }
-        static update(collectionName,json1,json2){
-            if(!json2){
-                json1=collectionName
-                json2=json1;
+        static update(collectionName,whereObj,updateObj){
+            if(!updateObj){
+                updateObj=whereObj;
+                whereObj=collectionName
                 collectionName= MingMongoClient.collectionName;
             }
             return new Promise((resolve,reject)=>{
                 MingMongoClient.connect().then((db)=>{
-                    db.collection(collectionName).updateOne(json1,{
-                        $set:json2
+                    db.collection(collectionName).updateOne(whereObj,{
+                        $set:updateObj
                     },(err,result)=>{
                         if(err){
                             reject(err);
@@ -1079,6 +1079,7 @@ M.getMongoDB = function (dbConfig) {
         }
 
     }
+   MingMongoClient.ObjectID=(id)=> new ObjectID(id)
    let Db=MingMongoClient;
     MingMongoClient.collectionName="test"
     M.mongoDb=Db;
