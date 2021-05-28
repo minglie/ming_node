@@ -38,6 +38,7 @@ M.httpEnd = (d) => {
 M._globle_cacheMap = {}
 //全局对象缓存
 M._globle_lib_cacheMap={}
+M._node_lib_path=process.env.NODE_PATH;
 //远程静态资源路径
 M.remoteStaticPath = "https://minglie.gitee.io/mingpage/static";
 M.remoteStaticPathEnable = true;
@@ -367,11 +368,19 @@ M.getHttps = function (url, callback, data) {
 }
 
 
-M.require = function (url) {
+M.require =async function (url,noCache) {
+    //如果需要缓存
+    let fileName=M.getFileNameByUrl(url);
+    if(!noCache){
+        if(fs.existsSync(M._node_lib_path+"/"+fileName)){
+            return require(M._node_lib_path+"/"+fileName)
+        }
+    }
     let ht = "http";
     if (url.startsWith("https")) {
         ht = "https";
     }
+    console.log("req require remote url:", url);
     let promise = new Promise(function (reslove, reject) {
         require(ht).get(url, function (req, res) {
             var d = '';
@@ -381,13 +390,17 @@ M.require = function (url) {
             req.on('end', () => {
                 let r = "";
                 try {
-                    r = JSON.parse(d)
-                } catch (e) {
-                    try {
-                        r = eval(d);
-                    } catch (e1) {
-                        r = d;
+                    if(fileName.endsWith(".js")){
+                        //如果需要缓存
+                        if(!noCache){
+                            M.writeFile(M._node_lib_path+"/"+fileName,d);
+                        }
+                        r= eval(d);
+                    }else {
+                        r = JSON.parse(d)
                     }
+                } catch (e) {
+                        r = d;
                 }
                 reslove(r);
             });
@@ -801,6 +814,10 @@ M.readCsvLine = function (file, callback) {
     })
 }
 
+M.getFileNameByUrl=function (url){
+    let split= url.split("/");
+    return split[split.length-1]
+}
 
 M.getFileList = function (path) {
     //遍历读取文件
