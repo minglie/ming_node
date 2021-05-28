@@ -13,14 +13,31 @@ async function main(){
         r= await xxlJob.startJobInfoById(6)
         console.log("jobinfo/statt<===",r)
     }
-
     //触发执行一次
-    if(1){
+    if(0){
         r= await xxlJob.triggerJobInfoById(2,"AA")
         console.log("jobinfo/trigger<===",r)
     }
+
+    //doSql
+    if(0){
+        r= await xxlJob.doSql("select 1")
+        console.log("jobinfo/doSql<===",r)
+    }
+    //getJobAttribute
+    if(0){
+        r= await xxlJob.getJobAttribute(1,"name")
+        console.log("getJobAttribute<===",r)
+    }
+
+    //setJobAttribute
+    if(1){
+        r= await xxlJob.setJobAttribute(1,"name","EEEE")
+        console.log("getJobAttribute<===",r)
+    }
+
 }
 
 main()
 //这句话必须加,脚本类的定时任务执行完一定要退出
-setTimeout(()=>process.exit(),3000)
+setTimeout(()=>process.exit(),1000)
