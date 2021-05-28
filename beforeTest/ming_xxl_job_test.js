@@ -31,10 +31,17 @@ async function main(){
     }
 
     //setJobAttribute
-    if(1){
-        r= await xxlJob.setJobAttribute(1,"name","EEEE")
+    if(0){
+        r= await xxlJob.setJobAttribute(1,"name","WWWW")
         console.log("getJobAttribute<===",r)
     }
+
+    //updateJobInfo
+    if(1){
+        r= await  xxlJob.updateJobInfo(1,{cron:"* 5 * * * ?"})
+        console.log("updateJobInfo<===",r)
+    }
+
 
 }
 

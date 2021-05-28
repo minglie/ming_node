@@ -44,6 +44,28 @@ ming_xxl_job.setJobAttribute=async function (id,key,value){
     return r;
 }
 
+ming_xxl_job.updateJobInfo=async function (id,jobInfo){
+    r= await M.post("http://localhost:8080/jobinfo/update",{
+        "jobDesc": jobInfo.jobDesc||"延时触发执行器执行",
+        "author": jobInfo.author||"XXL",
+        "jobGroup": jobInfo.jobGroup||1,
+        "scheduleType": jobInfo.scheduleType||"CRON",
+        "scheduleConf": jobInfo.cron|| "* 2 * * * ?",
+        "cronGen_display": jobInfo.cron|| "* 2 * * * ?",
+        "schedule_conf_CRON": jobInfo.cron|| "* 2 * * * ?",
+        "executorRouteStrategy": jobInfo.executorRouteStrategy|| "FIRST",
+        "misfireStrategy": "DO_NOTHING",
+        "executorBlockStrategy": "SERIAL_EXECUTION",
+        "executorTimeout": 0,
+        "executorFailRetryCount": 0,
+        id: id
+    },{
+        "Content-Type":"application/x-www-form-urlencoded;",
+        "XXL-JOB-ACCESS-TOKEN":""
+    })
+    return r;
+}
+
 
 ming_xxl_job.doSql=async function (sql){
     //触发执行一次
