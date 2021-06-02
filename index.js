@@ -1544,8 +1544,15 @@
          G._server = callback;
      }
      app.use=function (url,callback){
-         let regExp=new RegExp(url)
-         G._use[url] = {url,regExp,callback};
+         if (Array.isArray(url)) {
+             url.forEach(u=>{
+                 let regExp=new RegExp(u)
+                 G._use[u] = {url,regExp,callback};
+             })
+         } else {
+             let regExp=new RegExp(url)
+             G._use[url] = {url,regExp,callback};
+         }
      }
      /**
       * 注册get请求

@@ -4,7 +4,8 @@ app=M.server()
 
 app.listen(8888)
 
-app.use("/ae",(req,res)=>{
+app.use(["/ae","/mrr"],(req,res)=>{
+
     res.send("WW")
 })
 
