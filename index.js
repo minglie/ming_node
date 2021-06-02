@@ -1269,6 +1269,8 @@
      this._views = "static";
      //key为去除rest参数的url,val为原始url
      this._rest = {};
+     //通配符
+     this._use = {};
      //处理get和post请求
      this._get = {};
      this._post = {};
@@ -1442,6 +1444,7 @@
              var method = req.method.toLowerCase();
              if (req.isStaticRequest()) {
                  await G._begin(req, res);
+                 if (!res.alreadySend) privateObj.dealUseServer(req, res);
                  if (!res.alreadySend) privateObj.staticServer(req, res, G["_views"]);
              } else {
                  M.req=req;
@@ -1473,7 +1476,13 @@
                   * 加queryParam参数
                   */
                  req.params = Object.assign(req.params, url_module.parse(req.url, true).query);
- 
+
+                 /**
+                  * 处理app
+                  */
+
+
+
                  if ((method == "get" || method == "post") && (G['_' + method][pathname])) {
                      if (method == 'post') { /*执行post请求*/
                          var postStr = '';
@@ -1493,18 +1502,22 @@
                              }
                              req.params = Object.assign(req.params, postData);
                              await  G._begin(req, res);
+                             if (!res.alreadySend) privateObj.dealUseServer(req, res);
                              if (!res.alreadySend) G['_' + method][pathname](req, res); /*执行方法*/
                          })
                      } else if (method == "get") { /*执行get请求*/
                          await G._begin(req, res);
+                         if (!res.alreadySend) privateObj.dealUseServer(req, res);
                          if (!res.alreadySend) G['_' + method][pathname](req, res); /*执行方法*/
                      }
                  } else {
                      if (G['_mapping'][pathname]) {
                          await G._begin(req, res);
+                         if (!res.alreadySend) privateObj.dealUseServer(req, res);
                          if (!res.alreadySend) G['_mapping'][pathname](req, res); /*执行方法*/
                      } else {
                          await G._begin(req, res);
+                         if (!res.alreadySend) privateObj.dealUseServer(req, res);
                          if (!res.alreadySend) G._server(req, res);
                          if (!res.alreadySend) G["_no_router_handle"](req,res);
                      }
@@ -1530,6 +1543,10 @@
      app.server = function (callback) {
          G._server = callback;
      }
+     app.use=function (url,callback){
+         let regExp=new RegExp(url)
+         G._use[url] = {url,regExp,callback};
+     }
      /**
       * 注册get请求
       */
@@ -1543,7 +1560,6 @@
  
          G._get[url] = callback;
      }
- 
      /**
       *注册post请求
       */
@@ -1738,9 +1754,22 @@
          req.end();
      })
  }
- /**
-  * 代理服务器end
-  */
+/**
+ * 代理服务器end
+ */
+
+/**
+ *处理app.use
+ */
+privateObj.dealUseServer = async function (req, res) {
+    for (let key in M._use){
+        if(M._use[key].regExp.test(req.url)){
+           await  M._use[key].callback(req,res);
+           return;
+        }
+    }
+}
+
  privateObj.staticServer = async function (req, res, staticPath) {
      if (res.alreadySend) return;
      var pathname = url_module.parse(req.url).pathname;   /*获取url的值*/
