@@ -1358,7 +1358,7 @@
                  res.setHeader("X-Powered-By", ' 3.2.1')
                  res.setHeader("Content-Type", "application/json;charset=utf-8");
                  res.end(data);
-                 G._end(data);
+                 G._end(req,data);
              }
              //扩充res一个renderByUrl方法
              res.renderUrl = async function (url) {
@@ -1383,6 +1383,7 @@
                  res.writeHead(200, {"Content-Type": "" + (privateObj.staticMime[extname] || 'text/html') + ";charset='utf-8'",});
                  res.write(text);
                  res.end();
+                 G._end(req,text);
              }
  
              res.render = async function (url) {
@@ -1416,6 +1417,7 @@
                  }
                  res.write(text);
                  res.end();
+                 G._end(req,text);
              }
              //扩充res一个renderJs方法
              res.renderJs = function (text) {
@@ -1423,7 +1425,7 @@
                  res.writeHead(200, {"Content-Type": "application/javascript"});
                  res.write(text);
                  res.end();
- 
+                 G._end(req,text);
              }
              //扩充res一个renderHtml方法
              res.renderHtml = function (text) {
@@ -1431,9 +1433,13 @@
                  res.writeHead(200, {"Content-Type": "text/html;charset='utf-8'"});
                  res.write(text);
                  res.end();
+                 G._end(req,text);
              }
- 
- 
+             res.redirect = function (url) {
+                 res.alreadySend = true;
+                 res.writeHead(302, {'Content-Type': 'text/html; charset=utf-8', 'Location': url});
+                 res.end();
+             }
              //获取路由
              var pathname = url_module.parse(req.url).pathname;
              if (!pathname.endsWith('/')) {
@@ -1444,8 +1450,8 @@
              var method = req.method.toLowerCase();
              if (req.isStaticRequest()) {
                  await G._begin(req, res);
-                 if (!res.alreadySend) privateObj.dealUseServer(req, res);
-                 if (!res.alreadySend) privateObj.staticServer(req, res, G["_views"]);
+                 if (!res.alreadySend) await privateObj.dealUseServer(req, res);
+                 if (!res.alreadySend) await privateObj.staticServer(req, res, G["_views"]);
              } else {
                  M.req=req;
                  M.res=res;
@@ -1477,12 +1483,6 @@
                   */
                  req.params = Object.assign(req.params, url_module.parse(req.url, true).query);
 
-                 /**
-                  * 处理app
-                  */
-
-
-
                  if ((method == "get" || method == "post") && (G['_' + method][pathname])) {
                      if (method == 'post') { /*执行post请求*/
                          var postStr = '';
@@ -1502,24 +1502,24 @@
                              }
                              req.params = Object.assign(req.params, postData);
                              await  G._begin(req, res);
-                             if (!res.alreadySend) privateObj.dealUseServer(req, res);
-                             if (!res.alreadySend) G['_' + method][pathname](req, res); /*执行方法*/
+                             if (!res.alreadySend) await privateObj.dealUseServer(req, res);
+                             if (!res.alreadySend) await G['_' + method][pathname](req, res); /*执行方法*/
                          })
                      } else if (method == "get") { /*执行get请求*/
                          await G._begin(req, res);
-                         if (!res.alreadySend) privateObj.dealUseServer(req, res);
-                         if (!res.alreadySend) G['_' + method][pathname](req, res); /*执行方法*/
+                         if (!res.alreadySend) await privateObj.dealUseServer(req, res);
+                         if (!res.alreadySend) await G['_' + method][pathname](req, res); /*执行方法*/
                      }
                  } else {
                      if (G['_mapping'][pathname]) {
                          await G._begin(req, res);
-                         if (!res.alreadySend) privateObj.dealUseServer(req, res);
-                         if (!res.alreadySend) G['_mapping'][pathname](req, res); /*执行方法*/
+                         if (!res.alreadySend) await privateObj.dealUseServer(req, res);
+                         if (!res.alreadySend) await G['_mapping'][pathname](req, res); /*执行方法*/
                      } else {
                          await G._begin(req, res);
-                         if (!res.alreadySend) privateObj.dealUseServer(req, res);
-                         if (!res.alreadySend) G._server(req, res);
-                         if (!res.alreadySend) G["_no_router_handle"](req,res);
+                         if (!res.alreadySend) await privateObj.dealUseServer(req, res);
+                         if (!res.alreadySend) await G._server(req, res);
+                         if (!res.alreadySend) await G["_no_router_handle"](req,res);
                      }
                  }
              }
