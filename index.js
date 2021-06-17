@@ -1202,13 +1202,11 @@
  M.result = function (data, success,message) {
      var r = {};
      if (success == false) {
-         r.code = 3003;
-         r.message = message||"操作失败";
-         r.success = success;
+         r.code = -2;
+         r.msg  = message||"操作失败";
      } else {
-         r.code = 3002;
-         r.message = message||"操作成功"
-         r.success = true;
+         r.code = 200;
+         r.msg  = message||"success"
      }
      r.requestId=M.req.requestId;
      try {
