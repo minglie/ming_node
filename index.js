@@ -3,7 +3,7 @@
  * By : Minglie
  * QQ: 934031452
  * Date :2019.9.28
- * version :1.9.0
+ * version :1.9.9
  */
  var http = require('http');
  var https = require('https');
@@ -166,7 +166,7 @@
      })
  }
  
- M.post = function (url, callback, data, headers) {
+M._request = function (url, callback, data, headers,methed) {
      if (typeof callback == "function") {
  
      } else {
@@ -181,27 +181,26 @@
      var urlObj = url_module.parse(url)
      //发送 http Post 请求
      var postData = querystring.stringify(data);
- 
-     if (headers) {
-         if (headers["Content-Type"] == "application/json") {
-             postData = JSON.stringify(data);
-         }
-     } else {
+     if( headers["Content-Type"]==undefined){
+         headers["Content-Type"] ="application/json";
+     }
+     if (headers["Content-Type"] == "application/json") {
+         postData = JSON.stringify(data);
+     }else {
          headers = {
              'Content-Type': 'application/x-www-form-urlencoded; ' +
                  'charset=UTF-8',
-             'Cookie': M.cookie,
              'Content-Length': Buffer.byteLength(postData)
          }
      }
+
      //合并请求头
      headers = privateObj.getFunctionOrObjResult(M.reqComHeaders, headers)
- 
      var options = {
          hostname: urlObj.hostname,
          port: urlObj.port,
          path: urlObj.path,
-         method: 'POST',
+         method: methed,
          headers: headers
      }
      if (Object.keys(M.httpProxy).length > 0) {
@@ -254,9 +253,10 @@
          req.end();
      })
  }
- 
- 
- M.postJson = function (url, callback, data, headers) {
+M.post=(url, callback, data, headers)=>M._request(url, callback, data, headers,"POST")
+M.delete=(url, callback, data, headers)=>M._request(url, callback, data, headers,"DELETE")
+M.put=(url, callback, data, headers)=>M._request(url, callback, data, headers,"PUT")
+M.postJson = function (url, callback, data, headers) {
      if (typeof callback == "function") {
  
      } else {
@@ -337,9 +337,7 @@
          req.end();
      })
  }
- 
- 
- M.getHttps = function (url, callback, data) {
+M.getHttps = function (url, callback, data) {
      var getData = "";
      if (data) {
          getData = querystring.stringify(data);
@@ -1208,7 +1206,7 @@
          r.code = 200;
          r.msg  = message||"success"
      }
-     r.requestId=M.req.requestId;
+     r.requestId=M.req? M.req.requestId:"";
      try {
          var obj = JSON.parse(data);
          if (typeof obj == 'object' && obj) {
@@ -1272,6 +1270,8 @@
      //处理get和post请求
      this._get = {};
      this._post = {};
+     this._put = {};
+     this._delete = {};
      this._mapping = {};
      //用于模拟过滤器
      this._begin = function () {
@@ -1284,6 +1284,8 @@
      };
      var app =async function (req, res) {
          try {
+             M.req=req;
+             M.res=res;
              //是否已经发送过了
              res.alreadySend = false;
              req.requestId=M.randomStr();
@@ -1296,7 +1298,7 @@
                  }
              }
              //是否为rest请求
-             req.isGetRestRequest = function () {
+             req.isRestRequest = function () {
                  if (Object.keys(G._rest).length == 0) return false;
                  var isRest = false;
                  for (let i = 0; i < Object.keys(G._rest).length; i++) {
@@ -1447,17 +1449,17 @@
              //获取请求的方式 get  post
              var method = req.method.toLowerCase();
              if (req.isStaticRequest()) {
+
                  await G._begin(req, res);
                  if (!res.alreadySend) await privateObj.dealUseServer(req, res);
                  if (!res.alreadySend) await privateObj.staticServer(req, res, G["_views"]);
              } else {
-                 M.req=req;
-                 M.res=res;
+
                  //为req加个params用于存放请求参数
                  req.params = {};
                  var mapingPath = "";
                  //如果是rest风格的请求,为其封装请求参数
-                 if (req.isGetRestRequest()) {
+                 if (req.isRestRequest()) {
                      for (let i = 0; i < Object.keys(G._rest).length; i++) {
                          if (pathname.startsWith(Object.keys(G._rest)[i])) {
                              pathname = Object.keys(G._rest)[i];
@@ -1481,8 +1483,12 @@
                   */
                  req.params = Object.assign(req.params, url_module.parse(req.url, true).query);
 
-                 if ((method == "get" || method == "post") && (G['_' + method][pathname])) {
-                     if (method == 'post') { /*执行post请求*/
+                 if ((method == "get" ||
+                     method == "post" ||
+                     method == "put" ||
+                     method == "delete"
+                 ) && (G['_' + method][pathname])) {
+                     if (method != 'get') { /*执行post请求*/
                          var postStr = '';
                          req.on('data', function (chunk) {
                              postStr += chunk;
@@ -1491,12 +1497,13 @@
                              req.body = postStr;  /*表示拿到post的值*/
                              postData = "";
                              try {
-                                 postData = url_module.parse("?" + req.body, true).query;
-                             } catch (e) {
-                                 try {
+                                 if(req.headers["content-type"].indexOf("application/json")>=0){
                                      postData = JSON.parse(req.body);
-                                 } catch (e) {
+                                 }else {
+                                     postData = url_module.parse("?" + req.body, true).query;
                                  }
+                             } catch (e) {
+
                              }
                              req.params = Object.assign(req.params, postData);
                              await  G._begin(req, res);
@@ -1577,8 +1584,26 @@
          }
          G._post[url] = callback;
      }
- 
- 
+
+     app.put = function (url, callback) {
+         url = M.formatUrl(url);
+         var realUrl = url;
+         if (url.indexOf(":") > 0) {
+             url = url.substr(0, url.indexOf(":"));
+             G._rest[url] = realUrl;
+         }
+         G._put[url] = callback;
+     }
+
+     app.delete = function (url, callback) {
+         url = M.formatUrl(url);
+         var realUrl = url;
+         if (url.indexOf(":") > 0) {
+             url = url.substr(0, url.indexOf(":"));
+             G._rest[url] = realUrl;
+         }
+         G._delete[url] = callback;
+     }
      /**
       *注册任意请求方法的请求
       */
