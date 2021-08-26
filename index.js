@@ -2,8 +2,8 @@
  * File : index.js
  * By : Minglie
  * QQ: 934031452
- * Date :2019.9.28
- * version :1.9.9
+ * Date :2021.08.26
+ * version :2.0.0
  */
  var http = require('http');
  var https = require('https');
@@ -16,6 +16,7 @@
  var event = new EventEmitter();
  var privateObj = {};//本文件私有对象
  var M = {};
+ M.privateObj=privateObj;
  M.sessions = {}//保存session
  M.con_display_status_enable = false;//是否显示响应状态码
  M.cookie = "JSESSIONID=" + "6E202D5A022EBD62705AA436EC54963B";//请求携带的cook
@@ -78,8 +79,7 @@
      return r;
  }
  
- 
- M.get = function (url, callback, data, headers) {
+M.get = function (url, callback, data, headers) {
      if (typeof callback == "function") {
  
      } else {
@@ -165,7 +165,6 @@
          req.end();
      })
  }
- 
 M._request = function (url, callback, data, headers,methed) {
      if (typeof callback == "function") {
  
@@ -249,7 +248,7 @@ M._request = function (url, callback, data, headers,methed) {
          req.on('error', function (err) {
              console.error(err);
          });
-         req.write(postData);
+         if(methed !="GET") req.write(postData);
          req.end();
      })
  }
@@ -337,35 +336,14 @@ M.postJson = function (url, callback, data, headers) {
          req.end();
      })
  }
-M.getHttps = function (url, callback, data) {
-     var getData = "";
-     if (data) {
-         getData = querystring.stringify(data);
-         //url携带参数了
-         if (url.indexOf("?") > 0) {
-             getData = "&" + getData;
-         } else {
-             getData = "?" + getData;
-         }
-     }
-     https.get(url + getData, function (res) {
-         var datas = [];
-         var size = 0;
-         res.on('data', function (data) {
-             datas.push(data);
-             size += data.length;
-         });
-         res.on("end", function () {
-             var buff = Buffer.concat(datas, size);
-             var result = buff.toString();
-             callback(result, res);
-         });
-     }).on("error", function (err) {
-         console.log(err.stack)
-     });
- }
- 
- 
+//数据请求规范
+M.request={}
+M.request.get=M.get;
+M.request.post=M.post;
+M.request.delete=M.delete;
+M.request.put=M.put;
+
+
  M.require =async function (url,noCache) {
      //如果需要缓存
      let fileName=M.getFileNameByUrl(url);
@@ -785,30 +763,35 @@ M.getHttps = function (url, callback, data) {
  /**
   *逐行读取文件
   */
- M.readLine = function (file, callback) {
-     var remaining = '';
-     var input = fs.createReadStream(file);
-     input.on('data', function (data) {
-         remaining += data;
-         var index = remaining.indexOf('\n');
-         while (index > -1) {
-             var line = remaining.substring(0, index);
-             remaining = remaining.substring(index + 1);
-             callback(line);
-             index = remaining.indexOf('\n');
-         }
-     });
-     input.on('end', function () {
-         if (remaining.length > 0) {
-             callback(remaining);
-         }
-     });
+ M.readLine =async function (file, callback) {
+     let lineCount=0;
+     return new Promise((resolve, reject) =>{
+         var remaining = '';
+         var input = fs.createReadStream(file);
+         input.on('data', function (data) {
+             remaining += data;
+             var index = remaining.indexOf('\n');
+             while (index > -1) {
+                 var line = remaining.substring(0, index);
+                 remaining = remaining.substring(index + 1);
+                 lineCount++;
+                 callback(line);
+                 index = remaining.indexOf('\n');
+             }
+         });
+         input.on('end', function () {
+             if (remaining.length > 0) {
+                 resolve(lineCount);
+                 callback(remaining);
+             }
+         });
+     } )
  }
  
  
- M.readCsvLine = function (file, callback) {
-     M.readLine(file, function (line) {
-         callback(line.replace("\r", "").split(/(?<!\"[^,]+),(?![^,]+\")/));
+ M.readCsvLine =async function (file, callback) {
+    return  M.readLine(file, function (line) {
+          callback(line.replace("\r", "").split(/(?<!\"[^,]+),(?![^,]+\")/));
      })
  }
  
@@ -816,8 +799,8 @@ M.getHttps = function (url, callback, data) {
      let split= url.split("/");
      return split[split.length-1]
  }
- 
- M.getFileList = function (path) {
+
+M.getFileList = function (path) {
      //遍历读取文件
      function readFile(path, filesList, targetObj) {
          files = fs.readdirSync(path);//需要用到同步读取
@@ -859,8 +842,63 @@ M.getHttps = function (url, callback, data) {
      readFile(path, filesList, targetObj);
      return filesList;
  }
- 
- M.log = function (...params) {
+
+M.getFileDirList = function (path) {
+    //遍历读取文件
+    function readFile(path, filesList, targetObj) {
+        files = fs.readdirSync(path);//需要用到同步读取
+        files.forEach(walk);
+        function walk(file) {
+            states = fs.statSync(path + '/' + file);
+            if (states.isDirectory()) {
+                var item;
+                let dir=path + '/' + file;
+                if(dir.indexOf("lib")==-1){
+                    dirList.push(path + '/' + file)
+                }
+                if (targetObj["children"]) {
+                    item = {name: file, children: [], value: path + '/' + file};
+                    targetObj["children"].push(item);
+                } else {
+                    item = {name: file, children: [], value: path + '/' + file};
+                    filesList.push(item);
+                }
+                readFile(path + '/' + file, filesList, item);
+            }
+        }
+    }
+    var dirList=[]
+    var filesList = [];
+    var targetObj = {};
+    readFile(path, filesList, targetObj);
+    return dirList;
+}
+
+
+M.watchFile=function (watch,callback) {
+    let t1=new Date().getTime();
+    let t2=new Date().getTime();
+    fs.watch(watch, (event, file) => {
+        if (file) {
+            //console.log(event,"=======>event")
+            if(event==="change"){
+                t2=new Date().getTime();
+                if(t2-t1>800){
+                    t1=t2;
+                    if(file.indexOf(".")>0){
+                        callback({file,event})
+                    }
+                }
+            }else if(event==="rename"){
+                callback({file,event})
+            }
+        }
+    });
+}
+
+
+
+M.log = function (...params) {
      if (Array.isArray(params[0]) || typeof params[0] == 'object') {
          params = [JSON.stringify(params[0])]
      }
@@ -1203,7 +1241,7 @@ M.getHttps = function (url, callback, data) {
          r.code = -2;
          r.msg  = message||"操作失败";
      } else {
-         r.code = 200;
+         r.code = 0;
          r.msg  = message||"success"
      }
      r.requestId=M.req? M.req.requestId:"";
@@ -1219,7 +1257,25 @@ M.getHttps = function (url, callback, data) {
      }
      return JSON.stringify(r);
  }
- /**
+
+M.successResult=(d,msg)=>{
+    let r=d;
+    return {
+        code:0,
+        msg: msg||"success",
+        data:r
+    }
+}
+
+M.failResult=(msg,code,d)=>{
+    return {
+        code: code|| -1,
+        msg: msg||"fail",
+        data:d
+    }
+}
+
+/**
   *获取下划线式的对象
   */
  M.getUnderlineObj = function (obj) {
@@ -1936,6 +1992,15 @@ privateObj.dealUseServer = async function (req, res) {
              return;
      }
  }
+
+M.delayMs=async function (ms){
+    return new Promise(r=>{
+        setTimeout(()=>{
+            r(1)
+        },ms)
+    })
+}
+
  /**
   * ----------------------其他工具函数END--------------------------------------------
   */
@@ -2088,7 +2153,9 @@ privateObj.dealUseServer = async function (req, res) {
      ".jpg": "image/jpeg",
      ".jpz": "image/jpeg",
      ".js": "application/javascript",
-     ".jsx": "application/octet-stream",
+     ".jsx": "application/javascript",
+     ".woff":" application/x-font-woff",
+     ".woff2":" application/x-font-woff",
      ".jwc": "application/jwc",
      ".kjx": "application/x-kjx",
      ".lak": "x-lml/x-lak",
@@ -2304,7 +2371,6 @@ privateObj.dealUseServer = async function (req, res) {
      ".sv4cpio": "application/x-sv4cpio",
      ".sv4crc": "application/x-sv4crc",
      ".svf": "image/vnd",
-     ".svg": "image/svg+xml",
      ".svh": "image/svh",
      ".svr": "x-world/x-svr",
      ".swf": "application/x-shockwave-flash",
