@@ -956,52 +956,108 @@ M.log = function (...params) {
  }
  
  ///////////////////////////////
- 
- 
- M.getMySql = function (dbConfig) {
-     if (M.mysql) {
-         return M.mysql;
-     }
-     var mysql = require('mysql');
-     let defaultDbConfig = {
-         "host": dbConfig.host || "localhost",
-         "user": dbConfig.user || "root",
-         "password": dbConfig.password || "123456",
-         "port": dbConfig.port || "3306",
-         "database": dbConfig.database || "miapi",
-         multipleStatements: true,
-         dateStrings: true,
-         timezone: "08:00"
-     }
-     var Db = {};
-     console.log("connect mysql", defaultDbConfig)
-     var pool = mysql.createPool(defaultDbConfig);
-     Db.doSql = function (sql, params) {
-         if (Db.display_sql_enable) {
-             M.log(sql)
-         }
-         var promise = new Promise(function (reslove, reject) {
-             pool.getConnection(function (err, connection) {
-                 connection.query(sql, params, function (err, rows) {
-                     if (err) {
-                         console.error(err);
-                         reject(err);
-                     } else {
-                         reslove(rows);
-                     }
-                 });
- 
-                 connection.release();
-             });
-         })
-         return promise;
-     }
-     M.mysql = Db;
-     return Db;
- }
- 
- 
- M.getMongoDB = function (dbConfig) {
+
+
+M.getMySql = function (dbConfig) {
+    if (M.mysql) {
+        return M.mysql;
+    }
+    var mysql = require('mysql');
+    let defaultDbConfig = {
+        "host": dbConfig.host || "localhost",
+        "user": dbConfig.user || "root",
+        "password": dbConfig.password || "123456",
+        "port": dbConfig.port || "3306",
+        "database": dbConfig.database || "miapi",
+        multipleStatements: true,
+        dateStrings: true,
+        timezone: "08:00"
+    }
+    var Db = {};
+    console.log("connect mysql", defaultDbConfig)
+    var pool = mysql.createPool(defaultDbConfig);
+    Db.pool=pool;
+    Db.getConnection= function(callback){
+        return new Promise(((resolve, reject) => {
+            pool.getConnection(function(err, connection) {
+                if (err) {
+                    reject(null);
+                    return;
+                }
+                resolve(connection);
+            });
+        }))
+    }
+    Db.doSql = function (sql, params) {
+        if (Db.display_sql_enable) {
+            M.log(sql)
+        }
+        var promise = new Promise(function (reslove, reject) {
+            pool.getConnection(function (err, connection) {
+                connection.query(sql, params, function (err, rows) {
+                    if (err) {
+                        console.error(err);
+                        reject(err);
+                    } else {
+                        reslove(rows);
+                    }
+                });
+
+                connection.release();
+            });
+        })
+        return promise;
+    }
+    Db.transactionRun=async function (task){
+        Db.getConnection().then(async connection=>{
+            let doSqlObj={}
+            doSqlObj.doSql = function (sql, params) {
+                if (Db.display_sql_enable) {
+                    M.log(sql)
+                }
+                var promise = new Promise(function (reslove, reject) {
+                    connection.query(sql, params, function (err, rows) {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            reslove(rows);
+                        }
+                    });
+                })
+                return promise;
+            }
+            connection.beginTransaction(  async function(err) {
+                if (err) {
+                    console.error(err);
+                    return;
+                }
+                try {
+                    await task(doSqlObj)
+                }catch (e){
+                    connection.rollback(function() {
+                        console.error(e);
+                        connection.release();
+                    });
+                    return;
+                }
+                connection.commit(function(err) {
+                    //释放资源
+                    connection.release();
+                    if (err) {
+                        console.error(err);
+                        return;
+                    }
+                });
+            });
+        })
+    }
+    M.mysql = Db;
+    return Db;
+}
+
+
+
+M.getMongoDB = function (dbConfig) {
      if (M.mongoDb) {
          return M.mongoDb;
      }

@@ -10,7 +10,7 @@
  ```
 # cdn
 
-https://unpkg.com/ming_node@2.0.0/index.js
+https://unpkg.com/ming_node@2.1.0/index.js
 
   
 # ming_node最小环境    
