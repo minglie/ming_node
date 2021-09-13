@@ -2,8 +2,8 @@
  * File : index.js
  * By : Minglie
  * QQ: 934031452
- * Date :2021.08.26
- * version :2.2.0
+ * Date :2021.09.14
+ * version :2.2.2
  */
  var http = require('http');
  var https = require('https');
@@ -1802,13 +1802,13 @@ M.failResult=(msg,code,d)=>{
          );
          res.end();
      })
- 
- 
- 
+
+
+
      app.listen = function (port) {
-         http.createServer(app).listen(port);
+         const server= http.createServer(app).listen(port);
          console.log("listen on port:" + port);
-         return app;
+         return server;
      }
  
      return app;
