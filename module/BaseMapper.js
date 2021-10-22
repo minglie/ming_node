@@ -1,4 +1,4 @@
-const M=require("../index")
+const M=require("ming_node")
 const Db=M.getMySql({})
 
 class BaseMapper {
@@ -12,9 +12,16 @@ class BaseMapper {
      * @returns {Promise<*>}
      */
     async insert(obj){
-       let sql=  BaseMapper.getInsertObjSql(this.tableName,obj)
-       let r=await Db.doSql(sql);
-       return r;
+        let sql=  BaseMapper.getInsertObjSql(this.tableName,obj)
+        let r=await Db.doSql(sql);
+        return r;
+    }
+
+
+    async replace(obj){
+        let sql=  BaseMapper.getReplaceObjSql(this.tableName,obj)
+        let r=await Db.doSql(sql);
+        return r;
     }
 
     /**
@@ -125,7 +132,7 @@ class BaseMapper {
      * @param order
      * @returns {Promise<{total: (*|{}), dataList: *}>}
      */
-   async selectPage({page=1,num=10,queryCase="1=1", columns="*",order="id desc"}){
+    async selectPage({page=1,num=10,queryCase="1=1", columns="*",order="id desc"}){
         let start = (page - 1) * num;
         let whereCase=queryCase;
         let queryColumn=BaseMapper.getColumn(columns);
@@ -156,7 +163,7 @@ class BaseMapper {
      * @param queryCase
      * @returns {Promise<*>}
      */
-   async selectDescendantIdList({parent_id=-1, queryCase="1=1"}){
+    async selectDescendantIdList({parent_id=-1, queryCase="1=1"}){
         let sql=`
            select id from (
                 select t1.id,
@@ -167,9 +174,9 @@ class BaseMapper {
                 (select @pids := ${parent_id}) t2
                 ) t3 where ischild != 0 
         `;
-       let dataList=await Db.doSql(sql);
-       return dataList;
-   }
+        let dataList=await Db.doSql(sql);
+        return dataList;
+    }
 
     /**
      * 查树
@@ -178,31 +185,31 @@ class BaseMapper {
      * @returns {Promise<*>}
      */
     async selectTree({columns="*",parent_id=-1}){
-          const that=this;
-          async function getList(pid){
-               let sql=`
+        const that=this;
+        async function getList(pid){
+            let sql=`
                SELECT ${columns} from ${that.tableName} WHERE parent_id=${pid};
             `;
-               let dataList=await Db.doSql(sql);
-               return dataList;
-           };
-         async function addChilden(record){
-             let cList= await getList(record.id);
-             record.childen=cList;
-             if(cList.length==0){
-                 return
-             }
-             for (let i=0;i<cList.length;i++){
-                 let cObj= cList[i];
-                 addChilden(cObj);
-             }
-         }
+            let dataList=await Db.doSql(sql);
+            return dataList;
+        };
+        async function addChilden(record){
+            let cList= await getList(record.id);
+            record.childen=cList;
+            if(cList.length==0){
+                return
+            }
+            for (let i=0;i<cList.length;i++){
+                let cObj= cList[i];
+                addChilden(cObj);
+            }
+        }
 
         let rootList=await getList(parent_id);
-         for (let i=0;i<rootList.length;i++){
-             let obj=rootList[i];
-             await addChilden(obj);
-         }
+        for (let i=0;i<rootList.length;i++){
+            let obj=rootList[i];
+            await addChilden(obj);
+        }
         return rootList;
     }
 
@@ -215,7 +222,7 @@ class BaseMapper {
         }
         return queryColumn;
     }
-    
+
     static getFirstRecord(records){
         if(records.length==0){
             return null
@@ -239,6 +246,21 @@ class BaseMapper {
         return sql;
     }
 
+    static getReplaceObjSql(tableName, obj) {
+        var fields = "(";
+        var values = "(";
+        for (let field in obj) {
+            fields += field + ",";
+            values += `'${obj[field]}'` + ",";
+        }
+        fields = fields.substr(0, fields.lastIndexOf(","));
+        values = values.substr(0, values.lastIndexOf(","));
+        fields += ")";
+        values += ");";
+        let sql = "replace into " + tableName + fields + " values " + values;
+        return sql;
+    }
+
     static getDeleteObjSql(tableName,caseStr) {
         caseStr=!caseStr? `id=${obj.id}`:caseStr;
         let sql = `delete from ${tableName} where ${caseStr}`;
@@ -256,7 +278,7 @@ class BaseMapper {
         sql = `update ${tableName} set ${fields.map(u => u + "='" + obj[u] + "'")} where ${caseStr}`;
         return sql;
     }
-    
+
     static getSelectObjSql(tableName, obj) {
         var fields = [];
         for (let field in obj) {
@@ -266,7 +288,7 @@ class BaseMapper {
         sql = sql.replace(/,/g, " and ")
         return sql;
     }
-    
+
 }
 
 
