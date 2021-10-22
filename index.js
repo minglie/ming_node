@@ -3,7 +3,7 @@
  * By : Minglie
  * QQ: 934031452
  * Date :2021.09.14
- * version :2.2.2
+ * version :2.5.0
  */
  var http = require('http');
  var https = require('https');
@@ -30,6 +30,8 @@
  M.database_path = "./M_database.json";//文件型数据库路径
  M.log_display_time = true;//日志是否显示当前时间
  M.httpProxy = {};// http 代理配置
+ M._sseClientMap=new Map();
+ M._sseHeatTime=3000;
  M.httpBefore = (d) => {
      return d
  }
@@ -1963,31 +1965,96 @@ privateObj.dealUseServer = async function (req, res) {
  
  /*SSE SERVER */
  M.sseServer = function () {
+    //sse 心跳
+     function headBeat(){
+         try {
+             let clientIdList= Array.from(M._sseClientMap.keys());
+             for (let i=0;i<clientIdList.length;i++){
+                 let clientId= clientIdList[i];
+                 let res= M._sseClientMap.get(clientId).res;
+                 let r=  res.write(': \n\n');
+                 if(!r){
+                     M._sseClientMap.delete(clientId);
+                     M["_sse_disconnect"](clientId);
+                 }
+             }
+         }catch (e){
+            console.error(e);
+         }
+     }
+
+     M["_sse_connection"]=(clientId)=>{
+         console.log(clientId+" connection")
+     }
+
+     M["_sse_disconnect"]=(clientId)=>{
+         console.log(clientId+" disconnect")
+     }
+
+     M["_sse_send"]=(clientId,msg)=>{
+        // console.log("sse_send",clientId,msg)
+     }
+
+     event.on('sseSendMsg', function (sendData,clientId,eventName="slide",id=+new Date()) {
+         let sendObj={event:eventName,id:id,data:JSON.stringify(sendData),retry:10000}
+         if(!clientId){
+             let clientIdList= Array.from(M._sseClientMap.keys())
+             for (let i=0;i<clientIdList.length;i++){
+                 let clientId= clientIdList[i];
+                 let res=M._sseClientMap.get(clientId)?M._sseClientMap.get(clientId).res:null;
+                 if(res==null){
+                     continue;
+                 }
+                 res.write(`event: ${sendObj.event}\n`); // 事件类型
+                 res.write(`id: ${sendObj.id}\n`); // 消息 ID
+                 res.write(`data: ${sendObj.data}\n`); // 消息数据
+                 res.write(`retry: ${sendObj.retry}\n`); // 重连时间
+                 res.write('\n\n'); // 消息结束
+             }
+         }else {
+             let res=M._sseClientMap.get(clientId)?M._sseClientMap.get(clientId).res:null;
+             if(res==null){
+                 return
+             }
+             res.write(`event: ${sendObj.event}\n`); // 事件类型
+             res.write(`id: ${sendObj.id}\n`); // 消息 ID
+             res.write(`data: ${sendObj.data}\n`); // 消息数据
+             res.write(`retry: ${sendObj.retry}\n`); // 重连时间
+             res.write('\n\n'); // 消息结束
+         }
+         M["_sse_send"](clientId,sendObj);
+     })
+     setInterval(() => {
+         headBeat();
+     }, M._sseHeatTime);
+
      let app = function (req, res) {
-         console.log("SSEServer connect success")
+         headBeat();
+         let clientId=req.params.clientId;
+         let connectionRes= M["_sse_connection"](clientId);
+         if(connectionRes==false){
+             return;
+         }
+         M._sseClientMap.set(clientId,{res});
          res.writeHead(200, {
              'Content-Type': 'text/event-stream',
              'Cache-Control': 'no-cache',
              'Connection': 'keep-alive',
              'Access-Control-Allow-Origin': '*',
          });
-         event.removeAllListeners("sseSendMsg")
-         event.on('sseSendMsg', function (r) {
-             res.write('event: slide\n'); // 事件类型
-             res.write(`id: ${+new Date()}\n`); // 消息 ID
-             res.write(`data: ${r}\n`); // 消息数据
-             res.write('retry: 10000\n'); // 重连时间
-             res.write('\n\n'); // 消息结束
-         })
-         // 发送注释保持长连接
-         setInterval(() => {
-             res.write(': \n\n');
-         }, 12000);
- 
      };
-     app.send = function (msg) {
-         event.emit('sseSendMsg', msg);
+     app.send = function (msg,clientId,eventName,id) {
+         event.emit('sseSendMsg', msg,clientId,eventName,id);
      }
+
+     app.call = function (eventName,msg,clientId,id) {
+         event.emit('sseSendMsg', msg,clientId,eventName,id);
+     }
+
+     app.set = function (k, v) {
+         M["_" + k] = v;
+     }
+
      app.listen = function (port) {
          let serverObj = http.createServer(app).listen(port);
          app.serverObj = serverObj;
