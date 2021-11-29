@@ -71,6 +71,52 @@ class MemoryDb{
         rows = rows.splice((startPage - 1) * limit, limit)
         return {rows, total}
     }
+
+
+    deleteAll(o) {
+        if (o) {
+            let r_list = [];
+            let o_keys = Object.keys(caseObj);
+            let o_vals = o[o_key]
+            var d = this.dataList;
+            let delete_index=[]
+            for (let i = 0; i < d.length; i++) {
+                let s=0;
+                for (let j=0;j<o_keys.length;j++){
+                    if (d[i][o_keys[j]] != o_vals[j]) {
+                        break
+                    }
+                    s++;
+                }
+                if(s==o_keys.length){
+                    delete_index.push(i)
+                }
+            }
+            for (let i = 0; i < d.length; i++) {
+                 if(!delete_index.includes(i)){
+                     r_list.push(d[i])
+                 }
+            }
+            this.dataList=r_list;
+            return delete_index.length;
+        } else {
+            let length=this.dataList.length;
+            this.dataList=[];
+            return length;
+        }
+    }
+
+
+    deleteById(id) {
+        var d = this.dataList;
+        for (let i = 0; i < d.length; i++) {
+            if(d[i].id==id){
+                this.dataList.splice(i, 1);
+                return id;
+            }
+        }
+        return 0;
+    }
 }
 
 
