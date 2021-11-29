@@ -1,18 +1,13 @@
-var M=require("../index");
+var M=require("ming_node");
+var BaseGraphqlApi=require("plugins/BaseGraphqlApi");
 var app=M.server();
 app.listen(8888);
-app.put("/getById/:id",(req,res)=>{
-    console.log("put",req.params);
-    res.send("ok");
-})
-
-app.post("/getById/:id",(req,res)=>{
-    console.log("post",req.params);
-    res.send("ok");
-})
 
 
-app.delete("/getById/:id",(req,res)=>{
-    console.log("delete",req.params);
-    res.send("ok");
-})
+//方式1
+app.use(new BaseGraphqlApi({
+    tableName:"mi_file",
+    prefix:"mifile",
+    db:"mysql"
+}));
+

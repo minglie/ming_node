@@ -3,7 +3,7 @@
  * By : Minglie
  * QQ: 934031452
  * Date :2021.09.14
- * version :2.2.3
+ * version :2.2.4
  */
  var http = require('http');
  var https = require('https');
@@ -1663,15 +1663,30 @@ M.failResult=(msg,code,d)=>{
          G._server = callback;
      }
      app.use=function (url,callback){
-         if (Array.isArray(url)) {
-             url.forEach(u=>{
-                 let regExp=new RegExp(u)
-                 G._use[u] = {url,regExp,callback};
-             })
-         } else {
-             let regExp=new RegExp(url)
-             G._use[url] = {url,regExp,callback};
+         if(typeof url === 'function' || typeof url === 'object'  ){
+             let plugin=url;
+             let args=callback;
+             if(plugin.installed){
+                 return app;
+             }
+             if (typeof plugin === 'function') {
+                 plugin(app, args);
+             } else {
+                 plugin.install(app, args);
+             }
+             plugin.installed = true;
+         }else {
+             if (Array.isArray(url)) {
+                 url.forEach(u=>{
+                     let regExp=new RegExp(u)
+                     G._use[u] = {url,regExp,callback};
+                 })
+             } else {
+                 let regExp=new RegExp(url)
+                 G._use[url] = {url,regExp,callback};
+             }
          }
+         return app;
      }
      /**
       * 注册get请求
