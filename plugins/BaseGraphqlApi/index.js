@@ -1,0 +1,9 @@
+class BaseGraphqlApi{
+
+    constructor({tableName}) {
+
+
+    }
+
+
+}
