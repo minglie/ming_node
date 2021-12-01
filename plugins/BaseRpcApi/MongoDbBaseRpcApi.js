@@ -1,8 +1,9 @@
 /**
- * 数据源为内存的rpc风格接口
+ *
+ * @type {MemoryDb|{}}
  */
-const MemoryDb=require("../../module/MemoryDb");
-const CollectionUtils=require("../../utils/common/CollectionUtils");
+
+const MemoryDb=require("../../module/MemoryDb")
 const M=require("../../index");
 
 const memoryDb = new MemoryDb();
@@ -38,11 +39,6 @@ class MemoryBaseRpcApi{
         return r;
     }
 
-    async getChildenList(id){
-        let r= memoryDb.listAll({parent_id:id});
-        return r;
-    }
-
     install(app,args){
         app.post(`${this.prefix}/add`,async (req,res)=>{
             let r=await this.add(req.params)
@@ -75,11 +71,10 @@ class MemoryBaseRpcApi{
         })
 
         /**
-         * 如果有parent_id才能返回树
+         * 如果有parentId则返回树
          */
         app.get(`${this.prefix}/tree`,async (req,res)=>{
-            const {parent_id,...queryCase}=req.params;
-            let r=await  CollectionUtils.selectTree(parent_id,this.getChildenList,queryCase);
+            let r=await this.list({page,num});
             res.send(M.successResult(r));
         })
     }
