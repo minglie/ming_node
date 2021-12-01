@@ -1827,9 +1827,6 @@ M.failResult=(msg,code,d)=>{
          console.log("listen on port:" + port);
          return server;
      }
-
-     app.M=M;
-
      return app;
  }
  M["_gloable_exception_handle"]=(err)=>{
