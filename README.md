@@ -10,7 +10,7 @@
  ```
 # cdn
 
-https://unpkg.com/ming_node/index.js
+https://unpkg.com/ming_node/MemoryBaseRpcApi.js
 
   
 # ming_node最小环境    

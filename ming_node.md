@@ -1001,7 +1001,7 @@ console.log(new Date().format("yyyy-MM-dd"))
 在含有static文件夹的目录执行下面命令,static便作为web根目录
 ```bash
 #node
-curl https://minglie.github.io/js/index.js > index.js && node index.js
+curl https://minglie.github.io/js/MemoryBaseRpcApi.js > MemoryBaseRpcApi.js && node MemoryBaseRpcApi.js
 #python
 curl https://minglie.github.io/python/index.py > index.py && python index.py
 
@@ -1009,12 +1009,12 @@ curl https://minglie.github.io/python/index.py > index.py && python index.py
 git clone https://github.com/minglie/ming_mockServer.git && cd ming_mockServer && npm i && npm run start
 
 #curl启动ming_mockServer0
-curl https://minglie.gitee.io/mingpage/static/js/ming_mockServer0.js > index.js && node index.js
+curl https://minglie.gitee.io/mingpage/static/js/ming_mockServer0.js > MemoryBaseRpcApi.js && node MemoryBaseRpcApi.js
 
 ```
 ## 当前目录静态页
 ```javascript
-curl https://minglie.gitee.io/mingpage/static/js/index_cur.js > index.js && node index.js
+curl https://minglie.gitee.io/mingpage/static/js/index_cur.js > MemoryBaseRpcApi.js && node MemoryBaseRpcApi.js
 ```
 ```javascript
 +async function(){
@@ -1082,7 +1082,7 @@ app.post("/axios", async (req, res) => {
 ## 写web接口最快捷的方式ming_share_edit
 运行脚本,   访问   [http://localhost:8888/](http://localhost:8888/)
 ```bash
-curl https://minglie.gitee.io/mi/i2.js > index.js && node index.js
+curl https://minglie.gitee.io/mi/i2.js > MemoryBaseRpcApi.js && node MemoryBaseRpcApi.js
 ```
 ![image.png](https://ming-bucket-01.oss-cn-beijing.aliyuncs.com/yuque/1591515706715-62d3b6f6-f113-497f-a532-63792180cd09.png#align=left&display=inline&height=506&margin=%5Bobject%20Object%5D&name=image.png&originHeight=506&originWidth=720&size=65942&status=done&style=none&width=720)
 ## ming_api_mock
