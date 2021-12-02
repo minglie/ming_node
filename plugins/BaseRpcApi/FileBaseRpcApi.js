@@ -24,6 +24,11 @@ class FileBaseRpcApi extends AbstractBaseRpc{
         return r;
     }
 
+    async getById(id){
+        let r=M.getById(this.tableName,id);
+        return r;
+    }
+
     async list({page=1,num=10,queryCase}){
         page=Number.parseInt(page);
         num=Number.parseInt(num);

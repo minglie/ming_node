@@ -110,6 +110,15 @@ class MemoryDb{
         }
     }
 
+    getById(id) {
+        var d = this.dataList;
+        for (let i = 0; i < d.length; i++) {
+            if(d[i].id==id){
+                return d[i];
+            }
+        }
+        return null;
+    }
 
     deleteById(id) {
         var d = this.dataList;
