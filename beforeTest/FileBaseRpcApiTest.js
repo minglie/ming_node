@@ -1,7 +1,7 @@
 var M=require("../index");
 const FileBaseRpcApi= require("../plugins/BaseRpcApi/FileBaseRpcApi");
 
-let fileBaseRpcApi = new FileBaseRpcApi({prefix:"ming", tableName:"a.json"})
+let fileBaseRpcApi = new FileBaseRpcApi({prefix:"ming", tableName:"a.json",generateTime:true})
 var app=M.server();
 app.listen(8888);
 

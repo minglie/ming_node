@@ -3,9 +3,10 @@ const M=require("../../index");
 
 class AbstractBaseRpc{
 
-    constructor({tableName,prefix}) {
+    constructor({tableName,prefix,generateTime=false}) {
         this.tableName=tableName;
         this.prefix=prefix?prefix:tableName;
+        this.generateTime=generateTime;
     }
 
     async add(obj){}
@@ -17,7 +18,11 @@ class AbstractBaseRpc{
 
     install(app,args){
         app.post(`${this.prefix}/add`,async (req,res)=>{
-            let r=await this.add(req.params)
+            const params=req.params;
+            if(this.generateTime){
+                params.gmt_create=new Date();
+            }
+            let r=await this.add(params)
             res.send(M.successResult(r));
         })
         app.post(`${this.prefix}/delete`,async (req,res)=>{
@@ -26,7 +31,11 @@ class AbstractBaseRpc{
         });
 
         app.post(`${this.prefix}/update`,async (req,res)=>{
-            await this.update(req.params);
+            const params=req.params;
+            if(this.generateTime){
+                params.gmt_modified=new Date();
+            }
+            await this.update(params);
             res.send(M.successResult());
         });
 
