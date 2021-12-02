@@ -2,9 +2,9 @@
  * 数据源为内存的rpc风格接口
  */
 const MemoryDb=require("../../module/MemoryDb");
-const AbstractBaseRpc=require("./AbstractBaseRpc");
+const AbstractBaseRpcApi=require("./AbstractBaseRpcApi");
 
-class MemoryBaseRpcApi extends AbstractBaseRpc{
+class MemoryBaseRpcApi extends AbstractBaseRpcApi{
 
     constructor(props) {
        super(props);

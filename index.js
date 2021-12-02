@@ -1370,6 +1370,40 @@ M.failResult=(msg,code,d)=>{
  M.randomStr = function () {
      return (Math.random().toString(36) + new Date().getTime()).slice(2);
  }
+
+M.urlStringify = function (obj) {
+    if (obj !== null && typeof obj === 'object') {
+        var keys = Object.keys(obj);
+        var len = keys.length;
+        var flast = len - 1;
+        var fields = '';
+        for (var i = 0; i < len; ++i) {
+            var k = keys[i];
+            var v = obj[k];
+            var ks = k + "=";
+            fields += ks + v;
+            if (i < flast)
+                fields += "&";
+        }
+        return fields;
+    }
+    return '';
+};
+
+M.urlParse = function (url) {
+    url = url.substr(url.indexOf("?") + 1);
+    var t, n, r, i = url, s = {};
+    t = i.split("&"),
+        r = null,
+        n = null;
+    for (var o in t) {
+        var u = t[o].indexOf("=");
+        u !== -1 && (r = t[o].substr(0, u),
+            n = t[o].substr(u + 1),
+            s[r] = n)
+    }
+    return s
+};
  
  /**
   * 异常处理钩子

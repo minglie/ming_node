@@ -3,10 +3,10 @@
  */
 
 const BaseMapper=require("../../module/BaseMapper");
-const AbstractBaseRpc=require("./AbstractBaseRpc");
+const AbstractBaseRpcApi=require("./AbstractBaseRpcApi");
 
 
-class MysqlBaseRpcApi extends AbstractBaseRpc{
+class MysqlBaseRpcApi extends AbstractBaseRpcApi{
     constructor(props) {
         super(props);
         this.dbBaseMapper= new BaseMapper(this.tableName);

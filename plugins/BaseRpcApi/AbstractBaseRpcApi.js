@@ -1,7 +1,7 @@
 const CollectionUtils=require("../../utils/common/CollectionUtils");
 const M=require("../../index");
 
-class AbstractBaseRpc{
+class AbstractBaseRpcApi{
 
     constructor({tableName,prefix,generateTime=false}) {
         this.tableName=tableName;
@@ -69,4 +69,4 @@ class AbstractBaseRpc{
 
 
 
-module.exports = AbstractBaseRpc;
+module.exports = AbstractBaseRpcApi;

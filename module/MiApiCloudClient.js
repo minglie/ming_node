@@ -3,7 +3,7 @@ var https = require('https');
 var url_module = require('url');
 var M=require("../index")
 function myAxios(axiosConfig) {
-    axiosConfig.body=JSON.stringify(axiosConfig.data)
+    axiosConfig.body=M.urlStringify(axiosConfig.data)
     axiosConfig.headers.host = "";
     var urlObj = url_module.parse(axiosConfig.url)
     var options = {
@@ -11,8 +11,12 @@ function myAxios(axiosConfig) {
         port: urlObj.port,
         path: urlObj.path,
         method: axiosConfig.method.toLocaleUpperCase(),
-        headers: axiosConfig.headers
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+            ...axiosConfig.headers
+        }
     }
+
     let reqHttp = http;
     if (axiosConfig.url.startsWith("https")) {
         reqHttp = https;
@@ -277,10 +281,10 @@ function Resource(appId, appKey, baseurl) {
     this.baseurl = baseurl || "https://d.apicloud.com/mcm/api";
     this.appCode = SHA1(appId + "UZ" + appKey + "UZ" + now) + "." + now;
     this.defaultactions = {
-        'get': { method: 'GET', params: ["_id", "_relation"] }, //_relationid 鍚庣画鏀寔
-        'save': { method: 'POST', params: ["_id", "_relation"] }, //_relationid 鍚庣画鏀寔
+        'get': { method: 'GET', params: ["_id", "_relation"] },
+        'save': { method: 'POST', params: ["_id", "_relation"] },
         'query': { method: 'GET', params: ["filter"] },
-        'delete': { method: 'DELETE', params: ["_id", "_relation"] }, //_relationid 鍚庣画鏀寔
+        'delete': { method: 'DELETE', params: ["_id", "_relation"] },
         'login': { method: "POST", params: ["username", "password"] },
         'logout': { method: "POST" },
         'count': { method: "GET", params: ["_id", "_relation", "filter"] },

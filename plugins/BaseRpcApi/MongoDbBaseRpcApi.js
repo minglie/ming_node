@@ -2,10 +2,10 @@
  * @type {MemoryDb|{}}
  */
 const M=require("../../index");
-const AbstractBaseRpc=require("./AbstractBaseRpc");
+const AbstractBaseRpcApi=require("./AbstractBaseRpcApi");
 
 
-class MongoDbBaseRpcApi extends AbstractBaseRpc{
+class MongoDbBaseRpcApi extends AbstractBaseRpcApi{
     constructor(props) {
         super(props);
         this.mongoDb=M.mongoDb;
