@@ -17,7 +17,9 @@ class MongoDbBaseRpcApi extends AbstractBaseRpc{
     }
 
     async delete(obj){
-        let r= this.dbBaseMapper.delete(obj);
+        let r= this.mongoDb.remove(this.tableName,{
+            _id:  M.mongoDb.ObjectID(obj.id)
+        });
         return r;
     }
 
@@ -26,11 +28,28 @@ class MongoDbBaseRpcApi extends AbstractBaseRpc{
         return r;
     }
 
-    async list({page,num,queryCase}){
-
-
-        return r;
+    async list({page=1,num=10,queryCase}){
+        page=Number.parseInt(page);
+        num=Number.parseInt(num);
+        let tableName=this.tableName;
+        return new Promise(async (resolve,reject)=>{
+            this.mongoDb.connect().then((db)=>{
+                var result=db.collection(this.tableName).find(queryCase,{
+                    skip:(page-1)*num,
+                    limit:num
+                });
+                result.toArray(async function(err,docs){
+                    if(err){
+                        reject(err);
+                        return;
+                    }
+                    let total=await db.collection(tableName).count(queryCase);
+                    resolve({rows:docs,total:total});
+                })
+            })
+        })
     }
+
 
     async listAll(obj){
         let r= this.mongoDb.find(this.tableName,obj);
@@ -39,7 +58,9 @@ class MongoDbBaseRpcApi extends AbstractBaseRpc{
 
     async update(obj){
         let {id,...newObj}=obj;
-        let r= this.dbBaseMapper.update(newObj,`id=${id}`);
+        let r= this.mongoDb.update(this.tableName,{
+            _id:  M.mongoDb.ObjectID(id)
+        },newObj);
         return r;
     }
 

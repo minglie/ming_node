@@ -6,7 +6,7 @@
  * rem : 内存数据库
  */
 
-const M=require("ming_node");
+const M=require("../index");
 
 class MemoryDb{
 
