@@ -1,80 +1,56 @@
 /**
- *
- * @type {MemoryDb|{}}
+ * 数据源为内存的rpc风格接口
  */
+const M=require("../../index")
+const AbstractBaseRpc=require("./AbstractBaseRpc");
 
-const M=require("../../index");
-
-
-class FileBaseRpcApi{
-    constructor({tableName,prefix}) {
-        this.tableName=tableName;
-        this.prefix=prefix?prefix:tableName;
+class FileBaseRpcApi extends AbstractBaseRpc{
+    constructor(props) {
+        super(props);
     }
-
     async add(obj){
-        let r= M.addObjToFile(obj);
-        return r;
+        obj.id = M.randomStr();
+        M.addObjToFile(this.tableName, obj);
+        return obj;
     }
 
     async delete(obj){
-        let r= M.deleteAll(obj);
+        if (obj) {
+            M.deleteObjByPropFile(this.tableName, o);
+        } else {
+            M.writeObjToFile(this.tableName,[]);
+        }
         return r;
     }
 
-    async list(obj){
-        let r= memoryDb.listByPage({startPage:0,limit:3,obj});
-        return r;
+    async list({page=1,num=10,queryCase}){
+        page=Number.parseInt(page);
+        num=Number.parseInt(num);
+        if (page <= 0) page = 1;
+        let rows =await this.listAll(queryCase);
+        let total = rows.length;
+        rows = rows.splice((page - 1) * num, num)
+        return {rows, total}
     }
 
     async listAll(obj){
-        let r= memoryDb.listAll(obj);
-        return r;
+        if (obj) {
+            return M.listAllObjByPropFile(this.tableName, obj);
+        } else {
+            return M.getObjByFile(this.tableName);
+        }
     }
 
     async update(obj){
-        let r= memoryDb.update(obj);
+        let r=  M.updateObjByIdFile(this.tableName,obj);
         return r;
     }
 
-    install(app,args){
-        app.post(`${this.prefix}/add`,async (req,res)=>{
-            let r=await this.add(req.params)
-            res.send(M.successResult(r));
-        })
-        app.get(`${this.prefix}/delete`,async (req,res)=>{
-            let r=M.deleteById(req.params.id);
-            res.send(M.successResult());
-        });
-
-        app.post(`${this.prefix}/update`,async (req,res)=>{
-            await this.update(req.params);
-            res.send(M.successResult());
-        });
-
-        app.get(`${this.prefix}/getById`,async (req,res)=>{
-            let r=await this.getById(req.params.id);
-            res.send(M.successResult());
-        });
-
-        app.get(`${this.prefix}/listAll`,async (req,res)=>{
-            let r=await this.listAll();
-            res.send(M.successResult(r));
-        });
-
-        app.get(`${this.prefix}/list`,async (req,res)=>{
-            const {page,num}=req.params;
-            let r=await this.list({page,num});
-            res.send(M.successResult(r));
-        })
-
-        /**
-         * 如果有parentId则返回树
-         */
-        app.get(`${this.prefix}/tree`,async (req,res)=>{
-            let r=await this.list({page,num});
-            res.send(M.successResult(r));
-        })
+    async getChildenList(id,caseObj){
+        let r= this.listAll({parent_id:id,...caseObj});
+        return r;
     }
 }
+
+
 module.exports = FileBaseRpcApi;

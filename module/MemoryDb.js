@@ -11,6 +11,7 @@ const M=require("ming_node");
 class MemoryDb{
 
     constructor(tableName) {
+        this.tableName=tableName;
         this.dataList=[]
     }
 
@@ -35,10 +36,10 @@ class MemoryDb{
     }
 
     listAll(caseObj){
-        if (caseObj) {
+        let o_keys = Object.keys(caseObj);
+        if (caseObj && o_keys.length>0) {
             let r_list = [];
-            let o_keys = Object.keys(caseObj);
-            let o_vals = o[o_key]
+            let o_vals = Object.values(caseObj);
             var d = this.dataList;
             for (let i = 0; i < d.length; i++) {
                 let s=0;
@@ -52,13 +53,16 @@ class MemoryDb{
                     r_list.push(d[i]);
                 }
             }
+            return r_list;
         } else {
             return this.dataList;
         }
     }
 
 
-    listByPage = function (startPage=0, limit=10, caseObj) {
+    listByPage(startPage=0, limit=10, caseObj) {
+        startPage=Number.parseInt(startPage);
+        limit=Number.parseInt(limit);
         if (startPage <= 0) startPage = 1;
         let rows;
         if (caseObj) {
@@ -76,8 +80,8 @@ class MemoryDb{
     deleteAll(o) {
         if (o) {
             let r_list = [];
-            let o_keys = Object.keys(caseObj);
-            let o_vals = o[o_key]
+            let o_keys = Object.keys(o);
+            let o_vals = Object.values(o)
             var d = this.dataList;
             let delete_index=[]
             for (let i = 0; i < d.length; i++) {

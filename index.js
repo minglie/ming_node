@@ -663,7 +663,7 @@ M.request.put=M.put;
      var d = M.getObjByFile(file);
      for (let i = 0; i < d.length; i++) {
          if (d[i].id == obj.id) {
-             d.splice(i, 1, obj);
+             d.splice(i, 1, Object.assign(d[i],obj));
              break;
          }
      }
@@ -677,17 +677,28 @@ M.request.put=M.put;
          }
      }
  }
- M.listAllObjByPropFile = function (file, o) {
-     let r_list = [];
-     let o_key = Object.keys(o)[0];
-     let o_val = o[o_key]
-     var d = M.getObjByFile(file);
-     for (let i = 0; i < d.length; i++) {
-         if (d[i][o_key] == o_val) {
-             r_list.push(d[i]);
+ M.listAllObjByPropFile = function (file, caseObj) {
+     var d =  M.getObjByFile(file);
+     let o_keys = Object.keys(caseObj);
+     if (caseObj &&  o_keys.length>0) {
+         let r_list = [];
+         let o_vals = Object.values(caseObj);
+         for (let i = 0; i < d.length; i++) {
+             let s=0;
+             for (let j=0;j<o_keys.length;j++){
+                 if (d[i][o_keys[j]] != o_vals[j]) {
+                     break
+                 }
+                 s++;
+             }
+             if(s==o_keys.length){
+                 r_list.push(d[i]);
+             }
          }
+         return r_list;
+     } else {
+         return d;
      }
-     return r_list;
  }
  /**
   * 文件型数据库第二层封装

@@ -2,86 +2,42 @@
  * 数据源为内存的rpc风格接口
  */
 const MemoryDb=require("../../module/MemoryDb");
-const CollectionUtils=require("../../utils/common/CollectionUtils");
-const M=require("../../index");
+const AbstractBaseRpc=require("./AbstractBaseRpc");
 
-const memoryDb = new MemoryDb();
+class MemoryBaseRpcApi extends AbstractBaseRpc{
 
-class MemoryBaseRpcApi{
-    constructor({tableName,prefix}) {
-        this.tableName=tableName;
-        this.prefix=prefix?prefix:tableName;
+    constructor(props) {
+       super(props);
+       this.memoryDb=new MemoryDb(props.tableName);
     }
-
     async add(obj){
-        let r= memoryDb.add(obj);
+        let r= this.memoryDb.add(obj);
         return r;
     }
 
     async delete(obj){
-        let r= memoryDb.deleteAll(obj);
+        let r= this.memoryDb.deleteAll(obj);
         return r;
     }
 
-    async list(obj){
-        let r= memoryDb.listByPage({startPage:0,limit:3,obj});
+    async list({page,num,queryCase}){
+        let r= this.memoryDb.listByPage(page,num,queryCase);
         return r;
     }
 
     async listAll(obj){
-        let r= memoryDb.listAll(obj);
+        let r= this.memoryDb.listAll(obj);
         return r;
     }
 
     async update(obj){
-        let r= memoryDb.update(obj);
+        let r= this.memoryDb.update(obj);
         return r;
     }
 
-    async getChildenList(id){
-        let r= memoryDb.listAll({parent_id:id});
+    async getChildenList(id,caseObj){
+        let r= this.memoryDb.listAll({parent_id:id,...caseObj});
         return r;
-    }
-
-    install(app,args){
-        app.post(`${this.prefix}/add`,async (req,res)=>{
-            let r=await this.add(req.params)
-            res.send(M.successResult(r));
-        })
-        app.get(`${this.prefix}/delete`,async (req,res)=>{
-            let r=M.deleteById(req.params.id);
-            res.send(M.successResult());
-        });
-
-        app.post(`${this.prefix}/update`,async (req,res)=>{
-            await this.update(req.params);
-            res.send(M.successResult());
-        });
-
-        app.get(`${this.prefix}/getById`,async (req,res)=>{
-            let r=await this.getById(req.params.id);
-            res.send(M.successResult());
-        });
-
-        app.get(`${this.prefix}/listAll`,async (req,res)=>{
-            let r=await this.listAll();
-            res.send(M.successResult(r));
-        });
-
-        app.get(`${this.prefix}/list`,async (req,res)=>{
-            const {page,num}=req.params;
-            let r=await this.list({page,num});
-            res.send(M.successResult(r));
-        })
-
-        /**
-         * 如果有parent_id才能返回树
-         */
-        app.get(`${this.prefix}/tree`,async (req,res)=>{
-            const {parent_id,...queryCase}=req.params;
-            let r=await  CollectionUtils.selectTree(parent_id,this.getChildenList,queryCase);
-            res.send(M.successResult(r));
-        })
     }
 }
 
