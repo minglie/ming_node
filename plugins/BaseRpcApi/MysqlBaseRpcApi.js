@@ -1,84 +1,67 @@
 /**
- *
  * @type {MemoryDb|{}}
  */
 
-const MemoryDb=require("../../module/MemoryDb")
-const M=require("../../index");
+const BaseMapper=require("../../module/BaseMapper");
+const AbstractBaseRpc=require("./AbstractBaseRpc");
 
-const memoryDb = new MemoryDb();
 
-class MemoryBaseRpcApi{
-    constructor({tableName,prefix}) {
-        this.tableName=tableName;
-        this.prefix=prefix?prefix:tableName;
+class MysqlBaseRpcApi extends AbstractBaseRpc{
+    constructor(props) {
+        super(props);
+        this.dbBaseMapper= new BaseMapper(this.tableName);
     }
 
     async add(obj){
-        let r= memoryDb.add(obj);
+        if(obj.gmt_create){
+            obj.gmt_create=obj.gmt_create.format("yyyy-MM-dd hh:mm:ss");
+        }
+        let r= this.dbBaseMapper.insert(obj);
         return r;
     }
 
     async delete(obj){
-        let r= memoryDb.deleteAll(obj);
+        let r= this.dbBaseMapper.delete(obj);
         return r;
     }
 
-    async list(obj){
-        let r= memoryDb.listByPage({startPage:0,limit:3,obj});
+    async list({page,num,queryCase}){
+        let queryCaseStr= MysqlBaseRpcApi.obj2QueryCase(queryCase);
+        let r= this.dbBaseMapper.selectPage({page,num,queryCase:queryCaseStr});
         return r;
     }
 
     async listAll(obj){
-        let r= memoryDb.listAll(obj);
+        let queryCase= MysqlBaseRpcApi.obj2QueryCase(obj);
+        let r= this.dbBaseMapper.selectList({queryCase:queryCase});
         return r;
     }
 
     async update(obj){
-        let r= memoryDb.update(obj);
+        if(obj.gmt_modified){
+            obj.gmt_modified=obj.gmt_modified.format("yyyy-MM-dd hh:mm:ss");
+        }
+        let {id,...newObj}=obj;
+        let r= this.dbBaseMapper.update(newObj,`id=${id}`);
         return r;
     }
 
-    install(app,args){
-        app.post(`${this.prefix}/add`,async (req,res)=>{
-            let r=await this.add(req.params)
-            res.send(M.successResult(r));
-        })
-        app.get(`${this.prefix}/delete`,async (req,res)=>{
-            let r=M.deleteById(req.params.id);
-            res.send(M.successResult());
-        });
+    async getChildenList(id,caseObj){
+        let r= this.listAll({parent_id:id,...caseObj});
+        return r;
+    }
 
-        app.post(`${this.prefix}/update`,async (req,res)=>{
-            await this.update(req.params);
-            res.send(M.successResult());
-        });
+    static obj2QueryCase(obj){
+        let queryCase="1=1";
+        if(obj && Object.keys(obj).length>0){
+            for(var p in obj) {
+                queryCase=queryCase+` and ${p}='${obj[p]}' `
+            }
+        }
+        return queryCase;
 
-        app.get(`${this.prefix}/getById`,async (req,res)=>{
-            let r=await this.getById(req.params.id);
-            res.send(M.successResult());
-        });
-
-        app.get(`${this.prefix}/listAll`,async (req,res)=>{
-            let r=await this.listAll();
-            res.send(M.successResult(r));
-        });
-
-        app.get(`${this.prefix}/list`,async (req,res)=>{
-            const {page,num}=req.params;
-            let r=await this.list({page,num});
-            res.send(M.successResult(r));
-        })
-
-        /**
-         * 如果有parentId则返回树
-         */
-        app.get(`${this.prefix}/tree`,async (req,res)=>{
-            let r=await this.list({page,num});
-            res.send(M.successResult(r));
-        })
     }
 }
 
 
-module.exports = MemoryBaseRpcApi;
+module.exports = MysqlBaseRpcApi;

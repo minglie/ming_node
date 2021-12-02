@@ -1793,9 +1793,8 @@ M.failResult=(msg,code,d)=>{
      app.set("gloable_exception_handle",(err,req,res)=>{
          console.error(err.stack)
          if (res && !res.alreadySend) {
-             res.writeHead(500, { "Content-Type": "text/html;charset='utf-8'" });
-             res.write("server err");
-             res.end();
+            // res.writeHead(500, { "Content-Type": "text/j;charset='utf-8'" });
+             res.send(M.result(err.message,false,-1));
          }
      })
  

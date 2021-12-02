@@ -1,5 +1,5 @@
-const M=require("ming_node")
-const Db=M.getMySql({})
+const M=require("../index")
+const Db=M.mysql;
 
 class BaseMapper {
     constructor(tableName) {
@@ -139,7 +139,7 @@ class BaseMapper {
         let dataList=await Db.doSql(`SELECT ${queryColumn} FROM ${this.tableName} where ${whereCase} order by ${order}  LIMIT ${start},${num}`)
         let totalR=await Db.doSql(`SELECT count(1) c FROM ${this.tableName}  where ${whereCase}`)
         let total=totalR[0].c
-        return {dataList,total};
+        return {rows:dataList,total};
     }
 
     /**
