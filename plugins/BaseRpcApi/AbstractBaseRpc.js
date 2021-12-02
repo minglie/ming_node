@@ -36,7 +36,8 @@ class AbstractBaseRpc{
         });
 
         app.get(`${this.prefix}/listAll`,async (req,res)=>{
-            let r=await this.listAll();
+            const params=req.params;
+            let r=await this.listAll(params);
             res.send(M.successResult(r));
         });
 

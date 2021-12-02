@@ -15,10 +15,11 @@ class FileBaseRpcApi extends AbstractBaseRpc{
     }
 
     async delete(obj){
+        let r=0;
         if (obj) {
-            M.deleteObjByPropFile(this.tableName, o);
+            r= M.deleteObjByPropFile(this.tableName, obj);
         } else {
-            M.writeObjToFile(this.tableName,[]);
+            r=M.writeObjToFile(this.tableName,[]);
         }
         return r;
     }

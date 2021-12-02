@@ -657,6 +657,7 @@ M.request.put=M.put;
          }
      }
      M.writeObjToFile(file, d);
+     return d_num;
  }
  
  M.updateObjByIdFile = function (file, obj) {
