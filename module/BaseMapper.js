@@ -4,6 +4,7 @@ const Db=M.mysql;
 class BaseMapper {
     constructor(tableName) {
         this.tableName =tableName;
+        this.tableSchema=null;
     }
 
     /**
@@ -52,7 +53,7 @@ class BaseMapper {
     }
 
     /**
-     *根据条件改
+     * 删除
      * @param caseStr
      * @returns {Promise<*>}
      */
@@ -213,6 +214,14 @@ class BaseMapper {
         return rootList;
     }
 
+    async getTableSchema(){
+        if(this.tableSchema==null){
+            let dataBaseName=Db.dbConfig.database;
+            let sql=`select COLUMN_NAME,COLUMN_TYPE,COLUMN_COMMENT from information_schema.columns where table_schema ='${dataBaseName}'  and table_name = '${this.tableName}';`
+            let tableSchema=await Db.doSql(sql);
+            return tableSchema;
+        }
+    }
 
 
     static getColumn(columns){
@@ -288,6 +297,8 @@ class BaseMapper {
         sql = sql.replace(/,/g, " and ")
         return sql;
     }
+
+
 
 }
 

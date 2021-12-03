@@ -988,6 +988,7 @@ M.getMySql = function (dbConfig) {
         timezone: "08:00"
     }
     var Db = {};
+    Db.dbConfig=defaultDbConfig;
     console.log("connect mysql", defaultDbConfig)
     var pool = mysql.createPool(defaultDbConfig);
     Db.pool=pool;
@@ -1221,8 +1222,9 @@ M.getMongoDB = function (dbConfig) {
          }
  
      }
-    MingMongoClient.ObjectID=(id)=> new ObjectID(id)
-    let Db=MingMongoClient;
+     MingMongoClient.ObjectID=(id)=> new ObjectID(id)
+     let Db=MingMongoClient;
+     Db.dbConfig=Config;
      MingMongoClient.collectionName="test"
      M.mongoDb=Db;
      return Db;
