@@ -1,6 +1,6 @@
 const M=require("../../index");
 
-class AbstractBaseRpc{
+class AbstractBaseRest{
 
     constructor({tableName,prefix,generateTime=false}) {
         this.tableName=tableName;
@@ -47,4 +47,4 @@ class AbstractBaseRpc{
 
 
 
-module.exports = AbstractBaseRpc;
+module.exports = AbstractBaseRest;
