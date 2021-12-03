@@ -29,6 +29,9 @@ class AbstractBaseRest{
             res.send(M.successResult(r));
         });
 
+        /**
+         * 修改
+         */
         app.put(`${this.prefix}`,async (req,res)=>{
             const params=req.params;
             if(this.generateTime){
@@ -39,8 +42,14 @@ class AbstractBaseRest{
         });
 
         app.get(`${this.prefix}/:id`,async (req,res)=>{
-            let r=await this.getById(req.params.id);
-            res.send(M.successResult(r));
+            const {id,page,num,...queryCase}=req.params;
+            if(id==undefined){
+                let r=await this.list({page,num,queryCase});
+                res.send(M.successResult(r));
+            }else {
+                let r=await this.getById(req.params.id);
+                res.send(M.successResult(r));
+            }
         });
     }
 }
