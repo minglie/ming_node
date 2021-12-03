@@ -1,9 +1,8 @@
 /**
  * 数据源为内存的rpc风格接口
  */
-const M=require("../../index")
 const AbstractBaseRpcApi=require("./AbstractBaseRpcApi");
-const MiApiCloudClient=require("../../module/MiApiCloudClient")
+
 
 class ApiCloudBaseRpcApi extends AbstractBaseRpcApi{
     constructor(props) {
