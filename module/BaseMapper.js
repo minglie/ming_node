@@ -1,5 +1,5 @@
 const M=require("../index")
-const Db=M.mysql;
+const Db=M.getMySql({});
 
 class BaseMapper {
     constructor(tableName) {
@@ -13,6 +13,7 @@ class BaseMapper {
      * @returns {Promise<*>}
      */
     async insert(obj){
+        delete obj.id;
         let sql=  BaseMapper.getInsertObjSql(this.tableName,obj)
         let r=await Db.doSql(sql);
         return r;
