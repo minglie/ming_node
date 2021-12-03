@@ -1,5 +1,5 @@
-M=require("../../index")
-
+M=require("../../index");
+const Db=M.getMySql({});
 const{
     GraphQLObjectType,
     GraphQLString,
