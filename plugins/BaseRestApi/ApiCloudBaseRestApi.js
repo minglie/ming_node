@@ -18,8 +18,8 @@ class ApiCloudBaseRestApi extends AbstractBaseRestApi{
     }
 
     async delete(obj){
-
-
+        let r= await this.tableClient.delete(obj);
+        return r;
     }
 
     async getById(id){
