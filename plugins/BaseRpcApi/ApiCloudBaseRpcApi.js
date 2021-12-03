@@ -32,8 +32,9 @@ class ApiCloudBaseRpcApi extends AbstractBaseRpcApi{
         num=Number.parseInt(num);
         let limit=num;
         let skip= (page-1)*num
-        let r=await this.tableClient.list(queryCase,limit,skip,"createdAt ASC");
-        return r;
+        let rows=await this.tableClient.list(queryCase,limit,skip,"createdAt ASC");
+        let countResult=await this.tableClient.count(queryCase);
+        return {rows, total:countResult.count}
     }
 
     async listAll(obj){
