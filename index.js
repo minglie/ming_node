@@ -32,6 +32,7 @@
  M.httpProxy = {};// http 代理配置
  M._sseClientMap=new Map();
  M._sseHeatTime=3000;
+ M._moduleMap=new Map();//模块map
  M.httpBefore = (d) => {
      return d
  }
@@ -47,7 +48,16 @@
  M.remoteStaticPathEnable = true;
  //代理服务器配置
  M.proxyHost = "http://127.0.0.1:8888"
- M.proxyHost = ""
+ M.proxyHost = "";
+
+ M.setModule=function (key,module){
+    M._moduleMap.set(key,module);
+ }
+ M.getModule=function (key){
+    M._moduleMap.get(key);
+ }
+
+
  /**
   * ----------------------客户端START--------------------------------------------
   */

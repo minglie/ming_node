@@ -1,20 +1,18 @@
+var getGraphqlSchema= require("./getGraphqlSchema")
+const { graphqlHTTP } = require('express-graphql')
+
 class BaseGraphqlApi{
-
-    constructor({tableName}) {
-
+    constructor({dbBaseMapper,prefix}) {
+        this.dbBaseMapper=dbBaseMapper;
+        this.tableName=dbBaseMapper.tableName;
+        this.prefix=prefix?prefix:tableName;
     }
-
-    async add(obj){
-        obj.id = M.randomStr();
-        this.dataList=[...this.dataList,obj];
-        return obj;
-    }
-
     install(app,args){
-        const {M}=app;
-        app.get("/c",(req,res)=>{
-            res.send("c")
-        })
+        let schema= getGraphqlSchema( this.dbBaseMapper)
+        app.mapping(`/${this.prefix}`,graphqlHTTP({
+            schema:schema,
+            graphiql:true
+        }))
     }
-
 }
+module.exports = BaseGraphqlApi;

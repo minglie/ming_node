@@ -2,9 +2,13 @@ const M=require("../index")
 const Db=M.getMySql({});
 
 class BaseMapper {
+
+    //static BaseMapperMap=new Map();
+
     constructor(tableName) {
         this.tableName =tableName;
         this.tableSchema=null;
+        //BaseMapper.BaseMapperMap.set(tableName,this);
     }
 
     /**
