@@ -17,3 +17,6 @@ var app=M.server();
 app.listen(8888);
 
 app.use(mongoDbBaseRestApi);
+
+
+console.log(M._globle_plugin)

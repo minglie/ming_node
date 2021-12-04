@@ -42,6 +42,10 @@
  M._globle_cacheMap = {}
  //全局对象缓存
  M._globle_lib_cacheMap={}
+ //全局插件地址缓存
+ M._globle_plugin_url_cacheMap={};
+ //全局插件
+ M._globle_plugin=new Set();
  M._node_lib_path=process.env.NODE_PATH;
  //远程静态资源路径
  M.remoteStaticPath = "https://minglie.gitee.io/mingpage/static";
@@ -1732,6 +1736,7 @@ M.urlParse = function (url) {
              } else {
                  plugin.install(app, args);
              }
+             M._globle_plugin.add(plugin);
              plugin.installed = true;
          }else {
              if (Array.isArray(url)) {
@@ -1746,6 +1751,17 @@ M.urlParse = function (url) {
          }
          return app;
      }
+
+     app.installPlugin=async function (pluginUrl,constructorParams,pluginParams){
+         if(M._globle_plugin_url_cacheMap[pluginUrl]){
+             return
+         }
+         M._globle_plugin_url_cacheMap[pluginUrl]=pluginUrl;
+         const  Plugin= await M.require(pluginUrl);
+         const plugin= new Plugin(constructorParams);
+         app.use(plugin,pluginParams)
+     }
+
      /**
       * 注册get请求
       */
