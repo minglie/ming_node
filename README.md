@@ -10,7 +10,7 @@
  ```
 # cdn
 
-https://unpkg.com/ming_node/MemoryBaseRpcApi.js
+https://unpkg.com/ming_node/index.js
 
   
 # ming_node最小环境    
@@ -190,6 +190,16 @@ async function main(){
 
 ```
 
+# Rpc风格,服务插件
+[ming_node api插件.yuque](https://www.yuque.com/docs/share/f4444345-ea5b-4f3d-b0c7-ab267e901e81)
+```js
+var M=require("ming_node");
+const Api= require("ming_node/plugins/BaseRpcApi/MemoryBaseRpcApi");
+let api = new Api({tableName:"ming",generateTime:true})
+var app=M.server();
+app.listen(8888);
+app.use(api);
+```
 
 # 基于ming_node 的 ming_api_mock
 

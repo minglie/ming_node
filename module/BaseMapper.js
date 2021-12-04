@@ -163,6 +163,23 @@ class BaseMapper {
         return dataList;
     }
 
+
+    /**
+     * 分页查
+     * @param page
+     * @param num
+     * @param queryCase
+     * @param columns
+     * @param order
+     */
+    async selectPurePageList({page=1,num=10,queryCase="1=1", columns="*",order="id desc"}){
+        let start = (page - 1) * num;
+        let whereCase=queryCase;
+        let queryColumn=BaseMapper.getColumn(columns);
+        let dataList=await Db.doSql(`SELECT ${queryColumn} FROM ${this.tableName} where ${whereCase} order by ${order}  LIMIT ${start},${num}`)
+        return dataList;
+    }
+
     /**
      * 查后代
      * @param parent_id
@@ -222,7 +239,7 @@ class BaseMapper {
     async getTableSchema(){
         if(this.tableSchema==null){
             let dataBaseName=Db.dbConfig.database;
-            let sql=`select COLUMN_NAME,COLUMN_TYPE,COLUMN_COMMENT from information_schema.columns where table_schema ='${dataBaseName}'  and table_name = '${this.tableName}';`
+            let sql=`select column_name,column_type,column_comment from information_schema.columns where table_schema ='${dataBaseName}'  and table_name = '${this.tableName}';`
             let tableSchema=await Db.doSql(sql);
             return tableSchema;
         }
