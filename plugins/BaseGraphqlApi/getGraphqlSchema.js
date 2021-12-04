@@ -80,7 +80,6 @@ async function getGraphqlSchema({dbBaseMapper,generateTime}){
                         num,
                         order,
                         queryCase:queryCaseStr})
-                    //return Db.doSql(`select * from person`);
                 }
             },
             total:{
