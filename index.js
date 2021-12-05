@@ -3,7 +3,7 @@
  * By : Minglie
  * QQ: 934031452
  * Date :2021.12.01
- * version :2.2.7
+ * version :2.3.0
  */
  var http = require('http');
  var https = require('https');
@@ -60,6 +60,16 @@
  M.getModule=function (key){
     M._moduleMap.get(key);
  }
+
+M.getGloblePlugin=(pluginKey)=>{
+    let plugin=null;
+    M._globle_plugin.forEach(u=>{
+        if(u.key==pluginKey){
+            plugin=u;
+        }
+    })
+    return plugin;
+}
 
 
  /**
