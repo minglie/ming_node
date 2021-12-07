@@ -320,7 +320,44 @@ class BaseMapper {
         return sql;
     }
 
-
+    /**
+     * 给 list 加name
+     * @param tableName 表名
+     * @param list      列表
+     * @param list_idkey     列表中的idkey
+     * @param list_namekey   列表中的namekey
+     * @param db_idkey      库中的namekey
+     * @param db_namekey    库中的namekey
+     * @returns {Promise<void>}
+     */
+    static async appendListName(
+        {
+            tableName="t_user",
+            list,
+            list_idkey="create_user",
+            list_namekey="name",
+            db_idkey="create_user",
+            db_namekey="create_user_name",
+        }
+    ){
+        if(list==null || list.length==0){
+            return
+        }
+        const idKeyList=list.map(u=>u[list_idkey]);
+        let sql=`select ${db_idkey}, ${db_namekey} from ${tableName} where ${db_idkey} in (?)`
+        let dbDataList=await Db.doSql(sql,[idKeyList]);
+        const userMap = {};
+        for (let i = 0; i < dbDataList.length; i++) {
+            const idkeyV = dbDataList[i][db_idkey];
+            userMap[idkeyV] = dbDataList[i];
+        }
+        for (let i=0;i<list.length;i++){
+            if(userMap[list[i][list_idkey]]){
+                list[i][list_namekey]= userMap[list[i][list_idkey]][db_namekey];
+            }
+        }
+        return;
+    }
 
 }
 
