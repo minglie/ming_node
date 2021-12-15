@@ -46,7 +46,7 @@
  M._globle_plugin_url_cacheMap={};
  //全局插件
  M._globle_plugin=new Set();
- M._node_lib_path=process.env.NODE_PATH;
+M._node_lib_path=process.cwd()+"/.ming_node_cacke";
  //远程静态资源路径
  M.remoteStaticPath = "https://minglie.gitee.io/mingpage/static";
  M.remoteStaticPathEnable = true;
@@ -88,7 +88,7 @@ M.getGloblePlugin=(pluginKey)=>{
      }
      return Object.assign(obj, c1);
  }
- 
+
  //将对象追加到url上
  privateObj.appendDataToUrl = function (url, data) {
      let getData = "";
@@ -104,10 +104,10 @@ M.getGloblePlugin=(pluginKey)=>{
      let r = url + getData;
      return r;
  }
- 
+
 M.get = function (url, callback, data, headers) {
      if (typeof callback == "function") {
- 
+
      } else {
          headers = data || {};
          data = callback;
@@ -153,7 +153,7 @@ M.get = function (url, callback, data, headers) {
      if (url.startsWith("https")) {
          reqHttp = https;
      }
- 
+
      return new Promise((resolve, reject) => {
          options = M.httpBefore(options);
          if (options == false) {
@@ -186,21 +186,21 @@ M.get = function (url, callback, data, headers) {
          req.on('error', function (err) {
              reject(err);
              console.error(err);
- 
+
          });
          req.end();
      })
  }
 M._request = function (url, callback, data, headers,methed) {
      if (typeof callback == "function") {
- 
+
      } else {
          headers = data || {};
          data = callback;
          callback = () => {
          };
      }
- 
+
      url = privateObj.appendDataToUrl(url, M.reqComQueryparams);
      var html = '';
      var urlObj = url_module.parse(url)
@@ -238,7 +238,7 @@ M._request = function (url, callback, data, headers,methed) {
      if (url.startsWith("https")) {
          reqHttp = https;
      }
- 
+
      return new Promise((resolve, reject) => {
          var req = reqHttp.request(options, function (res) {
              options = M.httpBefore(options);
@@ -268,9 +268,9 @@ M._request = function (url, callback, data, headers,methed) {
                  M.httpEnd(html);
                  resolve(html);
              });
- 
+
          });
- 
+
          req.on('error', function (err) {
              console.error(err);
          });
@@ -283,7 +283,7 @@ M.delete=(url, callback, data, headers)=>M._request(url, callback, data, headers
 M.put=(url, callback, data, headers)=>M._request(url, callback, data, headers,"PUT")
 M.postJson = function (url, callback, data, headers) {
      if (typeof callback == "function") {
- 
+
      } else {
          headers = data || {};
          data = callback;
@@ -321,9 +321,9 @@ M.postJson = function (url, callback, data, headers) {
      if (url.startsWith("https")) {
          reqHttp = https;
      }
- 
+
      return new Promise((resolve, reject) => {
- 
+
          var req = reqHttp.request(options, function (res) {
              options = M.httpBefore(options);
              if (options == false) {
@@ -352,9 +352,9 @@ M.postJson = function (url, callback, data, headers) {
                  M.httpEnd(html);
                  resolve(html);
              });
- 
+
          });
- 
+
          req.on('error', function (err) {
              console.error(err);
          });
@@ -411,7 +411,7 @@ M.request.put=M.put;
      });
      return promise;
  }
- 
+
  M.import=async function (url,callback){
      if(M._globle_lib_cacheMap[url]){
          return M._globle_lib_cacheMap[url];
@@ -426,9 +426,9 @@ M.request.put=M.put;
          M._globle_lib_cacheMap[url]=r;
          return r
      }
- 
+
  }
- 
+
  /**
   *下载图片
   */
@@ -477,23 +477,23 @@ M.request.put=M.put;
      });
      req.end();
  }
- 
+
  /**
   *打印结果前钩子
   */
  M.beforeLogData = function (res, desc) {
      console.log("-----" + desc + "-----" + res.req.path + "-------------");
  }
- 
- 
+
+
  /**
   *打印结果后钩子
   */
  M.afterLogData = function () {
- 
+
      console.log("--END")
  }
- 
+
  /**
   *简化get请求
   */
@@ -516,9 +516,9 @@ M.request.put=M.put;
              }, data
          );
      }
- 
+
  }
- 
+
  /**
   *简化post请求
   */
@@ -530,7 +530,7 @@ M.request.put=M.put;
          }, data
      );
  }
- 
+
  M.postJson0 = function (url, data) {
      M.postJson(
          M.host + url,
@@ -539,28 +539,28 @@ M.request.put=M.put;
          }, data
      );
  }
- 
+
  M.template = function (str) {
      return eval("`" + str + "`");
  }
- 
- 
+
+
  /**
   * ----------------------客户端END--------------------------------------------
   */
- 
- 
+
+
  /**
   * ----------------------数据持久化读写START--------------------------------------------
   */
- 
+
  /**
   *递归创建文件夹
   */
  M.mkdir = function (dirpath, dirname) {
      //判断是否是第一次调用
      if (typeof dirname === "undefined") {
- 
+
          if (dirpath.indexOf(".") > 0) {
              dirpath = path.dirname(dirpath);
          }
@@ -603,7 +603,7 @@ M.request.put=M.put;
          });
      });
  }
- 
+
  privateObj.checkDirectory = function (src, dst, callback) {
      fs.access(dst, fs.constants.F_OK, (err) => {
          if (err) {
@@ -614,7 +614,7 @@ M.request.put=M.put;
          }
      });
  };
- 
+
  M.readFile = function (file) {
      if (fs.existsSync(file)) {
          return fs.readFileSync(file, "utf-8");
@@ -639,7 +639,7 @@ M.request.put=M.put;
  M.writeObjToFile = function (file, obj) {
      M.writeFile(file, JSON.stringify(obj));
  }
- 
+
  M.addObjToFile = function (file, obj) {
      try {
          var d = M.getObjByFile(file);
@@ -667,7 +667,7 @@ M.request.put=M.put;
      }
      M.writeObjToFile(file, d);
  }
- 
+
  M.deleteObjByPropFile = function (file, o) {
      let o_key = Object.keys(o)[0];
      let o_val = o[o_key]
@@ -683,7 +683,7 @@ M.request.put=M.put;
      M.writeObjToFile(file, d);
      return d_num;
  }
- 
+
  M.updateObjByIdFile = function (file, obj) {
      var d = M.getObjByFile(file);
      for (let i = 0; i < d.length; i++) {
@@ -791,10 +791,10 @@ M.request.put=M.put;
      } catch (e) {
          preObj = {};
      }
- 
+
      M.writeObjToFile(M.map_path, Object.assign(preObj, a));
  }
- 
+
  M.getAttribute = function (k) {
      return M.getObjByFile(M.map_path)[k];
  }
@@ -825,14 +825,14 @@ M.request.put=M.put;
          });
      } )
  }
- 
- 
+
+
  M.readCsvLine =async function (file, callback) {
     return  M.readLine(file, function (line) {
           callback(line.replace("\r", "").split(/(?<!\"[^,]+),(?![^,]+\")/));
      })
  }
- 
+
  M.getFileNameByUrl=function (url){
      let split= url.split("/");
      return split[split.length-1]
@@ -843,7 +843,7 @@ M.getFileList = function (path) {
      function readFile(path, filesList, targetObj) {
          files = fs.readdirSync(path);//需要用到同步读取
          files.forEach(walk);
- 
+
          function walk(file) {
              states = fs.statSync(path + '/' + file);
              if (states.isDirectory()) {
@@ -855,7 +855,7 @@ M.getFileList = function (path) {
                      item = {name: file, children: [], value: path + '/' + file};
                      filesList.push(item);
                  }
- 
+
                  readFile(path + '/' + file, filesList, item);
              } else {
                  //创建一个对象保存信息
@@ -863,7 +863,7 @@ M.getFileList = function (path) {
                  obj.size = states.size;//文件大小，以字节为单位
                  obj.name = file;//文件名
                  obj.path = path + '/' + file; //文件绝对路径
- 
+
                  if (targetObj["children"]) {
                      var item = {name: file, value: obj.path}
                      targetObj["children"].push(item);
@@ -874,7 +874,7 @@ M.getFileList = function (path) {
              }
          }
      }
- 
+
      var filesList = [];
      var targetObj = {};
      readFile(path, filesList, targetObj);
@@ -953,8 +953,8 @@ M.log = function (...params) {
          if (M.log_file_enable) M.appendFile(M.log_path, r);
      }
  }
- 
- 
+
+
  M.getSqlite = function (dbName) {
      if (M.sqlite) {
          return M.sqlite;
@@ -992,7 +992,7 @@ M.log = function (...params) {
      M.sqlite = Db;
      return Db;
  }
- 
+
  ///////////////////////////////
 
 
@@ -1103,12 +1103,12 @@ M.getMongoDB = function (dbConfig) {
      var MongoDB=require('mongodb');
      var MongoClient =MongoDB.MongoClient;
      const ObjectID = MongoDB.ObjectID;
- 
+
      var Config={
          dbUrl:  dbConfig.dbUrl|| 'mongodb://localhost:27017/',
          dbName: dbConfig.dbName|| 'miapi'
      };
- 
+
      class MingMongoClient{
        static  connect(){
              return new Promise((resolve,reject)=>{
@@ -1127,7 +1127,7 @@ M.getMongoDB = function (dbConfig) {
                  }
              })
          }
- 
+
          static find(collectionName,json){
              if(!json){
                  json=collectionName
@@ -1143,7 +1143,7 @@ M.getMongoDB = function (dbConfig) {
                          }
                          resolve(docs);
                      })
- 
+
                  })
              })
          }
@@ -1178,14 +1178,14 @@ M.getMongoDB = function (dbConfig) {
                          if(err){
                              reject(err);
                          }else{
- 
+
                              resolve(result);
                          }
                      })
                  })
              })
          }
- 
+
          static  insertMany(collectionName,json){
              if(!json){
                  json=collectionName
@@ -1197,14 +1197,14 @@ M.getMongoDB = function (dbConfig) {
                          if(err){
                              reject(err);
                          }else{
- 
+
                              resolve(result);
                          }
                      })
                  })
              })
          }
- 
+
          static remove(collectionName,json){
              if(!json){
                  json=collectionName
@@ -1216,14 +1216,14 @@ M.getMongoDB = function (dbConfig) {
                          if(err){
                              reject(err);
                          }else{
- 
+
                              resolve(result);
                          }
                      })
                  })
              })
          }
- 
+
          static  getById(collectionName,id){
              if(!id){
                  id=collectionName
@@ -1244,7 +1244,7 @@ M.getMongoDB = function (dbConfig) {
                  })
              })
          }
- 
+
      }
      MingMongoClient.ObjectID=(id)=> new ObjectID(id)
      let Db=MingMongoClient;
@@ -1253,9 +1253,9 @@ M.getMongoDB = function (dbConfig) {
      M.mongoDb=Db;
      return Db;
  }
- 
- 
- 
+
+
+
  /**
   * ----------------------Sql CRUD  START-------------------------------------------
   */
@@ -1273,7 +1273,7 @@ M.getMongoDB = function (dbConfig) {
      let sql = "insert into " + tableName + fields + " values " + values;
      return sql;
  }
- 
+
  M.getDeleteObjSql = function (tableName, obj) {
      var fields = [];
      for (let field in obj) {
@@ -1283,7 +1283,7 @@ M.getMongoDB = function (dbConfig) {
      sql = sql.replace(/,/g, " and ")
      return sql;
  }
- 
+
  M.getUpdateObjSql = function (tableName, obj, caseObj) {
      var fields = [];
      for (let field in obj) {
@@ -1300,11 +1300,11 @@ M.getMongoDB = function (dbConfig) {
          }
          sql = `update ${tableName} set ${fields.map(u => u + "='" + obj[u] + "'")} where ${caseObjfields.map(u => u + "='" + caseObj[u] + "'").join(" and ")}`;
      }
- 
+
      return sql;
  }
- 
- 
+
+
  M.getSelectObjSql = function (tableName, obj) {
      var fields = [];
      for (let field in obj) {
@@ -1314,17 +1314,17 @@ M.getMongoDB = function (dbConfig) {
      sql = sql.replace(/,/g, " and ")
      return sql;
  }
- 
+
  /**
   * ----------------------Sql CRUD  START-------------------------------------------
   */
- 
- 
+
+
  /**
   * ----------------------数据持久化读写END--------------------------------------------
   */
- 
- 
+
+
  /**
   * ----------------------服务器端START--------------------------------------------
   */
@@ -1381,7 +1381,7 @@ M.failResult=(msg,code,d)=>{
      }
      return result;
  }
- 
+
  /**
   *获取驼峰式的对象
   */
@@ -1392,7 +1392,7 @@ M.failResult=(msg,code,d)=>{
      }
      return result;
  }
- 
+
  M.randomStr = function () {
      return (Math.random().toString(36) + new Date().getTime()).slice(2);
  }
@@ -1430,7 +1430,7 @@ M.urlParse = function (url) {
     }
     return s
 };
- 
+
  /**
   * 异常处理钩子
   * @param e
@@ -1442,9 +1442,9 @@ M.urlParse = function (url) {
      }
      return true;
  }
- 
- 
- 
+
+
+
  M.server = function () {
      var G = this;   /*全局变量,也就是M*/
      //静态资源路径
@@ -1495,7 +1495,7 @@ M.urlParse = function (url) {
                  }
                  return isRest;
              }
- 
+
              req.ip = req.headers['x-forwarded-for'] ||
                  req.connection.remoteAddress ||
                  req.socket.remoteAddress ||
@@ -1571,7 +1571,7 @@ M.urlParse = function (url) {
                  res.end();
                  G._end(req,text);
              }
- 
+
              res.render = async function (url) {
                  res.alreadySend = true;
                  let text="";
@@ -1719,12 +1719,12 @@ M.urlParse = function (url) {
              M["_gloable_exception_handle"](e,req,res);
          }
      }
- 
- 
+
+
      app.begin = function (callback) {
          G._begin = callback;
      }
- 
+
      app.end = function (callback) {
          G._end = callback;
      }
@@ -1782,7 +1782,7 @@ M.urlParse = function (url) {
              url = url.substr(0, url.indexOf(":"));
              G._rest[url] = realUrl;
          }
- 
+
          G._get[url] = callback;
      }
      /**
@@ -1829,8 +1829,8 @@ M.urlParse = function (url) {
          }
          G._mapping[url] = callback;
      }
- 
- 
+
+
      M.formatUrl = function (url) {
          if (!url.endsWith('/')) {
              url = url + '/';
@@ -1847,7 +1847,7 @@ M.urlParse = function (url) {
          req.url = url;
          app(req, res);
      }
- 
+
      /**
       *重定向
       */
@@ -1855,12 +1855,12 @@ M.urlParse = function (url) {
          res.writeHead(302, {'Content-Type': 'text/html; charset=utf-8', 'Location': url});
          res.end();
      }
- 
+
      app.set = function (k, v) {
          M["_" + k] = v;
      }
- 
- 
+
+
      //全局异常钩子
      app.set("gloable_exception_handle",(err,req,res)=>{
          console.error(err.stack)
@@ -1869,12 +1869,12 @@ M.urlParse = function (url) {
              res.send(M.result(err.message,false,-1));
          }
      })
- 
+
      //render异常钩子
      app.set("render_exception_handle",(err,req,res)=>{
          console.error(err.stack)
      })
- 
+
      //没有对应接口时的处理器
      app.set("no_router_handle",(req,res)=>{
          res.end('no router')
@@ -1915,7 +1915,7 @@ M.urlParse = function (url) {
  M["_gloable_exception_handle"]=(err)=>{
      console.error(err)
  }
- 
+
  //异常捕获
  process.on('uncaughtException', function (err) {
      M["_gloable_exception_handle"](err,M.req,M.res);
@@ -1924,8 +1924,8 @@ M.urlParse = function (url) {
  process.on('unhandledRejection',function(err,promise){
      M["_gloable_exception_handle"](err,M.req,M.res);
  });
- 
- 
+
+
  /**
   * 代理服务器start
   */
@@ -1956,7 +1956,7 @@ M.urlParse = function (url) {
          })
      })
  }
- 
+
  M.axios = function (axiosConfig) {
      axiosConfig.headers.host = "";
      var urlObj = url_module.parse(axiosConfig.url)
@@ -1986,7 +1986,7 @@ M.urlParse = function (url) {
                  M.httpEnd(html);
                  resolve(html);
              });
- 
+
          });
          req.on('error', function (err) {
              console.error(err);
@@ -2020,7 +2020,7 @@ privateObj.dealUseServer = async function (req, res) {
      let fileName = pathname.replace("/", "");
      //获取文件的后缀名
      var extname = path.extname(pathname);
- 
+
      if (fileName.startsWith("__default_")) {
          res.setHeader("Access-Control-Allow-Origin", "*");
          res.setHeader("Access-Control-Allow-Headers", "X-Requested-With");
@@ -2035,7 +2035,7 @@ privateObj.dealUseServer = async function (req, res) {
          if (!res.alreadySend) await res.renderUrl(M.remoteStaticPath + pathname)
          return;
      }
- 
+
      if (pathname != '/favicon.ico') {  /*过滤请求favicon.ico*/
          //文件操作获取 static下面的index.html
          fs.readFile(staticPath + '/' + pathname, function (err, data) {
@@ -2059,7 +2059,7 @@ privateObj.dealUseServer = async function (req, res) {
          res.end();
      }
  }
- 
+
  /*SSE SERVER */
  M.sseServer = function () {
     //sse 心跳
@@ -2160,12 +2160,12 @@ privateObj.dealUseServer = async function (req, res) {
      }
      return app;
  }
- 
+
  /**
   * ----------------------服务器端END--------------------------------------------
   */
- 
- 
+
+
  /**
   * ----------------------其他工具函数START--------------------------------------------
   */
@@ -2175,11 +2175,11 @@ privateObj.dealUseServer = async function (req, res) {
              if (err || stderr) console.error(err, stderr);
              reslove(stdout);
          });
- 
+
      })
      return promise;
  }
- 
+
  M.getMyIp = function () {
      var interfaces = require('os').networkInterfaces();
      for (var devName in interfaces) {
@@ -2192,17 +2192,17 @@ privateObj.dealUseServer = async function (req, res) {
          }
      }
  }
- 
+
  /**
   *对象转JSON key不用引号括起来,因兼容性不好,所以去掉
   */
- 
+
  /**
   M.JSOM_Stringify=function(obj){
      return JSON.stringify(obj).replace(/"(\w+)"(\s*:\s*)/gis, '$1$2');
  }
   */
- 
+
  M.sleep = function (numberMillis) {
      var now = new Date();
      var exitTime = now.getTime() + numberMillis;
@@ -2224,7 +2224,7 @@ M.delayMs=async function (ms){
  /**
   * ----------------------其他工具函数END--------------------------------------------
   */
- 
+
  /**
   * 静态资源对应表
   */
@@ -2742,11 +2742,11 @@ M.delayMs=async function (ms){
      ".conf": "text/conf",
      ".sql": "text/sql"
  }
- 
+
  M.test = function () {
      console.log(privateObj.staticMime[".jssson"] || "aa")
  }
- 
+
  M.getRemoteCacheByUrl = async function (url) {
      if (url in M._globle_cacheMap) {
          return M._globle_cacheMap[url];
@@ -2761,7 +2761,7 @@ M.delayMs=async function (ms){
      M._globle_cacheMap[url] = text;
      return text;
  }
- 
+
  M.init = function () {
      /***
       * 下划线命名转为驼峰命名
@@ -2773,7 +2773,7 @@ M.delayMs=async function (ms){
          });
          return str;
      }
- 
+
      /***
       * 驼峰命名转下划线
       */
@@ -2782,7 +2782,7 @@ M.delayMs=async function (ms){
          str = this.replace(/([A-Z])/g, "_$1").toLowerCase();
          return str;
      }
- 
+
      //首字母变大写
      String.prototype.firstChartoUpper = function () {
          return this.replace(/^([a-z])/g, function (word) {
@@ -2816,9 +2816,9 @@ M.delayMs=async function (ms){
          }
          return fmt;
      }
- 
- 
+
+
  }
  M.init();
- 
+
  module.exports = M;
