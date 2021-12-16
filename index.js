@@ -46,14 +46,14 @@
  M._globle_plugin_url_cacheMap={};
  //全局插件
  M._globle_plugin=new Set();
-M._node_lib_path=process.cwd()+"/.ming_node_cacke";
+ M._node_lib_path=process.cwd()+"/.ming_node_cacke";
  //远程静态资源路径
  M.remoteStaticPath = "https://minglie.gitee.io/mingpage/static";
  M.remoteStaticPathEnable = true;
  //代理服务器配置
  M.proxyHost = "http://127.0.0.1:8888"
  M.proxyHost = "";
-
+ M.IO={}
  M.setModule=function (key,module){
     M._moduleMap.set(key,module);
  }
@@ -1903,13 +1903,13 @@ M.urlParse = function (url) {
          res.end();
      })
 
-
-
      app.listen = function (port) {
          const server= http.createServer(app).listen(port);
          console.log("listen on port:" + port);
          return server;
      }
+
+     global.app=app;
      return app;
  }
  M["_gloable_exception_handle"]=(err)=>{
@@ -2820,5 +2820,8 @@ M.delayMs=async function (ms){
 
  }
  M.init();
+
+ global.M=M;
+ global.MIO=M.IO;
 
  module.exports = M;
