@@ -3,7 +3,7 @@
  * By : Minglie
  * QQ: 934031452
  * Date :2021.12.01
- * version :2.6.0
+ * version :2.8.0
  */
 var http = require('http');
 var https = require('https');
@@ -1742,7 +1742,7 @@ M.server = function () {
         G._server = callback;
     }
     app.use=function (url,callback){
-        if(typeof url === 'function' || typeof url === 'object'  ){
+        if(typeof url === 'function' || (typeof url === 'object' && !Array.isArray(url))){
             let plugin=url;
             let args=callback;
             if(plugin.installed){
