@@ -3,7 +3,7 @@
  * By : Minglie
  * QQ: 934031452
  * Date :2021.12.01
- * version :2.5.0
+ * version :2.6.0
  */
 var http = require('http');
 var https = require('https');
@@ -1512,13 +1512,15 @@ M.server = function () {
                 let o = {}
                 o[key] = value;
                 let r_cookie = Object.assign(o, cfg)
-                res.setHeader("Set-Cookie", querystring.stringify(r_cookie, " ;"));
+                let setCookies= querystring.stringify(r_cookie, " ;");
+                setCookies=  setCookies.replace(/%2F/g,'/');
+                res.setHeader("Set-Cookie", setCookies);
             }
             if (true) {
                 Object.defineProperty(req, 'session', {
                     set: function (o) {
                         let sessionValue = req.cookies.sessionid || M.randomStr();
-                        res.cookie("sessionid", sessionValue)
+                        res.cookie("sessionid", sessionValue,{Path:"/"})
                         M.sessions[sessionValue] = o;
                     },
                     get: function () {
