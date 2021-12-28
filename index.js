@@ -1779,62 +1779,86 @@ M.server = function () {
         app.use(plugin,pluginParams)
     }
 
+    app.registServer=function (url,callback,single){
+        if (Array.isArray(url)) {
+            url.forEach(u=>{
+                single(u,callback);
+            })
+        } else {
+            single(url,callback);
+        }
+    }
+
     /**
      * 注册get请求
      */
     app.get = function (url, callback) {
-        url = M.formatUrl(url);
-        var realUrl = url;
-        if (url.indexOf(":") > 0) {
-            url = url.substr(0, url.indexOf(":"));
-            G._rest[url] = realUrl;
+        const single=(url,callback)=>{
+            url = M.formatUrl(url);
+            var realUrl = url;
+            if (url.indexOf(":") > 0) {
+                url = url.substr(0, url.indexOf(":"));
+                G._rest[url] = realUrl;
+            }
+            G._get[url] = callback;
         }
-
-        G._get[url] = callback;
+        app.registServer(url,callback,single)
     }
     /**
      *注册post请求
      */
     app.post = function (url, callback) {
-        url = M.formatUrl(url);
-        var realUrl = url;
-        if (url.indexOf(":") > 0) {
-            url = url.substr(0, url.indexOf(":"));
-            G._rest[url] = realUrl;
+        const single=(url,callback)=>{
+            url = M.formatUrl(url);
+            var realUrl = url;
+            if (url.indexOf(":") > 0) {
+                url = url.substr(0, url.indexOf(":"));
+                G._rest[url] = realUrl;
+            }
+            G._post[url] = callback;
         }
-        G._post[url] = callback;
+        app.registServer(url,callback,single)
     }
 
     app.put = function (url, callback) {
-        url = M.formatUrl(url);
-        var realUrl = url;
-        if (url.indexOf(":") > 0) {
-            url = url.substr(0, url.indexOf(":"));
-            G._rest[url] = realUrl;
+        const single=(url,callback)=>{
+            url = M.formatUrl(url);
+            var realUrl = url;
+            if (url.indexOf(":") > 0) {
+                url = url.substr(0, url.indexOf(":"));
+                G._rest[url] = realUrl;
+            }
+            G._put[url] = callback;
         }
-        G._put[url] = callback;
+        app.registServer(url,callback,single)
     }
 
     app.delete = function (url, callback) {
-        url = M.formatUrl(url);
-        var realUrl = url;
-        if (url.indexOf(":") > 0) {
-            url = url.substr(0, url.indexOf(":"));
-            G._rest[url] = realUrl;
+        const single=(url,callback)=>{
+            url = M.formatUrl(url);
+            var realUrl = url;
+            if (url.indexOf(":") > 0) {
+                url = url.substr(0, url.indexOf(":"));
+                G._rest[url] = realUrl;
+            }
+            G._delete[url] = callback;
         }
-        G._delete[url] = callback;
+        app.registServer(url,callback,single);
     }
     /**
      *注册任意请求方法的请求
      */
     app.mapping = function (url, callback) {
-        url = M.formatUrl(url);
-        var realUrl = url;
-        if (url.indexOf(":") > 0) {
-            url = url.substr(0, url.indexOf(":"));
-            G._rest[url] = realUrl;
+        const single=(url,callback)=>{
+            url = M.formatUrl(url);
+            var realUrl = url;
+            if (url.indexOf(":") > 0) {
+                url = url.substr(0, url.indexOf(":"));
+                G._rest[url] = realUrl;
+            }
+            G._mapping[url] = callback;
         }
-        G._mapping[url] = callback;
+        app.registServer(url,callback,single);
     }
 
 
