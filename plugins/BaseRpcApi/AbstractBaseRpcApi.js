@@ -11,7 +11,7 @@ class AbstractBaseRpcApi{
 
     async add(obj){}
     async delete(obj){}
-    async list({page,num,...queryCase}){}
+    async list({page,num,order,...queryCase}){}
     async listAll(obj){}
     async update(obj){}
     async getChildenList(id,queryCase){}
@@ -51,10 +51,13 @@ class AbstractBaseRpcApi{
         });
 
         app.get(`${this.prefix}/list`,async (req,res)=>{
-            const {page,num,...queryCase}=req.params;
-            let r=await this.list({page,num,queryCase});
+            let {page,num,order,...queryCase}=req.params;
+            if(!order){
+                order=null;
+            }
+            let r=await this.list({page,num,order,queryCase});
             res.send(M.successResult(r));
-        })
+        });
 
         /**
          * 如果有parent_id才能返回树

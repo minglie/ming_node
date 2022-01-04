@@ -3,7 +3,7 @@
  * By : Minglie
  * QQ: 934031452
  * Date :2021.12.01
- * version :2.8.0
+ * version :2.9.1
  */
 var http = require('http');
 var https = require('https');
@@ -437,23 +437,22 @@ M.import=async function (url,callback){
 /**
  *下载图片
  */
-M.download = function (url, file, callback) {
+M.download =async function (url, file) {
     var func = http;
     if (url.indexOf("https") >= 0) {
         func = https;
     }
-    func.get(url, function (res) {
-        res.setEncoding('binary');//转成二进制
-        var content = '';
-        res.on('data', function (data) {
-            content += data;
-        }).on('end', function () {
-            if (callback) callback();
-            fs.writeFile(file, content, 'binary', function (err) {
-                if (err) throw err;
-            });
+    return new Promise(((resolve, reject) => {
+        func.get(url, function (res) {
+            let writeStream = fs.createWriteStream(file);
+            res.on("end",d=>{
+                resolve(file);
+            }).on("error",e=>{
+                reject(e);
+            }).pipe(writeStream);
         });
-    });
+    }))
+
 }
 /**
  *下载所有图片
@@ -823,10 +822,8 @@ M.readLine =async function (file, callback) {
             }
         });
         input.on('end', function () {
-            if (remaining.length > 0) {
-                resolve(lineCount);
-                callback(remaining);
-            }
+            resolve(lineCount);
+            callback(remaining);
         });
     } )
 }
@@ -1579,6 +1576,47 @@ M.server = function () {
                 G._end(req,text);
             }
 
+
+            res.sendFile= async function (url,isDownLoad=false) {
+                let extname = path.extname(url);
+                let fileName=M.getFileNameByUrl(url);
+                if(url.startsWith("file")){
+                    url= url.substring(5);
+                    res.setHeader("Access-Control-Allow-Origin", "*");
+                    res.setHeader("Access-Control-Allow-Headers", "X-Requested-With");
+                    res.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
+                    res.setHeader("X-Powered-By", ' 3.2.1');
+                    if(isDownLoad){
+                        res.setHeader("Content-Disposition", "attachment;filename="+encodeURIComponent(fileName,"utf-8"));
+                    }
+                    res.writeHead(200, {"Content-Type": "" + (privateObj.staticMime[extname] || 'text/html') + ";charset='utf-8'",});
+                    fs.createReadStream(url).on("end",d=>{})
+                        .on("error",e=>{
+                            console.error(e);
+                        }).pipe(res);
+                }else {
+                    var func = http;
+                    if (url.indexOf("https") >= 0) {
+                        func = https;
+                    }
+                    func.get(url, function (res1) {
+                        res.setHeader("Access-Control-Allow-Origin", "*");
+                        res.setHeader("Access-Control-Allow-Headers", "X-Requested-With");
+                        res.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
+                        res.setHeader("X-Powered-By", ' 3.2.1');
+                        if(isDownLoad){
+                            res.setHeader("Content-Disposition", "attachment;filename="+encodeURIComponent(fileName,"utf-8"));
+                        }
+                        res.writeHead(200, {"Content-Type": "" + (privateObj.staticMime[extname] || 'text/html') + ";charset='utf-8'",});
+                        res1.on("end",d=>{})
+                            .on("error",e=>{
+                                console.error(e)
+                            }).pipe(res);
+                    });
+                }
+            }
+
+
             res.render = async function (url) {
                 res.alreadySend = true;
                 let text="";
@@ -1624,6 +1662,14 @@ M.server = function () {
             res.renderHtml = function (text) {
                 res.alreadySend = true;
                 res.writeHead(200, {"Content-Type": "text/html;charset='utf-8'"});
+                res.write(text);
+                res.end();
+                G._end(req,text);
+            }
+            //扩充res一个renderHtml方法
+            res.renderCss = function (text) {
+                res.alreadySend = true;
+                res.writeHead(200, {"Content-Type": "text/css;charset='utf-8'"});
                 res.write(text);
                 res.end();
                 G._end(req,text);

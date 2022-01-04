@@ -27,12 +27,12 @@ class ApiCloudBaseRestApi extends AbstractBaseRestApi{
         return r[0];
     }
 
-    async list({page=1,num=10,queryCase}){
+    async list({page=1,num=10,order="createdAt ASC",queryCase}){
         page=Number.parseInt(page);
         num=Number.parseInt(num);
         let limit=num;
         let skip= (page-1)*num
-        let r=await this.tableClient.list(queryCase,limit,skip,"createdAt ASC");
+        let r=await this.tableClient.list(queryCase,limit,skip,order);
         return r;
     }
 

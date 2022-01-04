@@ -30,9 +30,9 @@ class MysqlBaseRestApi extends AbstractBaseRestApi{
         return r;
     }
 
-    async list({page,num,queryCase}){
-        let queryCaseStr= MysqlBaseRestApi.obj2QueryCase(queryCase);
-        let r= this.dbBaseMapper.selectPage({page,num,queryCase:queryCaseStr});
+    async list({page,num,order,queryCase}){
+        let queryCaseStr= MysqlBaseRpcApi.obj2QueryCase(queryCase);
+        let r= this.dbBaseMapper.selectPage({order,page,num,queryCase:queryCaseStr});
         return r;
     }
 

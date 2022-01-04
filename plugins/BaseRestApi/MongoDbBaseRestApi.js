@@ -28,7 +28,7 @@ class MongoDbBaseRestApi extends AbstractBaseRestApi{
         return r;
     }
 
-    async list({page=1,num=10,queryCase}){
+    async list({page=1,num=10,order,queryCase}){
         page=Number.parseInt(page);
         num=Number.parseInt(num);
         let tableName=this.tableName;

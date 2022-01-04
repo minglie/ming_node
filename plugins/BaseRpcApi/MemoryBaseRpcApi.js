@@ -25,7 +25,7 @@ class MemoryBaseRpcApi extends AbstractBaseRpcApi{
         return r;
     }
 
-    async list({page,num,queryCase}){
+    async list({page,num,order,queryCase}){
         let r= this.memoryDb.listByPage(page,num,queryCase);
         return r;
     }

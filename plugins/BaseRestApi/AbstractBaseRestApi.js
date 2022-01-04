@@ -10,7 +10,7 @@ class AbstractBaseRest{
 
     async add(obj){}
     async delete(obj){}
-    async list({page,num,...queryCase}){}
+    async list({page,num,order,...queryCase}){}
     async listAll(obj){}
     async update(obj){}
     async getChildenList(id,queryCase){}
@@ -42,9 +42,9 @@ class AbstractBaseRest{
         });
 
         app.get(`${this.prefix}/:id`,async (req,res)=>{
-            const {id,page,num,...queryCase}=req.params;
+            const {id,page,num,order,...queryCase}=req.params;
             if(id==undefined){
-                let r=await this.list({page,num,queryCase});
+                let r=await this.list({page,num,order,queryCase});
                 res.send(M.successResult(r));
             }else {
                 let r=await this.getById(req.params.id);
