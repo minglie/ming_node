@@ -55,7 +55,7 @@ app.get("/getSession",(req,res)=>{
 ```javascript
 +async function(){
     M =await new Promise((v)=>require('https').get("https://minglie.github.io/js/ming_node.js",(q)=>{d='';q.on('data',(a)=>d+=a);q.on('end',()=>v(eval(d)))}))
-  var app=M.server();
+   var app=M.server();
     app.listen(8888);
     app.get("/",async (req,res)=>{ 
        app.redirect("/index.html",req,res)
@@ -110,13 +110,21 @@ app.listen(8888);
 app.get("/baidu",(req,res)=>{ 
     console.log(req.params);
     //响应html文本
-   // res.renderHtml("hello woed")
+    res.renderHtml("hello woed")
    //响应js文本
-    //res.renderJs("alert(5)")
+    res.renderJs("alert(5)")
     //响应本地文件
-    //res.renderUrl("file:D:/G/ming_node/test/test.html");
+    res.renderUrl("file:D:/G/ming_node/test/test.html");
     //响应百度首页
     res.renderUrl("https://www.baidu.com/index.html");
+    //响应一个网络文件,支持二进制
+    res.sendFile("https://ming/a.txt");
+    //响应一个本地文件,支持二进制
+    res.sendFile("file:C:/Users/a.txt");
+    //响应一个网络文件,支持二进制,浏览器直接下载
+    res.sendFile("https://ming/a.txt",true);
+    //响应一个本地文件,支持二进制,浏览器直接下载
+    res.sendFile("file:C:/Users/a.txt",true);
 })
 
 ```
