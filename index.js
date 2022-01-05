@@ -3,7 +3,7 @@
  * By : Minglie
  * QQ: 934031452
  * Date :2021.12.01
- * version :2.9.1
+ * version :2.9.2
  */
 var http = require('http');
 var https = require('https');
@@ -2082,8 +2082,9 @@ M.axios = function (axiosConfig) {
 privateObj.dealUseServer = async function (req, res) {
     for (let key in M._use){
         if(M._use[key].regExp.test(req.url)){
-            await  M._use[key].callback(req,res);
-            return;
+            if(!res.alreadySend){
+                await  M._use[key].callback(req,res);
+            }
         }
     }
 }
