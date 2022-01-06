@@ -13,7 +13,7 @@ class FileDb{
     constructor(tableName,readFromMemory=true) {
         this.tableName=tableName;
         this.readFromMemory=readFromMemory;
-        this.dataList=[]
+        this.dataList=M.getObjByFile(this.tableName)
     }
 
     readFromFile(){
@@ -102,16 +102,16 @@ class FileDb{
                 let ret=0;
                 if (a[orderField]>b[orderField]) {
                     ret= 1;
-                 }else if(a<b){
+                }else if(a<b){
                     ret= -1
-                 }else{
+                }else{
                     ret= 0;
-                 }
-                 if(orderType=="desc"){
-                     return ret;
-                 }else {
-                     return -1*ret;
-                 }
+                }
+                if(orderType=="asc"){
+                    return ret;
+                }else {
+                    return -1*ret;
+                }
             })
         }
         let total = rows.length;
@@ -142,9 +142,9 @@ class FileDb{
                 }
             }
             for (let i = 0; i < d.length; i++) {
-                 if(!delete_index.includes(i)){
-                     r_list.push(d[i])
-                 }
+                if(!delete_index.includes(i)){
+                    r_list.push(d[i])
+                }
             }
             this.dataList=r_list;
             return delete_index.length;
