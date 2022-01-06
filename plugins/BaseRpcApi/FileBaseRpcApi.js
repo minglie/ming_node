@@ -2,9 +2,9 @@
  * 数据源为内存的rpc风格接口
  */
 const FileDb=require("../../module/FileDb");
-const AbstractBaseRestApi=require("./AbstractBaseRestApi");
+const AbstractBaseRpcApi=require("./AbstractBaseRpcApi");
 
-class FileBaseRpcApi extends AbstractBaseRestApi{
+class FileBaseRpcApi extends AbstractBaseRpcApi{
 
     constructor(props) {
         super(props);
