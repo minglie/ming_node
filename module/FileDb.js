@@ -100,9 +100,17 @@ class FileDb{
             let orderType=orderArr[1];
             rows.sort((a,b)=>{
                 let ret=0;
-                if (a[orderField]>b[orderField]) {
+                let a_order_v=0;
+                let b_order_v=0;
+                if(a[orderField]!=null){
+                    a_order_v=a[orderField];
+                }
+                if(b[orderField]!=null){
+                    b_order_v=b[orderField];
+                }
+                if (a_order_v>b_order_v) {
                     ret= 1;
-                }else if(a<b){
+                }else if(a_order_v<b_order_v){
                     ret= -1
                 }else{
                     ret= 0;
