@@ -1,59 +1,50 @@
 /**
  * 数据源为内存的rpc风格接口
  */
-const M=require("../../index")
-const AbstractBaseRpcApi=require("./AbstractBaseRpcApi");
+const FileDb=require("../../module/FileDb");
+const AbstractBaseRestApi=require("./AbstractBaseRestApi");
 
-class FileBaseRpcApi extends AbstractBaseRpcApi{
+class FileBaseRpcApi extends AbstractBaseRestApi{
+
     constructor(props) {
         super(props);
+        if(props.readFromMemory==null){
+            props.readFromMemory=true;
+        }
+        this.fileDb=new FileDb(props.tableName,props.readFromMemory);
     }
     async add(obj){
-        obj.id = M.randomStr();
-        M.addObjToFile(this.tableName, obj);
-        return obj;
+        let r= this.fileDb.add(obj);
+        return r;
     }
 
     async delete(obj){
-        let r=0;
-        if (obj) {
-            r= M.deleteObjByPropFile(this.tableName, obj);
-        } else {
-            r=M.writeObjToFile(this.tableName,[]);
-        }
+        let r= this.fileDb.deleteAll(obj);
         return r;
     }
 
     async getById(id){
-        let r=M.getById(this.tableName,id);
+        let r=this.fileDb.getById(id);
         return r;
     }
 
-    async list({page=1,num=10,order, queryCase}){
-        page=Number.parseInt(page);
-        num=Number.parseInt(num);
-        if (page <= 0) page = 1;
-        let rows =await this.listAll(queryCase);
-        let total = rows.length;
-        rows = rows.splice((page - 1) * num, num)
-        return {rows, total}
+    async list({page,num,order,queryCase}){
+        let r= this.fileDb.listByPage({page,num,caseObj:queryCase,order});
+        return r;
     }
 
     async listAll(obj){
-        if (obj) {
-            return M.listAllObjByPropFile(this.tableName, obj);
-        } else {
-            return M.getObjByFile(this.tableName);
-        }
+        let r= this.fileDb.listAll(obj);
+        return r;
     }
 
     async update(obj){
-        let r=  M.updateObjByIdFile(this.tableName,obj);
+        let r= this.fileDb.update(obj);
         return r;
     }
 
     async getChildenList(id,caseObj){
-        let r= this.listAll({parent_id:id,...caseObj});
+        let r= this.fileDb.listAll({parent_id:id,...caseObj});
         return r;
     }
 }

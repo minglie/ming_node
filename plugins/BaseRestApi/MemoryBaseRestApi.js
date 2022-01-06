@@ -26,7 +26,7 @@ class MemoryBaseRestApi extends AbstractBaseRestApi{
     }
 
     async list({page,num,order,queryCase}){
-        let r= this.memoryDb.listByPage(page,num,queryCase);
+        let r= this.memoryDb.listByPage({page,num,caseObj:queryCase,order});
         return r;
     }
 

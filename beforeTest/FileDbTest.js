@@ -1,6 +1,6 @@
-MemoryDb=require("../module/MemoryDb")
+FileDb=require("../module/FileDb")
 
-db= new MemoryDb()
+db= new FileDb("a.json",false)
 
 db.add({
     name:"zs"

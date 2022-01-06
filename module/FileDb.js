@@ -3,16 +3,25 @@
  * By : Minglie
  * QQ: 934031452
  * Date :2021.09.14
- * rem : 内存数据库
+ * rem : 文件数据库
  */
 
 const M=require("../index");
 
-class MemoryDb{
+class FileDb{
 
-    constructor(tableName) {
+    constructor(tableName,readFromMemory=true) {
         this.tableName=tableName;
+        this.readFromMemory=readFromMemory;
         this.dataList=[]
+    }
+
+    readFromFile(){
+        if(this.readFromMemory){
+            return
+        }else {
+            this.dataList=M.getObjByFile(this.tableName);
+        }
     }
 
     /**
@@ -21,21 +30,26 @@ class MemoryDb{
      * @returns {Promise<*>}
      */
     async add(obj){
+        this.readFromFile();
         obj.id = M.randomStr();
         this.dataList=[...this.dataList,obj];
+        M.writeObjToFile(this.tableName,this.dataList)
         return obj;
     }
 
     async update(obj){
+        this.readFromFile();
         for (let i = 0; i < this.dataList.length; i++) {
             if (this.dataList[i].id == obj.id) {
                 this.dataList[i]=obj;
                 return
             }
         }
+        M.writeObjToFile(this.tableName,this.dataList)
     }
 
     listAll(caseObj){
+        this.readFromFile();
         let o_keys=[];
         if(caseObj){
             o_keys = Object.keys(caseObj);
@@ -108,6 +122,7 @@ class MemoryDb{
 
 
     deleteAll(o) {
+        this.readFromFile();
         if (o) {
             let r_list = [];
             let o_keys = Object.keys(o);
@@ -138,9 +153,11 @@ class MemoryDb{
             this.dataList=[];
             return length;
         }
+        M.writeObjToFile(this.tableName,this.dataList)
     }
 
     getById(id) {
+        this.readFromFile();
         var d = this.dataList;
         for (let i = 0; i < d.length; i++) {
             if(d[i].id==id){
@@ -151,6 +168,7 @@ class MemoryDb{
     }
 
     deleteById(id) {
+        this.readFromFile();
         var d = this.dataList;
         for (let i = 0; i < d.length; i++) {
             if(d[i].id==id){
@@ -158,9 +176,10 @@ class MemoryDb{
                 return id;
             }
         }
+        M.writeObjToFile(this.tableName,this.dataList)
         return 0;
     }
 }
 
 
-module.exports = MemoryDb;
+module.exports = FileDb;
