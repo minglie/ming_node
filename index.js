@@ -3,7 +3,7 @@
  * By : Minglie
  * QQ: 934031452
  * Date :2021.12.01
- * version :2.9.5
+ * version :2.9.6
  */
 var http = require('http');
 var https = require('https');
@@ -109,7 +109,7 @@ M.get = function (url, callback, data, headers) {
     if (typeof callback == "function") {
 
     } else {
-        headers = data || {};
+        headers = data || {'Content-Type': 'application/json'};
         data = callback;
         callback = () => {
         };
@@ -175,7 +175,11 @@ M.get = function (url, callback, data, headers) {
             res.on('end', function () {
                 callback(html, res);
                 try {
-                    html = JSON.parse(html)
+                    if(headers && headers['Content-Type']=='application/json'){
+                        html = JSON.parse(html)
+                    }else {
+                        html = html;
+                    }
                 } catch (e) {
                     html = html;
                 }
@@ -1985,8 +1989,6 @@ M.server = function () {
         console.log("listen on port:" + port);
         return server;
     }
-
-    global.app=app;
     return app;
 }
 M["_gloable_exception_handle"]=(err)=>{
@@ -2833,7 +2835,7 @@ M.getRemoteCacheByUrl = async function (url) {
     if (url.startsWith("file:")) {
         text = M.readFile(url.substring(5));
     } else {
-        text = await M.get(url);
+        text = await M.get(url,{},{});
     }
     console.log("req remote url:", url);
     M._globle_cacheMap[url] = text;
