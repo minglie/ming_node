@@ -1776,7 +1776,11 @@ M.server = function () {
             }
         } catch (e) {
             console.error(e);
-            M["_gloable_exception_handle"](e,req,res);
+            try {
+                M["_gloable_exception_handle"](e,req,res);
+            }catch (e){
+                console.error("e2",e);
+            }
         }
     }
 
