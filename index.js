@@ -3,7 +3,7 @@
  * By : Minglie
  * QQ: 934031452
  * Date :2021.12.01
- * version :2.9.6
+ * version :2.9.7
  */
 var http = require('http');
 var https = require('https');
@@ -1501,11 +1501,14 @@ M.server = function () {
                 }
                 return isRest;
             }
-
-            req.ip = req.headers['x-forwarded-for'] ||
-                req.connection.remoteAddress ||
-                req.socket.remoteAddress ||
-                req.connection.socket.remoteAddress;
+            try {
+                req.ip = req.headers['x-forwarded-for'] ||
+                    req.connection.remoteAddress ||
+                    req.socket.remoteAddress ||
+                    req.connection.socket.remoteAddress;
+            }catch (e){
+                req.ip="";
+            }
             //请求cookies封装
             req.cookies = querystring.parse(req.headers['cookie'], "; ");
             //设置浏览器cookies
@@ -1945,7 +1948,7 @@ M.server = function () {
     //全局异常钩子
     app.set("gloable_exception_handle",(err,req,res)=>{
         console.error(err.stack)
-        if (res && !res.alreadySend) {
+        if (res && res.send && !res.alreadySend) {
             // res.writeHead(500, { "Content-Type": "text/j;charset='utf-8'" });
             res.send(M.result(err.message,false,-1));
         }
