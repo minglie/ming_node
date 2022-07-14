@@ -362,6 +362,7 @@ M.postJson = function (url, callback, data, headers) {
 
         req.on('error', function (err) {
             console.error(err);
+            throw err;
         });
         req.write(postData);
         req.end();
@@ -1075,6 +1076,7 @@ M.getMySql = function (dbConfig) {
             connection.beginTransaction(  async function(err) {
                 if (err) {
                     console.error(err);
+                    throw err;
                     return;
                 }
                 try {
@@ -1083,6 +1085,7 @@ M.getMySql = function (dbConfig) {
                     connection.rollback(function() {
                         console.error(e);
                         connection.release();
+                        throw e;
                     });
                     return;
                 }
@@ -1091,6 +1094,7 @@ M.getMySql = function (dbConfig) {
                     connection.release();
                     if (err) {
                         console.error(err);
+                        throw err;
                         return;
                     }
                 });
@@ -1601,6 +1605,7 @@ M.server = function () {
                     fs.createReadStream(url).on("end",d=>{})
                         .on("error",e=>{
                             console.error(e);
+                            throw e;
                         }).pipe(res);
                 }else {
                     var func = http;
@@ -1618,7 +1623,8 @@ M.server = function () {
                         res.writeHead(200, {"Content-Type": "" + (privateObj.staticMime[extname] || 'text/html') + ";charset='utf-8'",});
                         res1.on("end",d=>{})
                             .on("error",e=>{
-                                console.error(e)
+                                console.error(e);
+                                throw e;
                             }).pipe(res);
                     });
                 }
