@@ -3,7 +3,7 @@
  * By : Minglie
  * QQ: 934031452
  * Date :2021.12.01
- * version :2.9.7
+ * version :2.9.8
  */
 var http = require('http');
 var https = require('https');
@@ -277,6 +277,7 @@ M._request = function (url, callback, data, headers,methed) {
 
         req.on('error', function (err) {
             console.error(err);
+            throw err;
         });
         if(methed !="GET") req.write(postData);
         req.end();
@@ -2076,6 +2077,7 @@ M.axios = function (axiosConfig) {
         });
         req.on('error', function (err) {
             console.error(err);
+            throw err;
         });
         req.write(axiosConfig.body);
         req.end();
