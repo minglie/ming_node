@@ -3,7 +3,7 @@
  * By : Minglie
  * QQ: 934031452
  * Date :2021.12.01
- * version :2.9.8
+ * version :2.9.9
  */
 var http = require('http');
 var https = require('https');
@@ -2352,7 +2352,7 @@ privateObj.staticMime = {
     ".axs": "application/olescript",
     ".bas": "text/plain",
     ".bcpio": "application/x-bcpio",
-    ".bin ": "application/octet-stream",
+    ".bin": "application/octet-stream",
     ".bld": "application/bld",
     ".bld2": "application/bld2",
     ".bmp": "image/bmp",
@@ -2469,8 +2469,8 @@ privateObj.staticMime = {
     ".jpz": "image/jpeg",
     ".js": "application/javascript",
     ".jsx": "application/javascript",
-    ".woff":" application/x-font-woff",
-    ".woff2":" application/x-font-woff",
+    ".woff":"application/x-font-woff",
+    ".woff2":"application/x-font-woff",
     ".jwc": "application/jwc",
     ".kjx": "application/x-kjx",
     ".lak": "x-lml/x-lak",
