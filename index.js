@@ -2835,7 +2835,8 @@ privateObj.staticMime = {
     ".py": "text/plain",
     ".redis": "text/plain",
     ".conf": "text/conf",
-    ".sql": "text/sql"
+    ".sql": "text/sql",
+    ".ejs": "text/plain"
 }
 
 M.test = function () {
