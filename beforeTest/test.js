@@ -1,12 +1,11 @@
 M=require("../index.js")
 
+
 async function main(){
-
-
-    a=await M.request.post("https://reqres.in/api/users",{})
-    console.log(a)
+   await M.readCsvLine("./a.csv",l=>{
+        console.log(l)
+    })
+    console.log("结束")
 }
-
-
 
 main()

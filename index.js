@@ -839,8 +839,33 @@ M.readLine =async function (file, callback) {
 
 
 M.readCsvLine =async function (file, callback) {
+    function parseStringToArray(str) {
+        const result = [];
+        let temp = '';
+        let inQuotes = false;
+        for (let i = 0; i < str.length; i++) {
+            const char = str[i];
+            if (char === ',' && !inQuotes) {
+                result.push(temp.trim());
+                temp = '';
+            } else if (char === '"') {
+                if (inQuotes && str[i + 1] === '"') {
+                    temp += '"';
+                    i++;
+                } else {
+                    inQuotes = !inQuotes;
+                }
+            } else {
+                temp += char;
+            }
+        }
+
+        result.push(temp.trim());
+
+        return result;
+    }
     return  M.readLine(file, function (line) {
-        callback(line.replace("\r", "").split(/(?<!\"[^,]+),(?![^,]+\")/));
+        callback(parseStringToArray(line));
     })
 }
 
