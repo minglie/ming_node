@@ -1,11 +1,5 @@
 M=require("../index.js")
 
+app=M.server()
 
-async function main(){
-   await M.readCsvLine("./a.csv",l=>{
-        console.log(l)
-    })
-    console.log("结束")
-}
-
-main()
+app.listen(8888)

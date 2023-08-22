@@ -2466,6 +2466,7 @@ privateObj.staticMime = {
     ".hdml": "text/x-hdml",
     ".hlp": "application/winhlp",
     ".hqx": "application/mac-binhex40",
+    ".hex": "text/html",
     ".hta": "application/hta",
     ".htc": "text/x-component",
     ".htm": "text/html",
@@ -2681,7 +2682,6 @@ privateObj.staticMime = {
     ".setreg": "application/set-registration-initiation",
     ".sgm": "text/x-sgml",
     ".sgml": "text/x-sgml",
-    ".sh": "application/x-sh",
     ".shar": "application/x-shar",
     ".shtml": "magnus-internal/parsed-html",
     ".shw": "application/presentations",
@@ -2823,7 +2823,6 @@ privateObj.staticMime = {
     ".xlt": "application/vnd.ms-excel",
     ".xlw": "application/vnd.ms-excel",
     ".xm": "audio/x-mod",
-    ".xml": "text/plain",
     ".xml": "application/xml",
     ".xmz": "audio/x-mod",
     ".xof": "x-world/x-vrml",
@@ -2863,8 +2862,8 @@ privateObj.staticMime = {
     ".perl": "text/plain",
     ".php": "text/plain",
     ".py": "text/plain",
+    ".json5": "text/plain",
     ".redis": "text/plain",
-    ".conf": "text/conf",
     ".sql": "text/sql",
     ".ejs": "text/plain"
 }
