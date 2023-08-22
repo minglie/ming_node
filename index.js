@@ -3,19 +3,19 @@
  * By : Minglie
  * QQ: 934031452
  * Date :2021.12.01
- * version :2.9.9
+ * version :3.0.2
  */
-var http = require('http');
-var https = require('https');
-var url_module = require('url');
-var querystring = require('querystring');
-var fs = require('fs');
-var path = require('path');
-var child_process = require('child_process');
-var EventEmitter = require('events').EventEmitter;
-var event = new EventEmitter();
-var privateObj = {};//本文件私有对象
-var M = {};
+const http = require('http');
+const https = require('https');
+const url_module = require('url');
+const querystring = require('querystring');
+const fs = require('fs');
+const path = require('path');
+const child_process = require('child_process');
+const EventEmitter = require('events').EventEmitter;
+const event = new EventEmitter();
+const privateObj = {};//本文件私有对象
+const M = {};
 M.privateObj=privateObj;
 M.sessions = {}//保存session
 M.con_display_status_enable = false;//是否显示响应状态码
@@ -134,9 +134,9 @@ M.get = function (url, callback, data, headers) {
     }
     //合并请求头
     headers = privateObj.getFunctionOrObjResult(M.reqComHeaders, headers)
-    var html = '';
-    var urlObj = url_module.parse(url)
-    var options = {
+    let html = '';
+    let urlObj = url_module.parse(url)
+    let options = {
         hostname: urlObj.hostname,
         port: urlObj.port,
         path: urlObj.path + getData,
@@ -159,7 +159,7 @@ M.get = function (url, callback, data, headers) {
         if (options == false) {
             return;
         }
-        var req = reqHttp.request(options, function (res) {
+        let req = reqHttp.request(options, function (res) {
             if (M.con_display_status_enable) console.log('STATUS:' + res.statusCode);
             if (global.debug && res.statusCode != 200) {
                 while (1) {
@@ -206,10 +206,10 @@ M._request = function (url, callback, data, headers,methed) {
     }
 
     url = privateObj.appendDataToUrl(url, M.reqComQueryparams);
-    var html = '';
-    var urlObj = url_module.parse(url)
+    let html = '';
+    let urlObj = url_module.parse(url)
     //发送 http Post 请求
-    var postData = querystring.stringify(data);
+    let postData = querystring.stringify(data);
     if( headers["Content-Type"]==undefined){
         headers["Content-Type"] ="application/json";
     }
@@ -225,7 +225,7 @@ M._request = function (url, callback, data, headers,methed) {
 
     //合并请求头
     headers = privateObj.getFunctionOrObjResult(M.reqComHeaders, headers)
-    var options = {
+    let options = {
         hostname: urlObj.hostname,
         port: urlObj.port,
         path: urlObj.path,
@@ -244,7 +244,7 @@ M._request = function (url, callback, data, headers,methed) {
     }
 
     return new Promise((resolve, reject) => {
-        var req = reqHttp.request(options, function (res) {
+        let req = reqHttp.request(options, function (res) {
             options = M.httpBefore(options);
             if (options == false) {
                 return;
@@ -296,10 +296,10 @@ M.postJson = function (url, callback, data, headers) {
         };
     }
     url = privateObj.appendDataToUrl(url, M.reqComQueryparams);
-    var html = '';
-    var urlObj = url_module.parse(url)
+    let html = '';
+    let urlObj = url_module.parse(url)
     //发送 http Post 请求
-    var postData = JSON.stringify(data);
+    let postData = JSON.stringify(data);
     if (!headers) {
         headers = {
             'Content-Type': 'application/json; ' +
@@ -309,7 +309,7 @@ M.postJson = function (url, callback, data, headers) {
     }
     //合并请求头
     headers = privateObj.getFunctionOrObjResult(M.reqComHeaders, headers)
-    var options = {
+    let options = {
         hostname: urlObj.hostname,
         port: urlObj.port,
         path: urlObj.path,
@@ -329,7 +329,7 @@ M.postJson = function (url, callback, data, headers) {
 
     return new Promise((resolve, reject) => {
 
-        var req = reqHttp.request(options, function (res) {
+        let req = reqHttp.request(options, function (res) {
             options = M.httpBefore(options);
             if (options == false) {
                 return;
@@ -393,7 +393,8 @@ M.require =async function (url,noCache) {
     console.log("req require remote url:", url);
     let promise = new Promise(function (reslove, reject) {
         require(ht).get(url, function (req, res) {
-            var d = '';
+            res.setEncoding('utf-8');
+            let d = '';
             req.on('data', (data) => {
                 d += data;
             });
@@ -444,7 +445,7 @@ M.import=async function (url,callback){
  *下载图片
  */
 M.download =async function (url, file) {
-    var func = http;
+    let func = http;
     if (url.indexOf("https") >= 0) {
         func = https;
     }
@@ -464,23 +465,24 @@ M.download =async function (url, file) {
  *下载所有图片
  */
 M.downloadAllImg = function (url, file, callback) {
-    var urlObj = url_module.parse(url)
-    var options = {
+    let urlObj = url_module.parse(url)
+    let options = {
         hostname: urlObj.hostname,
     }
-    var func = http;
+    let func = http;
     if (url.indexOf("https") >= 0) {
         func = https;
     }
-    var req = func.request(options, function (res) {
+    let req = func.request(options, function (res) {
+        res.setEncoding('utf-8');
         res.on('data', function (data) {
             //Buffer
-            var string = data.toString();
-            var rule = /https?:\/\/.[^"]+\.(png|jpg|gif|jpeg)/gi;
-            var ary = string.match(rule);    //拿到所有jpg结尾的链接集合
+            let string = data.toString();
+            let rule = /https?:\/\/.[^"]+\.(png|jpg|gif|jpeg)/gi;
+            let ary = string.match(rule);    //拿到所有jpg结尾的链接集合
             if (callback) callback(ary);
-            var x = 0;
-            for (var i in ary) {
+            let x = 0;
+            for (let i in ary) {
                 M.download(ary[i], file + (x++) + ary[i].substr(ary[i].lastIndexOf(".")));
             }
         });
@@ -599,8 +601,8 @@ M.mkdir = function (dirpath, dirname) {
 M.copyDir = function (src, dst) {
     let paths = fs.readdirSync(src); //同步读取当前目录
     paths.forEach(function (path) {
-        var _src = src + '/' + path;
-        var _dst = dst + '/' + path;
+        let _src = src + '/' + path;
+        let _dst = dst + '/' + path;
         fs.stat(_src, function (err, stats) {  //stats  该对象 包含文件属性
             if (err) throw err;
             if (stats.isFile()) { //如果是个文件则拷贝
@@ -643,7 +645,7 @@ M.appendFile = function (file, str) {
  */
 M.getObjByFile = function (file) {
     data = M.readFile(file) || "[]"
-    var obj = JSON.parse(data.toString());
+    let obj = JSON.parse(data.toString());
     return obj;
 }
 M.writeObjToFile = function (file, obj) {
@@ -652,7 +654,7 @@ M.writeObjToFile = function (file, obj) {
 
 M.addObjToFile = function (file, obj) {
     try {
-        var d = M.getObjByFile(file);
+        let d = M.getObjByFile(file);
         M.writeObjToFile(file, [...d, obj]);
     } catch (e) {
         M.writeObjToFile(file, [obj]);
@@ -665,8 +667,8 @@ M.deleteObjByIdFile = function (file, id) {
     } else {
         ids = id;
     }
-    var d = M.getObjByFile(file);
-    var d1 = M.getObjByFile(file);
+    let d = M.getObjByFile(file);
+    let d1 = M.getObjByFile(file);
     let d_num = 0;
     for (let i = 0; i < d1.length; i++) {
         if (ids.indexOf(d1[i].id) >= 0) {
@@ -681,8 +683,8 @@ M.deleteObjByIdFile = function (file, id) {
 M.deleteObjByPropFile = function (file, o) {
     let o_key = Object.keys(o)[0];
     let o_val = o[o_key]
-    var d = M.getObjByFile(file);
-    var d1 = M.getObjByFile(file);
+    let d = M.getObjByFile(file);
+    let d1 = M.getObjByFile(file);
     let d_num = 0;
     for (let i = 0; i < d1.length; i++) {
         if (d1[i][o_key] == o_val) {
@@ -695,7 +697,7 @@ M.deleteObjByPropFile = function (file, o) {
 }
 
 M.updateObjByIdFile = function (file, obj) {
-    var d = M.getObjByFile(file);
+    let d = M.getObjByFile(file);
     for (let i = 0; i < d.length; i++) {
         if (d[i].id == obj.id) {
             d.splice(i, 1, Object.assign(d[i],obj));
@@ -705,7 +707,7 @@ M.updateObjByIdFile = function (file, obj) {
     M.writeObjToFile(file, d);
 }
 M.getObjByIdFile = function (file, id) {
-    var d = M.getObjByFile(file);
+    let d = M.getObjByFile(file);
     for (let i = 0; i < d.length; i++) {
         if (d[i].id == id) {
             return d[i];
@@ -713,7 +715,7 @@ M.getObjByIdFile = function (file, id) {
     }
 }
 M.listAllObjByPropFile = function (file, caseObj) {
-    var d =  M.getObjByFile(file);
+    let d =  M.getObjByFile(file);
     let o_keys = Object.keys(caseObj);
     if (caseObj &&  o_keys.length>0) {
         let r_list = [];
@@ -814,13 +816,14 @@ M.getAttribute = function (k) {
 M.readLine =async function (file, callback) {
     let lineCount=0;
     return new Promise((resolve, reject) =>{
-        var remaining = '';
-        var input = fs.createReadStream(file);
+        let remaining = '';
+        let input = fs.createReadStream(file);
+        input.setEncoding('utf-8');
         input.on('data', function (data) {
             remaining += data;
-            var index = remaining.indexOf('\n');
+            let index = remaining.indexOf('\n');
             while (index > -1) {
-                var line = remaining.substring(0, index);
+                let line = remaining.substring(0, index);
                 remaining = remaining.substring(index + 1);
                 lineCount++;
                 callback(line);
@@ -855,7 +858,7 @@ M.getFileList = function (path) {
         function walk(file) {
             states = fs.statSync(path + '/' + file);
             if (states.isDirectory()) {
-                var item;
+                let item;
                 if (targetObj["children"]) {
                     item = {name: file, children: [], value: path + '/' + file};
                     targetObj["children"].push(item);
@@ -867,24 +870,24 @@ M.getFileList = function (path) {
                 readFile(path + '/' + file, filesList, item);
             } else {
                 //创建一个对象保存信息
-                var obj = new Object();
+                let obj = new Object();
                 obj.size = states.size;//文件大小，以字节为单位
                 obj.name = file;//文件名
                 obj.path = path + '/' + file; //文件绝对路径
 
                 if (targetObj["children"]) {
-                    var item = {name: file, value: obj.path}
+                    let item = {name: file, value: obj.path}
                     targetObj["children"].push(item);
                 } else {
-                    var item = {name: file, value: obj.path};
+                    let item = {name: file, value: obj.path};
                     filesList.push(item);
                 }
             }
         }
     }
 
-    var filesList = [];
-    var targetObj = {};
+    let filesList = [];
+    let targetObj = {};
     readFile(path, filesList, targetObj);
     return filesList;
 }
@@ -897,7 +900,7 @@ M.getFileDirList = function (path) {
         function walk(file) {
             states = fs.statSync(path + '/' + file);
             if (states.isDirectory()) {
-                var item;
+                let item;
                 let dir=path + '/' + file;
                 if(dir.indexOf("lib")==-1){
                     dirList.push(path + '/' + file)
@@ -913,9 +916,9 @@ M.getFileDirList = function (path) {
             }
         }
     }
-    var dirList=[]
-    var filesList = [];
-    var targetObj = {};
+    let dirList=[]
+    let filesList = [];
+    let targetObj = {};
     readFile(path, filesList, targetObj);
     return dirList;
 }
@@ -967,10 +970,10 @@ M.getSqlite = function (dbName) {
     if (M.sqlite) {
         return M.sqlite;
     }
-    var SQLite3 = require('sqlite3').verbose();
-    var Db = new SQLite3.Database(dbName || "ming_autotest.db");
+    let SQLite3 = require('sqlite3').verbose();
+    let Db = new SQLite3.Database(dbName || "ming_autotest.db");
     Db.doSql = function doSql(sql) {
-        var promise = new Promise(function (reslove, reject) {
+        let promise = new Promise(function (reslove, reject) {
             if (Db.display_sql_enable) {
                 M.log(sql)
             }
@@ -1008,7 +1011,7 @@ M.getMySql = function (dbConfig) {
     if (M.mysql) {
         return M.mysql;
     }
-    var mysql = require('mysql');
+    let mysql = require('mysql');
     let defaultDbConfig = {
         "host": dbConfig.host || "localhost",
         "user": dbConfig.user || "root",
@@ -1019,10 +1022,10 @@ M.getMySql = function (dbConfig) {
         dateStrings: true,
         timezone: "08:00"
     }
-    var Db = {};
+    let Db = {};
     Db.dbConfig=defaultDbConfig;
     console.log("connect mysql", defaultDbConfig)
-    var pool = mysql.createPool(defaultDbConfig);
+    let pool = mysql.createPool(defaultDbConfig);
     Db.pool=pool;
     Db.getConnection= function(callback){
         return new Promise(((resolve, reject) => {
@@ -1039,7 +1042,7 @@ M.getMySql = function (dbConfig) {
         if (Db.display_sql_enable) {
             M.log(sql)
         }
-        var promise = new Promise(function (reslove, reject) {
+        let promise = new Promise(function (reslove, reject) {
             pool.getConnection(function (err, connection) {
                 connection.query(sql, params, function (err, rows) {
                     if (err) {
@@ -1062,7 +1065,7 @@ M.getMySql = function (dbConfig) {
                 if (Db.display_sql_enable) {
                     M.log(sql)
                 }
-                var promise = new Promise(function (reslove, reject) {
+                let promise = new Promise(function (reslove, reject) {
                     connection.query(sql, params, function (err, rows) {
                         if (err) {
                             reject(err);
@@ -1111,11 +1114,11 @@ M.getMongoDB = function (dbConfig) {
     if (M.mongoDb) {
         return M.mongoDb;
     }
-    var MongoDB=require('mongodb');
-    var MongoClient =MongoDB.MongoClient;
+    let MongoDB=require('mongodb');
+    let MongoClient =MongoDB.MongoClient;
     const ObjectID = MongoDB.ObjectID;
 
-    var Config={
+    let Config={
         dbUrl:  dbConfig.dbUrl|| 'mongodb://localhost:27017/',
         dbName: dbConfig.dbName|| 'miapi'
     };
@@ -1146,7 +1149,7 @@ M.getMongoDB = function (dbConfig) {
             }
             return new Promise((resolve,reject)=>{
                 MingMongoClient.connect().then((db)=>{
-                    var result=db.collection(collectionName).find(json);
+                    let result=db.collection(collectionName).find(json);
                     result.toArray(function(err,docs){
                         if(err){
                             reject(err);
@@ -1242,7 +1245,7 @@ M.getMongoDB = function (dbConfig) {
             }
             return new  Promise((resolve,reject)=>{
                 MingMongoClient.connect().then((db)=>{
-                    var whereArgs = {
+                    let whereArgs = {
                         _id: new ObjectID(id)
                     };
                     db.collection(collectionName).findOne(whereArgs,{},function(err,result){
@@ -1271,8 +1274,8 @@ M.getMongoDB = function (dbConfig) {
  * ----------------------Sql CRUD  START-------------------------------------------
  */
 M.getInsertObjSql = function (tableName, obj) {
-    var fields = "(";
-    var values = "(";
+    let fields = "(";
+    let values = "(";
     for (let field in obj) {
         fields += field + ",";
         values += `'${obj[field]}'` + ",";
@@ -1286,7 +1289,7 @@ M.getInsertObjSql = function (tableName, obj) {
 }
 
 M.getDeleteObjSql = function (tableName, obj) {
-    var fields = [];
+    let fields = [];
     for (let field in obj) {
         fields.push(field);
     }
@@ -1296,7 +1299,7 @@ M.getDeleteObjSql = function (tableName, obj) {
 }
 
 M.getUpdateObjSql = function (tableName, obj, caseObj) {
-    var fields = [];
+    let fields = [];
     for (let field in obj) {
         if (field != "id")
             fields.push(field);
@@ -1305,7 +1308,7 @@ M.getUpdateObjSql = function (tableName, obj, caseObj) {
     if (!caseObj) {
         sql = `update ${tableName} set ${fields.map(u => u + "='" + obj[u] + "'")} where id=${obj.id}`;
     } else {
-        var caseObjfields = [];
+        let caseObjfields = [];
         for (let caseObjfield in caseObj) {
             caseObjfields.push(caseObjfield)
         }
@@ -1317,7 +1320,7 @@ M.getUpdateObjSql = function (tableName, obj, caseObj) {
 
 
 M.getSelectObjSql = function (tableName, obj) {
-    var fields = [];
+    let fields = [];
     for (let field in obj) {
         fields.push(field);
     }
@@ -1343,7 +1346,7 @@ M.getSelectObjSql = function (tableName, obj) {
  *封装返回数据
  */
 M.result = function (data, success,message) {
-    var r = {};
+    let r = {};
     if (success == false) {
         r.code = -2;
         r.msg  = message||"操作失败";
@@ -1353,7 +1356,7 @@ M.result = function (data, success,message) {
     }
     r.requestId=M.req? M.req.requestId:"";
     try {
-        var obj = JSON.parse(data);
+        let obj = JSON.parse(data);
         if (typeof obj == 'object' && obj) {
             r.data = obj;
         } else {
@@ -1386,7 +1389,7 @@ M.failResult=(msg,code,d)=>{
  *获取下划线式的对象
  */
 M.getUnderlineObj = function (obj) {
-    var result = {};
+    let result = {};
     for (let field in obj) {
         result[field.humpToUnderline()] = obj[field]
     }
@@ -1397,7 +1400,7 @@ M.getUnderlineObj = function (obj) {
  *获取驼峰式的对象
  */
 M.getHumpObj = function (obj) {
-    var result = {};
+    let result = {};
     for (let field in obj) {
         result[field.underlineToHump()] = obj[field]
     }
@@ -1410,14 +1413,14 @@ M.randomStr = function () {
 
 M.urlStringify = function (obj) {
     if (obj !== null && typeof obj === 'object') {
-        var keys = Object.keys(obj);
-        var len = keys.length;
-        var flast = len - 1;
-        var fields = '';
-        for (var i = 0; i < len; ++i) {
-            var k = keys[i];
-            var v = obj[k];
-            var ks = k + "=";
+        let keys = Object.keys(obj);
+        let len = keys.length;
+        let flast = len - 1;
+        let fields = '';
+        for (let i = 0; i < len; ++i) {
+            let k = keys[i];
+            let v = obj[k];
+            let ks = k + "=";
             fields += ks + v;
             if (i < flast)
                 fields += "&";
@@ -1429,12 +1432,12 @@ M.urlStringify = function (obj) {
 
 M.urlParse = function (url) {
     url = url.substr(url.indexOf("?") + 1);
-    var t, n, r, i = url, s = {};
+    let t, n, r, i = url, s = {};
     t = i.split("&"),
         r = null,
         n = null;
-    for (var o in t) {
-        var u = t[o].indexOf("=");
+    for (let o in t) {
+        let u = t[o].indexOf("=");
         u !== -1 && (r = t[o].substr(0, u),
             n = t[o].substr(u + 1),
             s[r] = n)
@@ -1457,7 +1460,7 @@ M.err = function (e) {
 
 
 M.server = function () {
-    var G = this;   /*全局变量,也就是M*/
+    let G = this;   /*全局变量,也就是M*/
     //静态资源路径
     this._views = "static";
     //key为去除rest参数的url,val为原始url
@@ -1479,8 +1482,10 @@ M.server = function () {
     //如果实现此函数,则只能有一个此服务
     this._server = function () {
     };
-    var app =async function (req, res) {
+    let app =async function (req, res) {
         try {
+            req.setEncoding('utf-8');
+            res.setEncoding('utf-8');
             M.req=req;
             M.res=res;
             //是否已经发送过了
@@ -1497,7 +1502,7 @@ M.server = function () {
             //是否为rest请求
             req.isRestRequest = function () {
                 if (Object.keys(G._rest).length == 0) return false;
-                var isRest = false;
+                let isRest = false;
                 for (let i = 0; i < Object.keys(G._rest).length; i++) {
                     if (pathname.startsWith(Object.keys(G._rest)[i])) {
                         isRest = true;
@@ -1579,9 +1584,9 @@ M.server = function () {
                 if (!isString) {
                     text = JSON.stringify(text);
                 }
-                var pathname = url_module.parse(url).pathname;   /*获取url的值*/
+                let pathname = url_module.parse(url).pathname;   /*获取url的值*/
                 //获取文件的后缀名
-                var extname = path.extname(pathname);
+                let extname = path.extname(pathname);
                 res.writeHead(200, {"Content-Type": "" + (privateObj.staticMime[extname] || 'text/html') + ";charset='utf-8'",});
                 res.write(text);
                 res.end();
@@ -1608,7 +1613,7 @@ M.server = function () {
                             throw e;
                         }).pipe(res);
                 }else {
-                    var func = http;
+                    let func = http;
                     if (url.indexOf("https") >= 0) {
                         func = https;
                     }
@@ -1647,9 +1652,9 @@ M.server = function () {
                 if (!isString) {
                     text = JSON.stringify(text);
                 }
-                var pathname = url_module.parse(url).pathname;   /*获取url的值*/
+                let pathname = url_module.parse(url).pathname;   /*获取url的值*/
                 //获取文件的后缀名
-                var extname = path.extname(pathname);
+                let extname = path.extname(pathname);
                 res.writeHead(200, {"Content-Type": "" + (privateObj.staticMime[extname] || 'text/html') + ";charset='utf-8'",});
                 let templateStr=""
                 try {
@@ -1694,13 +1699,13 @@ M.server = function () {
                 res.end();
             }
             //获取路由
-            var pathname = url_module.parse(req.url).pathname;
+            let pathname = url_module.parse(req.url).pathname;
             if (!pathname.endsWith('/')) {
                 pathname = pathname + '/';
             }
             // pathname.startsWith("/usr/")
             //获取请求的方式 get  post
-            var method = req.method.toLowerCase();
+            let method = req.method.toLowerCase();
             if (req.isStaticRequest()) {
 
                 await G._begin(req, res);
@@ -1710,7 +1715,7 @@ M.server = function () {
 
                 //为req加个params用于存放请求参数
                 req.params = {};
-                var mapingPath = "";
+                let mapingPath = "";
                 //如果是rest风格的请求,为其封装请求参数
                 if (req.isRestRequest()) {
                     for (let i = 0; i < Object.keys(G._rest).length; i++) {
@@ -1719,7 +1724,7 @@ M.server = function () {
                             mapingPath = G._rest[pathname];
                         }
                     }
-                    var realPathName = url_module.parse(req.url).pathname;
+                    let realPathName = url_module.parse(req.url).pathname;
                     if (!realPathName.endsWith('/')) {
                         realPathName = realPathName + '/';
                     }
@@ -1742,7 +1747,7 @@ M.server = function () {
                     method == "delete"
                 ) && (G['_' + method][pathname])) {
                     if (method != 'get') { /*执行post请求*/
-                        var postStr = '';
+                        let postStr = '';
                         req.on('data', function (chunk) {
                             postStr += chunk;
                         })
@@ -1859,7 +1864,7 @@ M.server = function () {
     app.get = function (url, callback) {
         const single=(url,callback)=>{
             url = M.formatUrl(url);
-            var realUrl = url;
+            let realUrl = url;
             if (url.indexOf(":") > 0) {
                 url = url.substr(0, url.indexOf(":"));
                 G._rest[url] = realUrl;
@@ -1874,7 +1879,7 @@ M.server = function () {
     app.post = function (url, callback) {
         const single=(url,callback)=>{
             url = M.formatUrl(url);
-            var realUrl = url;
+            let realUrl = url;
             if (url.indexOf(":") > 0) {
                 url = url.substr(0, url.indexOf(":"));
                 G._rest[url] = realUrl;
@@ -1887,7 +1892,7 @@ M.server = function () {
     app.put = function (url, callback) {
         const single=(url,callback)=>{
             url = M.formatUrl(url);
-            var realUrl = url;
+            let realUrl = url;
             if (url.indexOf(":") > 0) {
                 url = url.substr(0, url.indexOf(":"));
                 G._rest[url] = realUrl;
@@ -1900,7 +1905,7 @@ M.server = function () {
     app.delete = function (url, callback) {
         const single=(url,callback)=>{
             url = M.formatUrl(url);
-            var realUrl = url;
+            let realUrl = url;
             if (url.indexOf(":") > 0) {
                 url = url.substr(0, url.indexOf(":"));
                 G._rest[url] = realUrl;
@@ -1915,7 +1920,7 @@ M.server = function () {
     app.mapping = function (url, callback) {
         const single=(url,callback)=>{
             url = M.formatUrl(url);
-            var realUrl = url;
+            let realUrl = url;
             if (url.indexOf(":") > 0) {
                 url = url.substr(0, url.indexOf(":"));
                 G._rest[url] = realUrl;
@@ -2029,6 +2034,7 @@ M.getAxiosConfig = async (req) => {
         axiosConfig.method = req.method.toLocaleLowerCase();
         axiosConfig.headers = req.headers
         let postStr = '';
+        req.setEncoding('utf-8');
         req.on('data', function (chunk) {
             postStr += chunk;
         })
@@ -2052,8 +2058,8 @@ M.getAxiosConfig = async (req) => {
 
 M.axios = function (axiosConfig) {
     axiosConfig.headers.host = "";
-    var urlObj = url_module.parse(axiosConfig.url)
-    var options = {
+    let urlObj = url_module.parse(axiosConfig.url)
+    let options = {
         hostname: urlObj.hostname,
         port: urlObj.port,
         path: urlObj.path,
@@ -2064,9 +2070,9 @@ M.axios = function (axiosConfig) {
     if (axiosConfig.url.startsWith("https")) {
         reqHttp = https;
     }
-    var html = '';
+    let html = '';
     return new Promise((resolve, reject) => {
-        var req = reqHttp.request(options, function (res) {
+        let req = reqHttp.request(options, function (res) {
             options = M.httpBefore(options);
             if (options == false) {
                 return;
@@ -2108,13 +2114,13 @@ privateObj.dealUseServer = async function (req, res) {
 
 privateObj.staticServer = async function (req, res, staticPath) {
     if (res.alreadySend) return;
-    var pathname = url_module.parse(req.url).pathname;   /*获取url的值*/
+    let pathname = url_module.parse(req.url).pathname;   /*获取url的值*/
     if (pathname == '/') {
         pathname = '/index.html'; /*默认加载的首页*/
     }
     let fileName = pathname.replace("/", "");
     //获取文件的后缀名
-    var extname = path.extname(pathname);
+    let extname = path.extname(pathname);
 
     if (fileName.startsWith("__default_")) {
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -2265,7 +2271,7 @@ M.sseServer = function () {
  * ----------------------其他工具函数START--------------------------------------------
  */
 M.exec = function (comand) {
-    var promise = new Promise(function (reslove, reject) {
+    let promise = new Promise(function (reslove, reject) {
         child_process.exec(comand, function (err, stdout, stderr) {
             if (err || stderr) console.error(err, stderr);
             reslove(stdout);
@@ -2276,11 +2282,11 @@ M.exec = function (comand) {
 }
 
 M.getMyIp = function () {
-    var interfaces = require('os').networkInterfaces();
-    for (var devName in interfaces) {
-        var iface = interfaces[devName];
-        for (var i = 0; i < iface.length; i++) {
-            var alias = iface[i];
+    let interfaces = require('os').networkInterfaces();
+    for (let devName in interfaces) {
+        let iface = interfaces[devName];
+        for (let i = 0; i < iface.length; i++) {
+            let alias = iface[i];
             if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal) {
                 return alias.address;
             }
@@ -2299,8 +2305,8 @@ M.getMyIp = function () {
  */
 
 M.sleep = function (numberMillis) {
-    var now = new Date();
-    var exitTime = now.getTime() + numberMillis;
+    let now = new Date();
+    let exitTime = now.getTime() + numberMillis;
     while (true) {
         now = new Date();
         if (now.getTime() > exitTime)
@@ -2863,7 +2869,7 @@ M.init = function () {
      * 下划线命名转为驼峰命名
      */
     String.prototype.underlineToHump = function () {
-        var re = /_(\w)/g;
+        let re = /_(\w)/g;
         str = this.replace(re, function ($0, $1) {
             return $1.toUpperCase();
         });
@@ -2874,7 +2880,7 @@ M.init = function () {
      * 驼峰命名转下划线
      */
     String.prototype.humpToUnderline = function () {
-        var re = /_(\w)/g;
+        let re = /_(\w)/g;
         str = this.replace(/([A-Z])/g, "_$1").toLowerCase();
         return str;
     }
@@ -2893,7 +2899,7 @@ M.init = function () {
     }
     //格式化日期
     Date.prototype.format = function (fmt) {
-        var o = {
+        let o = {
             "M+": this.getMonth() + 1,                 //月份
             "d+": this.getDate(),                    //日
             "h+": this.getHours(),                   //小时
@@ -2905,7 +2911,7 @@ M.init = function () {
         if (/(y+)/.test(fmt)) {
             fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
         }
-        for (var k in o) {
+        for (let k in o) {
             if (new RegExp("(" + k + ")").test(fmt)) {
                 fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
             }

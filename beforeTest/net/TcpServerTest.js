@@ -9,7 +9,7 @@ app.set("connect",(req,res)=>{
 
 app.set("data",(req,res)=>{
 
-    console.log(req.params)
+    console.log(req.params+"")
 
     res.send("123")
 

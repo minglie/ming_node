@@ -1,5 +1,6 @@
-const net = require('net');
-const os = require("os");
+import net  from "net"
+import os from 'os'
+
 class TcpServer {
     static _EventCallBack={};
     static socketClientMap={};
@@ -105,4 +106,4 @@ class TcpServer {
 
 }
 
-module.exports = TcpServer;
+export default TcpServer;
