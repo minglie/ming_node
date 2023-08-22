@@ -1485,7 +1485,6 @@ M.server = function () {
     let app =async function (req, res) {
         try {
             req.setEncoding('utf-8');
-            res.setEncoding('utf-8');
             M.req=req;
             M.res=res;
             //是否已经发送过了

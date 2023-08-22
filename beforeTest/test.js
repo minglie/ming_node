@@ -1,8 +1,12 @@
-var M=require("../index");
+M=require("../index.js")
 
-app=M.server()
-app.listen(8888)
+async function main(){
 
-app.get(["/h15","/h16","/h18888"],(req,res)=>{
-    res.send("BBBBXXXEEEEE")
-})
+
+    a=await M.request.post("https://reqres.in/api/users",{})
+    console.log(a)
+}
+
+
+
+main()
