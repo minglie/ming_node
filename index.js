@@ -393,7 +393,6 @@ M.require =async function (url,noCache) {
     console.log("req require remote url:", url);
     let promise = new Promise(function (reslove, reject) {
         require(ht).get(url, function (req, res) {
-            res.setEncoding('utf-8');
             let d = '';
             req.on('data', (data) => {
                 d += data;
