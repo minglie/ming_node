@@ -1,3 +1,8 @@
+/**
+ build/CUR_DIR
+ led/tb.v led.v
+ */
+
 const fs = require('fs');
 
 fs.writeFileSync('run.bat',
