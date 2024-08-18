@@ -11,7 +11,7 @@ let argsPath=args[0] || "./";
 function install(){
     fs.writeFileSync('run.bat',
 
-`rmdir /s /q work
+        `rmdir /s /q work
 del vsim.wlf
 del transcript
 set MY_PARAM=%1%
