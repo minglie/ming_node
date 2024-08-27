@@ -225,5 +225,3 @@ https://www.yuque.com/docs/share/e1f16015-0719-4ffd-9464-a35610389153?# 《ming_
 # ming_node使用文档
 
 https://www.yuque.com/docs/share/e1f16015-0719-4ffd-9464-a35610389153?# 《ming_node》
-
-https://unpkg.com/minglitlie-test/h5/index.html
