@@ -36,8 +36,8 @@ led test`
     );
 
     fs.writeFileSync('sims/filelist.f',
-`"../src/*v"
-"../tb/*v"`
+`"../src/led.v"
+"../tb/tb.v"`
     );
 
 
