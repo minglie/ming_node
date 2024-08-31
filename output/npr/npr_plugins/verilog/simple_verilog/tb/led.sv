@@ -28,9 +28,9 @@ end
 
 always@(*)begin
     case(state_c)
-        S0: begin//״̬
+        S0: begin
             if(s0_s1_start)begin
-                state_n = S1;//״̬1
+                state_n = S1;
             end
             else begin
                 state_n = state_c;
@@ -39,7 +39,7 @@ always@(*)begin
 
         S1:begin
             if(s1_s2_start)begin
-                state_n = S2;//״̬2
+                state_n = S2;
             end
             else begin
                 state_n = state_c;
@@ -48,7 +48,7 @@ always@(*)begin
 
         S2:begin
             if(s2_s3_start)begin
-                state_n = S3;//״̬3
+                state_n = S3;
             end
             else begin
                 state_n = state_c;
