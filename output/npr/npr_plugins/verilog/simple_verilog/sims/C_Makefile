@@ -3,7 +3,6 @@ work= work
 output= ./
 vsimbatch0= -do "run -all"
 
-
 #commandbegin
 all:compile vsim
 lib:
@@ -14,7 +13,10 @@ vlog :
 	vlog  -f filelist.f -l $(output)/compile.log
 compile: lib vlog
 run:
-	modelsim -do ./run.do
+	vsim work.tb -l tb.log -c -do "run -all;exit;"
+restart:
+	vlog -f filelist.f -l $(output)/compile.log
+	vsim work.tb -l tb.log -c -do "run -all;exit;"	
 #make clean
 clean:
 	del *.log

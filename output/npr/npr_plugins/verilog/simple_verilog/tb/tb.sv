@@ -2,31 +2,50 @@
 
 module tb();
 
+
+parameter PERIOD  = 10;
+
+reg           clk=1;
+reg           rst_n=1;
 reg           key;
-wire          led;
+wire[2:0]          led;
+
+
+
 initial begin
+    forever #(PERIOD/2)  clk=~clk;
+end
+
+
+
+initial begin
+    $monitor ("rst_n=%0b led=%0b",rst_n, led);
+    #(PERIOD*2) 
+    rst_n  =  1;
     key <= 1'b1;   
-    #12        
+    #(PERIOD*2)        
     key <= 1'b1;  
-    #3
+    #(PERIOD*2) 
     key <= 1'b0;   
-    #2
+    #(PERIOD*2) 
     key <= 1'b1;
-    #2
+     #(PERIOD*2) 
     key <= 1'b0;
-    #2        
+     #(PERIOD*2) 
     key <= 1'b1;  
-    #3
+    #(PERIOD*2) 
     key <= 1'b0;   
-    #2
+     #(PERIOD*2) 
     key <= 1'b1;
-    #2
+    #(PERIOD*2) 
     key <= 1'b0;
-    $display("DDDDDDDDD");
+    $display("TTTT");
 end
 
 //例化led模块
 led  u_led(
+     .clk          (clk),
+    .rst_n          (rst_n),
     .key          (key),
     .led          (led)
     );
