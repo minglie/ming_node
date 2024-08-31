@@ -25,7 +25,7 @@ always@(posedge clk or negedge rst_n)begin
         state_c <= state_n;
     end
 end
-//第二段：组合逻辑always模块，描述状态转移条件判断
+
 always@(*)begin
     case(state_c)
         S0: begin//状态
@@ -59,7 +59,7 @@ always@(*)begin
         end
     endcase
 end
-//第三段：设计转移条件
+
 assign s0_s1_start  = state_c==S0 ;
 assign s1_s2_start   = state_c==S1  ;
 assign s2_s3_start   = state_c==S2   ;

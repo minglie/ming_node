@@ -1,4 +1,4 @@
-`timescale 1ns / 1ns        //仿真单位/仿真精度
+`timescale 1ns / 1ns
 
 module tb();
 
@@ -42,7 +42,7 @@ initial begin
     $display("TTTT");
 end
 
-//例化led模块
+
 led  u_led(
      .clk          (clk),
     .rst_n          (rst_n),
