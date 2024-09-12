@@ -1,1 +1,0 @@
-compile.bat; restart -f;run 1000ns
