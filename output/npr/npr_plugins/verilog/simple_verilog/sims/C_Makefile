@@ -1,0 +1,27 @@
+#setting parameter
+work= work
+output= ./
+vsimbatch0= -do "run -all"
+
+#commandbegin
+all:compile vsim
+lib:
+	echo "start compile for Questasim10.6c"
+	vlib $(work)
+	vmap work $(work)
+vlog :
+	vlog  -f filelist.f -l $(output)/compile.log
+compile: lib vlog
+run:
+	vsim work.tb -l tb.log -c -do "run -all;exit;"
+restart:
+	vlog -f filelist.f -l $(output)/compile.log
+	vsim work.tb -l tb.log -c -do "run -all;exit;"	
+#make clean
+clean:
+	del *.log
+	del *.wlf
+	del vsim_stacktrace.vstf
+	del transcript
+	del modelsim.ini
+	rmdir /s /q work
