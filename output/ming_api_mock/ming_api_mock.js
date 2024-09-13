@@ -14,7 +14,7 @@ const path = require('path');
 const child_process = require('child_process');
 const EventEmitter = require('events').EventEmitter;
 const event = new EventEmitter();
-const privateObj = {};//本文件私有对�?
+const privateObj = {};//本文件私有对�?
 const M = {};
 M.privateObj=privateObj;
 M.sessions = {}//保存session
@@ -24,9 +24,9 @@ M.reqComQueryparams = undefined;//请求的公共的查询参数
 M.reqComHeaders = undefined;//请求的公共请求头
 M.host = "http://127.0.0.1:7001";
 M.log_file_enable = true;//将日志输出到文件
-M.log_console_enable = true;//将日志输出到控制�?
+M.log_console_enable = true;//将日志输出到控制�?
 M.log_path = "./M.log";//输出日志文件路径
-M.map_path = "./M_map.json";//全局作用域路�?
+M.map_path = "./M_map.json";//全局作用域路�?
 M.database_path = "./M_database.json";//文件型数据库路径
 M.log_display_time = true;//日志是否显示当前时间
 M.httpProxy = {};// http 代理配置
@@ -47,10 +47,10 @@ M._globle_plugin_url_cacheMap={};
 //全局插件
 M._globle_plugin=new Set();
 M._node_lib_path=process.cwd()+"/.ming_node_cacke";
-//远程静态资源路�?
+//远程静态资源路�?
 M.remoteStaticPath = "https://minglie.gitee.io/mingpage/static";
 M.remoteStaticPathEnable = true;
-//代理服务器配�?
+//代理服务器配�?
 M.proxyHost = "http://127.0.0.1:8888"
 M.proxyHost = "";
 M.IO={}
@@ -75,7 +75,7 @@ M.getGloblePlugin=(pluginKey)=>{
 /**
  * ----------------------客户端START--------------------------------------------
  */
-//解析对象或函数返回�?
+//解析对象或函数返回�?
 privateObj.getFunctionOrObjResult = function (objOrFunc, obj) {
     let c1;
     if (!objOrFunc) {
@@ -89,12 +89,12 @@ privateObj.getFunctionOrObjResult = function (objOrFunc, obj) {
     return Object.assign(obj, c1);
 }
 
-//将对象追加到url�?
+//将对象追加到url�?
 privateObj.appendDataToUrl = function (url, data) {
     let getData = "";
     if (data) {
         getData = querystring.stringify(data);
-        //url携带参数�?
+        //url携带参数�?
         if (url.indexOf("?") > 0) {
             getData = "&" + getData;
         } else {
@@ -125,14 +125,14 @@ M.get = function (url, callback, data, headers) {
     if (data || M.reqComQueryparams) {
         data = privateObj.getFunctionOrObjResult(M.reqComQueryparams, data)
         getData = querystring.stringify(data);
-        //url携带参数�?
+        //url携带参数�?
         if (url.indexOf("?") > 0) {
             getData = "&" + getData;
         } else {
             getData = "?" + getData;
         }
     }
-    //合并请求�?
+    //合并请求�?
     headers = privateObj.getFunctionOrObjResult(M.reqComHeaders, headers)
     let html = '';
     let urlObj = url_module.parse(url)
@@ -208,7 +208,7 @@ M._request = function (url, callback, data, headers,methed) {
     url = privateObj.appendDataToUrl(url, M.reqComQueryparams);
     let html = '';
     let urlObj = url_module.parse(url)
-    //发�? http Post 请求
+    //发�? http Post 请求
     let postData = querystring.stringify(data);
     if( headers["Content-Type"]==undefined){
         headers["Content-Type"] ="application/json";
@@ -223,7 +223,7 @@ M._request = function (url, callback, data, headers,methed) {
         }
     }
 
-    //合并请求�?
+    //合并请求�?
     headers = privateObj.getFunctionOrObjResult(M.reqComHeaders, headers)
     let options = {
         hostname: urlObj.hostname,
@@ -298,7 +298,7 @@ M.postJson = function (url, callback, data, headers) {
     url = privateObj.appendDataToUrl(url, M.reqComQueryparams);
     let html = '';
     let urlObj = url_module.parse(url)
-    //发�? http Post 请求
+    //发�? http Post 请求
     let postData = JSON.stringify(data);
     if (!headers) {
         headers = {
@@ -307,7 +307,7 @@ M.postJson = function (url, callback, data, headers) {
             'Cookie': M.cookie
         }
     }
-    //合并请求�?
+    //合并请求�?
     headers = privateObj.getFunctionOrObjResult(M.reqComHeaders, headers)
     let options = {
         hostname: urlObj.hostname,
@@ -377,7 +377,7 @@ M.request.put=M.put;
 
 
 M.require =async function (url,noCache) {
-    //如果需要缓�?
+    //如果需要缓�?
     let fileName=M.getFileNameByUrl(url);
     let cacheFilePath= path.join(M._node_lib_path,fileName);
     if(!noCache){
@@ -401,7 +401,7 @@ M.require =async function (url,noCache) {
                 let r = "";
                 try {
                     if(fileName.endsWith(".js")){
-                        //如果需要缓�?
+                        //如果需要缓�?
                         if(!noCache){
                             if (!fs.existsSync(M._node_lib_path)) {
                                 fs.mkdirSync(M._node_lib_path);
@@ -461,7 +461,7 @@ M.download =async function (url, file) {
 
 }
 /**
- *下载所有图�?
+ *下载所有图�?
  */
 M.downloadAllImg = function (url, file, callback) {
     let urlObj = url_module.parse(url)
@@ -478,7 +478,7 @@ M.downloadAllImg = function (url, file, callback) {
             //Buffer
             let string = data.toString();
             let rule = /https?:\/\/.[^"]+\.(png|jpg|gif|jpeg)/gi;
-            let ary = string.match(rule);    //拿到所有jpg结尾的链接集�?
+            let ary = string.match(rule);    //拿到所有jpg结尾的链接集�?
             if (callback) callback(ary);
             let x = 0;
             for (let i in ary) {
@@ -490,7 +490,7 @@ M.downloadAllImg = function (url, file, callback) {
 }
 
 /**
- *打印结果前钩�?
+ *打印结果前钩�?
  */
 M.beforeLogData = function (res, desc) {
     console.log("-----" + desc + "-----" + res.req.path + "-------------");
@@ -498,7 +498,7 @@ M.beforeLogData = function (res, desc) {
 
 
 /**
- *打印结果后钩�?
+ *打印结果后钩�?
  */
 M.afterLogData = function () {
 
@@ -566,10 +566,10 @@ M.template = function (str) {
  */
 
 /**
- *递归创建文件�?
+ *递归创建文件�?
  */
 M.mkdir = function (dirpath, dirname) {
-    //判断是否是第一次调�?
+    //判断是否是第一次调�?
     if (typeof dirname === "undefined") {
 
         if (dirpath.indexOf(".") > 0) {
@@ -581,7 +581,7 @@ M.mkdir = function (dirpath, dirname) {
             M.mkdir(dirpath, path.dirname(dirpath));
         }
     } else {
-        //判断第二个参数是否正常，避免调用时传入错误参�?
+        //判断第二个参数是否正常，避免调用时传入错误参�?
         if (dirname !== path.dirname(dirpath)) {
             M.mkdir(dirpath);
             return;
@@ -595,18 +595,18 @@ M.mkdir = function (dirpath, dirname) {
     }
 }
 /**
- *文件夹拷�?
+ *文件夹拷�?
  */
 M.copyDir = function (src, dst) {
     let paths = fs.readdirSync(src); //同步读取当前目录
     paths.forEach(function (path) {
         let _src = src + '/' + path;
         let _dst = dst + '/' + path;
-        fs.stat(_src, function (err, stats) {  //stats  该对�? 包含文件属�?
+        fs.stat(_src, function (err, stats) {  //stats  该对�? 包含文件属�?
             if (err) throw err;
-            if (stats.isFile()) { //如果是个文件则拷�?
-                let readable = fs.createReadStream(_src);//创建读取�?
-                let writable = fs.createWriteStream(_dst);//创建写入�?
+            if (stats.isFile()) { //如果是个文件则拷�?
+                let readable = fs.createReadStream(_src);//创建读取�?
+                let writable = fs.createWriteStream(_dst);//创建写入�?
                 readable.pipe(writable);
             } else if (stats.isDirectory()) { //是目录则 递归
                 privateObj.checkDirectory(_src, _dst, M.copyDir);
@@ -640,7 +640,7 @@ M.appendFile = function (file, str) {
     fs.appendFileSync(file, str);
 }
 /**
- 文件型数据库第一层封�?
+ 文件型数据库第一层封�?
  */
 M.getObjByFile = function (file) {
     data = M.readFile(file) || "[]"
@@ -737,7 +737,7 @@ M.listAllObjByPropFile = function (file, caseObj) {
     }
 }
 /**
- * 文件型数据库第二层封�?
+ * 文件型数据库第二层封�?
  */
 M.add = function (obj) {
     obj.id = M.randomStr();
@@ -786,7 +786,7 @@ M.listByPage = function (startPage, limit, caseObj) {
     return {rows, total}
 }
 /**
- * 全局作用�?
+ * 全局作用�?
  * @param k
  * @param v
  */
@@ -876,7 +876,7 @@ M.getFileNameByUrl=function (url){
 M.getFileList = function (path) {
     //遍历读取文件
     function readFile(path, filesList, targetObj) {
-        files = fs.readdirSync(path);//需要用到同步读�?
+        files = fs.readdirSync(path);//需要用到同步读�?
         files.forEach(walk);
 
         function walk(file) {
@@ -893,10 +893,10 @@ M.getFileList = function (path) {
 
                 readFile(path + '/' + file, filesList, item);
             } else {
-                //创建一个对象保存信�?
+                //创建一个对象保存信�?
                 let obj = new Object();
-                obj.size = states.size;//文件大小，以字节为单�?
-                obj.name = file;//文件�?
+                obj.size = states.size;//文件大小，以字节为单�?
+                obj.name = file;//文件�?
                 obj.path = path + '/' + file; //文件绝对路径
 
                 if (targetObj["children"]) {
@@ -919,7 +919,7 @@ M.getFileList = function (path) {
 M.getFileDirList = function (path) {
     //遍历读取文件
     function readFile(path, filesList, targetObj) {
-        files = fs.readdirSync(path);//需要用到同步读�?
+        files = fs.readdirSync(path);//需要用到同步读�?
         files.forEach(walk);
         function walk(file) {
             states = fs.statSync(path + '/' + file);
@@ -1410,7 +1410,7 @@ M.failResult=(msg,code,d)=>{
 }
 
 /**
- *获取下划线式的对�?
+ *获取下划线式的对�?
  */
 M.getUnderlineObj = function (obj) {
     let result = {};
@@ -1485,11 +1485,11 @@ M.err = function (e) {
 
 M.server = function () {
     let G = this;   /*全局变量,也就是M*/
-    //静态资源路�?
+    //静态资源路�?
     this._views = "static";
     //key为去除rest参数的url,val为原始url
     this._rest = {};
-    //通配�?
+    //通配�?
     this._use = {};
     //处理get和post请求
     this._get = {};
@@ -1497,13 +1497,13 @@ M.server = function () {
     this._put = {};
     this._delete = {};
     this._mapping = {};
-    //用于模拟过滤�?
+    //用于模拟过滤�?
     this._begin = function () {
     }
-    //服务器响应后的钩子函�?
+    //服务器响应后的钩子函�?
     this._end = function () {
     }
-    //如果实现此函�?,则只能有一个此服务
+    //如果实现此函�?,则只能有一个此服务
     this._server = function () {
     };
     let app =async function (req, res) {
@@ -1511,10 +1511,10 @@ M.server = function () {
             req.setEncoding('utf-8');
             M.req=req;
             M.res=res;
-            //是否已经发送过�?
+            //是否已经发送过�?
             res.alreadySend = false;
             req.requestId=M.randomStr();
-            //是否为静态资源请�?
+            //是否为静态资源请�?
             req.isStaticRequest = function () {
                 if (req.url.indexOf("?") > 0) {
                     return privateObj.staticMime[path.extname(req.url.substr(0, req.url.indexOf("?")))];
@@ -1607,8 +1607,8 @@ M.server = function () {
                 if (!isString) {
                     text = JSON.stringify(text);
                 }
-                let pathname = url_module.parse(url).pathname;   /*获取url的�?*/
-                //获取文件的后缀�?
+                let pathname = url_module.parse(url).pathname;   /*获取url的�?*/
+                //获取文件的后缀�?
                 let extname = path.extname(pathname);
                 res.writeHead(200, {"Content-Type": "" + (privateObj.staticMime[extname] || 'text/html') + ";charset='utf-8'",});
                 res.write(text);
@@ -1675,8 +1675,8 @@ M.server = function () {
                 if (!isString) {
                     text = JSON.stringify(text);
                 }
-                let pathname = url_module.parse(url).pathname;   /*获取url的�?*/
-                //获取文件的后缀�?
+                let pathname = url_module.parse(url).pathname;   /*获取url的�?*/
+                //获取文件的后缀�?
                 let extname = path.extname(pathname);
                 res.writeHead(200, {"Content-Type": "" + (privateObj.staticMime[extname] || 'text/html') + ";charset='utf-8'",});
                 let templateStr=""
@@ -1727,7 +1727,7 @@ M.server = function () {
                 pathname = pathname + '/';
             }
             // pathname.startsWith("/usr/")
-            //获取请求的方�? get  post
+            //获取请求的方�? get  post
             let method = req.method.toLowerCase();
             if (req.isStaticRequest()) {
 
@@ -1739,7 +1739,7 @@ M.server = function () {
                 //为req加个params用于存放请求参数
                 req.params = {};
                 let mapingPath = "";
-                //如果是rest风格的请�?,为其封装请求参数
+                //如果是rest风格的请�?,为其封装请求参数
                 if (req.isRestRequest()) {
                     for (let i = 0; i < Object.keys(G._rest).length; i++) {
                         if (pathname.startsWith(Object.keys(G._rest)[i])) {
@@ -1775,7 +1775,7 @@ M.server = function () {
                             postStr += chunk;
                         })
                         req.on('end',async function (err, chunk) {
-                            req.body = postStr;  /*表示拿到post的�?*/
+                            req.body = postStr;  /*表示拿到post的�?*/
                             postData = "";
                             try {
                                 if(req.headers["content-type"].indexOf("application/json")>=0){
@@ -1828,7 +1828,7 @@ M.server = function () {
         G._end = callback;
     }
     /**
-     *唯一服务的方�?
+     *唯一服务的方�?
      */
     app.server = function (callback) {
         G._server = callback;
@@ -1938,7 +1938,7 @@ M.server = function () {
         app.registServer(url,callback,single);
     }
     /**
-     *注册任意请求方法的请�?
+     *注册任意请求方法的请�?
      */
     app.mapping = function (url, callback) {
         const single=(url,callback)=>{
@@ -1972,7 +1972,7 @@ M.server = function () {
     }
 
     /**
-     *重定�?
+     *重定�?
      */
     app.redirect = function (url, req, res) {
         res.writeHead(302, {'Content-Type': 'text/html; charset=utf-8', 'Location': url});
@@ -1998,7 +1998,7 @@ M.server = function () {
         console.error(err.stack)
     })
 
-    //没有对应接口时的处理�?
+    //没有对应接口时的处理�?
     app.set("no_router_handle",(req,res)=>{
         res.end('no router')
     })
@@ -2062,7 +2062,7 @@ M.getAxiosConfig = async (req) => {
             postStr += chunk;
         })
         req.on('end', function (err, chunk) {
-            req.body = postStr;  /*表示拿到post的�?*/
+            req.body = postStr;  /*表示拿到post的�?*/
             postData = "";
             try {
                 if (req.body.indexOf("=") == -1) {
@@ -2137,12 +2137,12 @@ privateObj.dealUseServer = async function (req, res) {
 
 privateObj.staticServer = async function (req, res, staticPath) {
     if (res.alreadySend) return;
-    let pathname = url_module.parse(req.url).pathname;   /*获取url的�?*/
+    let pathname = url_module.parse(req.url).pathname;   /*获取url的�?*/
     if (pathname == '/') {
-        pathname = '/index.html'; /*默认加载的首�?*/
+        pathname = '/index.html'; /*默认加载的首�?*/
     }
     let fileName = pathname.replace("/", "");
-    //获取文件的后缀�?
+    //获取文件的后缀�?
     let extname = path.extname(pathname);
 
     if (fileName.startsWith("__default_")) {
@@ -2318,7 +2318,7 @@ M.getMyIp = function () {
 }
 
 /**
- *对象转JSON key不用引号括起�?,因兼容性不�?,所以去�?
+ *对象转JSON key不用引号括起�?,因兼容性不�?,所以去�?
  */
 
 /**
@@ -2888,7 +2888,7 @@ M.getRemoteCacheByUrl = async function (url) {
 
 M.init = function () {
     /***
-     * 下划线命名转为驼峰命�?
+     * 下划线命名转为驼峰命�?
      */
     String.prototype.underlineToHump = function () {
         let re = /_(\w)/g;
@@ -2919,14 +2919,14 @@ M.init = function () {
             return word.replace(word.charAt(0), word.charAt(0).toLowerCase());
         });
     }
-    //格式化日�?
+    //格式化日�?
     Date.prototype.format = function (fmt) {
         let o = {
             "M+": this.getMonth() + 1,                 //月份
-            "d+": this.getDate(),                    //�?
+            "d+": this.getDate(),                    //�?
             "h+": this.getHours(),                   //小时
-            "m+": this.getMinutes(),                 //�?
-            "s+": this.getSeconds(),                 //�?
+            "m+": this.getMinutes(),                 //�?
+            "s+": this.getSeconds(),                 //�?
             "q+": Math.floor((this.getMonth() + 3) / 3), //季度
             "S": this.getMilliseconds()             //毫秒
         };
@@ -2955,200 +2955,200 @@ module.exports = M;
 
 
 const indexHtml="<!DOCTYPE html>\n" +
-"<html>\n" +
-"<head>\n" +
-"    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\" />\n" +
-"    <meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\">\n" +
-"    <link rel=\"stylesheet\" href=\"https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css\">\n" +
-"    <script src=\"https://cdn.bootcss.com/jquery/3.3.1/jquery.js\"></script>\n" +
-"    <script src=\"https://langjie.oss-cn-hangzhou.aliyuncs.com/space/root/project/viphelp/js/lib/monacoeditor/min/vs/loader.js\"></script>\n" +
-"    <script>\n" +
-"        M = {}\n" +
-"    </script>\n" +
-"    <style>\n" +
-"        * { \n" +
-"            touch-action: none;\n" +
-"             } \n" +
-"        #resize {\n" +
-"            width: 5px;\n" +
-"            height: 10px;\n" +
-"        }\n" +
-"        option {\n" +
-"            font-weight: bold;\n" +
-"            font-size: large;\n" +
-"            color: #00b4ef;\n" +
-"        }\n" +
-"\n" +
-"    </style>\n" +
-"</head>\n" +
-"\n" +
-"<body>\n" +
-"    <div id=\"app\">\n" +
-"        <select id=\"laungeSelectId\" class=\"form-control\" style=\"width:50%; float: left;\" onchange=\"selectOnchang(this)\">\n" +
-"            \n" +
-"        </select>\n" +
-"        <div align=\"center\">\n" +
-"            <button id=\"btn\" onclick=\"btnOnclick(this)\" style=\"float: left; width: 40%; height: 35px;\" align=\"center\" type=\"button\" class=\"btn btn-success btn-lg btn-block\">Run</button>\n" +
-"        </div>\n" +
-"        <select  id=\"themeSelectId\"  class=\"form-control\" style=\"width: 10%; float: right;\"  onchange=\"selectOnThemechang(this)\">\n" +
-"            <option>vs</option>\n" +
-"            <option>vs-dark</option>\n" +
-"            <option>hc-black</option>\n" +
-"        </select>\n" +
-"    </div>\n" +
-" \n" +
-"    <div id=\"container\" style=\"width:100%;height:2000px;float:left; border:1px solid grey\"></div>\n" +
-"    <script>\n" +
-"\n" +
-"        M.languageMap={\n" +
-"            \"js\":\"javascript\",\n" +
-"            \"jsx\":\"javascript\",\n" +
-"            \"md\":\"markdown\",\n" +
-"            \"conf\":\"lua\"\n" +
-"        }\n" +
-"\n" +
-"        M.file =localStorage.file || \"server.js\"\n" +
-"        M.theme=localStorage.theme || \"vs-dark\";  \n" +
-"        function getlanguage(file){\n" +
-"            M.language = file.split(\".\")[1];\n" +
-"            if(Object.keys(M.languageMap).indexOf(M.language)>=0){\n" +
-"                 M.language=M.languageMap[M.language];\n" +
-"            }\n" +
-"            return   M.language;\n" +
-"        }\n" +
-"        require.config({\n" +
-"            baseUrl: 'https://langjie.oss-cn-hangzhou.aliyuncs.com/space/root/project/viphelp/js/lib/monacoeditor/', paths: { 'vs': 'min/vs' }\n" +
-"        });\n" +
-"\n" +
-"        function selectOnchang(d) {\n" +
-"            localStorage.file=d.value;\n" +
-"            M.file=d.value;\n" +
-"         \n" +
-"            $(\"#container\").children().remove();\n" +
-"            $.ajax({\n" +
-"                type: \"GET\",\n" +
-"                url: \"./\"+ M.file,\n" +
-"                async: false,\n" +
-"                dataType:\"text\",\n" +
-"                success: function (data) {\n" +
-"                    if (data == \"no router\") {\n" +
-"                        data = null;\n" +
-"                    }\n" +
-"                    require(['vs/editor/editor.main'], function () {\n" +
-"                        var editor = monaco.editor.create(document.getElementById('container'), {\n" +
-"                            value: [\n" +
-"                                data\n" +
-"                            ].join('\\n'),\n" +
-"                            language: getlanguage(M.file),\n" +
-"                            theme: M.theme,\n" +
-"                            automaticLayout: true,\n" +
-"                            scrollbar: {\n" +
-"                                useShadows: false,\n" +
-"                                vertical: 'visible',\n" +
-"                                horizontal: 'visible',\n" +
-"                                horizontalSliderSize: 5,\n" +
-"                                verticalSliderSize: 5,\n" +
-"                                horizontalScrollbarSize: 15,\n" +
-"                                verticalScrollbarSize: 15,\n" +
-"                            },\n" +
-"                            quickSuggestions: true,\n" +
-"                            overviewRulerBorder: true,\n" +
-"                            minimap: {\n" +
-"                                enabled: false\n" +
-"                            }\n" +
-"                        });\n" +
-"                        M.editor = editor;\n" +
-"                        if( $(\"#themeSelectId\").val()!=M.theme){\n" +
-"                            $(\"#themeSelectId\").val(M.theme) \n" +
-"                            selectOnThemechang({ value: M.theme })\n" +
-"                        }\n" +
-"                    }\n" +
-"                    );\n" +
-"                }, error: function () {\n" +
-"                    require(['vs/editor/editor.main'], function () {\n" +
-"                        var editor = monaco.editor.create(document.getElementById('container'), {\n" +
-"                            value: [\n" +
-"                               \"ss\"\n" +
-"                            ].join('\\n'),\n" +
-"                            language: getlanguage(M.file),\n" +
-"                            theme: M.theme,\n" +
-"                            automaticLayout: true,\n" +
-"                            scrollbar: {\n" +
-"                                useShadows: false,\n" +
-"                                vertical: 'visible',\n" +
-"                                horizontal: 'visible',\n" +
-"                                horizontalSliderSize: 5,\n" +
-"                                verticalSliderSize: 5,\n" +
-"                                horizontalScrollbarSize: 15,\n" +
-"                                verticalScrollbarSize: 15,\n" +
-"                            },\n" +
-"                            quickSuggestions: true,\n" +
-"                            overviewRulerBorder: true,\n" +
-"                            minimap: {\n" +
-"                                enabled: false\n" +
-"                            }\n" +
-"                        });\n" +
-"                        M.editor = editor;\n" +
-"\n" +
-"                        if( $(\"#themeSelectId\").val()!=M.theme){\n" +
-"                            $(\"#themeSelectId\").val(M.theme) \n" +
-"                            selectOnThemechang({ value: M.theme })\n" +
-"                        }\n" +
-"\n" +
-"\n" +
-"                    }\n" +
-"                    );\n" +
-"                }\n" +
-"            });\n" +
-"        }\n" +
-"\n" +
-"       function selectOnThemechang(d){\n" +
-"            M.theme=d.value;  \n" +
-"            localStorage.theme= M.theme;\n" +
-"            monaco.editor.setTheme(M.theme);\n" +
-"        }\n" +
-"\n" +
-"    \n" +
-"        function ming_alert(str) {\n" +
-"            btn.innerHTML = str;\n" +
-"            window.setTimeout(() => {\n" +
-"                btn.innerHTML = \"Run\";\n" +
-"            }, 500);\n" +
-"        }\n" +
-"\n" +
-"        btnOnclick = function () {\n" +
-"            let fun = M.editor.getValue();\n" +
-"            $.ajax({\n" +
-"                type: \"post\",\n" +
-"                url: \"/_run_?file=\" + M.file,\n" +
-"                data: { fun },\n" +
-"                dataType: \"json\",\n" +
-"                success: function (data) {\n" +
-"                    ming_alert(JSON.stringify(data));\n" +
-"                },\n" +
-"                error: function (e) {\n" +
-"                    ming_alert(JSON.stringify(e));\n" +
-"                }\n" +
-"            });\n" +
-"        }\n" +
-"\n" +
-"       \n" +
-"        $.get(\"/_curFileList\").then(d=>{\n" +
-"                 let fileList=d.data.split(\"\\n\").filter(u=>u.includes(\".\")).map(u=>{\n" +
-"                     return  `<option>${u}</option>`\n" +
-"                 })\n" +
-"                 let fileListStr=fileList.toLocaleString().replace(/,/g,\"\")\n" +
-"                 document.getElementById(\"laungeSelectId\").innerHTML=fileListStr;               \n" +
-"                 setTimeout(()=>{\n" +
-"                    selectOnchang({value:M.file}) \n" +
-"                    laungeSelectId.value=M.file;\n" +
-"                 },200)\n" +
-"            \n" +
-"       })\n" +
-"</script>\n" +
-"</body>\n" +
-"\n" +
-"</html>";
+    "<html>\n" +
+    "<head>\n" +
+    "    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\" />\n" +
+    "    <meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\">\n" +
+    "    <link rel=\"stylesheet\" href=\"https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css\">\n" +
+    "    <script src=\"https://cdn.bootcss.com/jquery/3.3.1/jquery.js\"></script>\n" +
+    "    <script src=\"https://langjie.oss-cn-hangzhou.aliyuncs.com/space/root/project/viphelp/js/lib/monacoeditor/min/vs/loader.js\"></script>\n" +
+    "    <script>\n" +
+    "        M = {}\n" +
+    "    </script>\n" +
+    "    <style>\n" +
+    "        * { \n" +
+    "            touch-action: none;\n" +
+    "             } \n" +
+    "        #resize {\n" +
+    "            width: 5px;\n" +
+    "            height: 10px;\n" +
+    "        }\n" +
+    "        option {\n" +
+    "            font-weight: bold;\n" +
+    "            font-size: large;\n" +
+    "            color: #00b4ef;\n" +
+    "        }\n" +
+    "\n" +
+    "    </style>\n" +
+    "</head>\n" +
+    "\n" +
+    "<body>\n" +
+    "    <div id=\"app\">\n" +
+    "        <select id=\"laungeSelectId\" class=\"form-control\" style=\"width:50%; float: left;\" onchange=\"selectOnchang(this)\">\n" +
+    "            \n" +
+    "        </select>\n" +
+    "        <div align=\"center\">\n" +
+    "            <button id=\"btn\" onclick=\"btnOnclick(this)\" style=\"float: left; width: 40%; height: 35px;\" align=\"center\" type=\"button\" class=\"btn btn-success btn-lg btn-block\">Run</button>\n" +
+    "        </div>\n" +
+    "        <select  id=\"themeSelectId\"  class=\"form-control\" style=\"width: 10%; float: right;\"  onchange=\"selectOnThemechang(this)\">\n" +
+    "            <option>vs</option>\n" +
+    "            <option>vs-dark</option>\n" +
+    "            <option>hc-black</option>\n" +
+    "        </select>\n" +
+    "    </div>\n" +
+    " \n" +
+    "    <div id=\"container\" style=\"width:100%;height:2000px;float:left; border:1px solid grey\"></div>\n" +
+    "    <script>\n" +
+    "\n" +
+    "        M.languageMap={\n" +
+    "            \"js\":\"javascript\",\n" +
+    "            \"jsx\":\"javascript\",\n" +
+    "            \"md\":\"markdown\",\n" +
+    "            \"conf\":\"lua\"\n" +
+    "        }\n" +
+    "\n" +
+    "        M.file =localStorage.file || \"server.js\"\n" +
+    "        M.theme=localStorage.theme || \"vs-dark\";  \n" +
+    "        function getlanguage(file){\n" +
+    "            M.language = file.split(\".\")[1];\n" +
+    "            if(Object.keys(M.languageMap).indexOf(M.language)>=0){\n" +
+    "                 M.language=M.languageMap[M.language];\n" +
+    "            }\n" +
+    "            return   M.language;\n" +
+    "        }\n" +
+    "        require.config({\n" +
+    "            baseUrl: 'https://langjie.oss-cn-hangzhou.aliyuncs.com/space/root/project/viphelp/js/lib/monacoeditor/', paths: { 'vs': 'min/vs' }\n" +
+    "        });\n" +
+    "\n" +
+    "        function selectOnchang(d) {\n" +
+    "            localStorage.file=d.value;\n" +
+    "            M.file=d.value;\n" +
+    "         \n" +
+    "            $(\"#container\").children().remove();\n" +
+    "            $.ajax({\n" +
+    "                type: \"GET\",\n" +
+    "                url: \"./\"+ M.file,\n" +
+    "                async: false,\n" +
+    "                dataType:\"text\",\n" +
+    "                success: function (data) {\n" +
+    "                    if (data == \"no router\") {\n" +
+    "                        data = null;\n" +
+    "                    }\n" +
+    "                    require(['vs/editor/editor.main'], function () {\n" +
+    "                        var editor = monaco.editor.create(document.getElementById('container'), {\n" +
+    "                            value: [\n" +
+    "                                data\n" +
+    "                            ].join('\\n'),\n" +
+    "                            language: getlanguage(M.file),\n" +
+    "                            theme: M.theme,\n" +
+    "                            automaticLayout: true,\n" +
+    "                            scrollbar: {\n" +
+    "                                useShadows: false,\n" +
+    "                                vertical: 'visible',\n" +
+    "                                horizontal: 'visible',\n" +
+    "                                horizontalSliderSize: 5,\n" +
+    "                                verticalSliderSize: 5,\n" +
+    "                                horizontalScrollbarSize: 15,\n" +
+    "                                verticalScrollbarSize: 15,\n" +
+    "                            },\n" +
+    "                            quickSuggestions: true,\n" +
+    "                            overviewRulerBorder: true,\n" +
+    "                            minimap: {\n" +
+    "                                enabled: false\n" +
+    "                            }\n" +
+    "                        });\n" +
+    "                        M.editor = editor;\n" +
+    "                        if( $(\"#themeSelectId\").val()!=M.theme){\n" +
+    "                            $(\"#themeSelectId\").val(M.theme) \n" +
+    "                            selectOnThemechang({ value: M.theme })\n" +
+    "                        }\n" +
+    "                    }\n" +
+    "                    );\n" +
+    "                }, error: function () {\n" +
+    "                    require(['vs/editor/editor.main'], function () {\n" +
+    "                        var editor = monaco.editor.create(document.getElementById('container'), {\n" +
+    "                            value: [\n" +
+    "                               \"ss\"\n" +
+    "                            ].join('\\n'),\n" +
+    "                            language: getlanguage(M.file),\n" +
+    "                            theme: M.theme,\n" +
+    "                            automaticLayout: true,\n" +
+    "                            scrollbar: {\n" +
+    "                                useShadows: false,\n" +
+    "                                vertical: 'visible',\n" +
+    "                                horizontal: 'visible',\n" +
+    "                                horizontalSliderSize: 5,\n" +
+    "                                verticalSliderSize: 5,\n" +
+    "                                horizontalScrollbarSize: 15,\n" +
+    "                                verticalScrollbarSize: 15,\n" +
+    "                            },\n" +
+    "                            quickSuggestions: true,\n" +
+    "                            overviewRulerBorder: true,\n" +
+    "                            minimap: {\n" +
+    "                                enabled: false\n" +
+    "                            }\n" +
+    "                        });\n" +
+    "                        M.editor = editor;\n" +
+    "\n" +
+    "                        if( $(\"#themeSelectId\").val()!=M.theme){\n" +
+    "                            $(\"#themeSelectId\").val(M.theme) \n" +
+    "                            selectOnThemechang({ value: M.theme })\n" +
+    "                        }\n" +
+    "\n" +
+    "\n" +
+    "                    }\n" +
+    "                    );\n" +
+    "                }\n" +
+    "            });\n" +
+    "        }\n" +
+    "\n" +
+    "       function selectOnThemechang(d){\n" +
+    "            M.theme=d.value;  \n" +
+    "            localStorage.theme= M.theme;\n" +
+    "            monaco.editor.setTheme(M.theme);\n" +
+    "        }\n" +
+    "\n" +
+    "    \n" +
+    "        function ming_alert(str) {\n" +
+    "            btn.innerHTML = str;\n" +
+    "            window.setTimeout(() => {\n" +
+    "                btn.innerHTML = \"Run\";\n" +
+    "            }, 500);\n" +
+    "        }\n" +
+    "\n" +
+    "        btnOnclick = function () {\n" +
+    "            let fun = M.editor.getValue();\n" +
+    "            $.ajax({\n" +
+    "                type: \"post\",\n" +
+    "                url: \"/_run_?file=\" + M.file,\n" +
+    "                data: { fun },\n" +
+    "                dataType: \"json\",\n" +
+    "                success: function (data) {\n" +
+    "                    ming_alert(JSON.stringify(data));\n" +
+    "                },\n" +
+    "                error: function (e) {\n" +
+    "                    ming_alert(JSON.stringify(e));\n" +
+    "                }\n" +
+    "            });\n" +
+    "        }\n" +
+    "\n" +
+    "       \n" +
+    "        $.get(\"/_curFileList\").then(d=>{\n" +
+    "                 let fileList=d.data.split(\"\\n\").filter(u=>u.includes(\".\")).map(u=>{\n" +
+    "                     return  `<option>${u}</option>`\n" +
+    "                 })\n" +
+    "                 let fileListStr=fileList.toLocaleString().replace(/,/g,\"\")\n" +
+    "                 document.getElementById(\"laungeSelectId\").innerHTML=fileListStr;               \n" +
+    "                 setTimeout(()=>{\n" +
+    "                    selectOnchang({value:M.file}) \n" +
+    "                    laungeSelectId.value=M.file;\n" +
+    "                 },200)\n" +
+    "            \n" +
+    "       })\n" +
+    "</script>\n" +
+    "</body>\n" +
+    "\n" +
+    "</html>";
 
 
 
@@ -3169,16 +3169,17 @@ g_args.args=[]
 g_args.port=port;
 g_args.staticPath=staticPath;
 for(let i=0;i<args.length;i++){
-	 g_args.args.push(args[i]);
-     if(args[i].includes("=")){
-       let paArr=  args[i].split("=")
+    g_args.args.push(args[i]);
+    if(args[i].includes("=")){
+        let paArr=  args[i].split("=")
         g_args[paArr[0]]=paArr[1]
-     }
+    }
 }
 console.log("g_args==>",g_args)
 var app = M.server();
 app.listen(port);
 app.set("views", staticPath);
+global.app=app;
 M.log_path = staticPath+"M.log";
 M.map_path =staticPath+ "M_map.json";
 M.database_path = staticPath+"M_database.json";
@@ -3212,18 +3213,18 @@ app.post("/_run_", async (req, res) => {
         res.send(M.result("error", false))
     }
 })
-app.get("/_curFileList",async (req,res)=>{ 
+app.get("/_curFileList",async (req,res)=>{
     let s1="__default_server.js\n__default_index.html\n";
-   if(os.type().startsWith("Window")){
-       s=await M.exec("dir /b  "+`"${staticPath}"`)
-   }else{
-       s=await M.exec("ls "+staticPath)
-   }
+    if(os.type().startsWith("Window")){
+        s=await M.exec("dir /b  "+`"${staticPath}"`)
+    }else{
+        s=await M.exec("ls "+staticPath)
+    }
     res.send(M.result(s1+s))
 })
 
 
-app.get("/_t",async (req,res)=>{ 
+app.get("/_t",async (req,res)=>{
     console.log(req.params);
     res.send(M.result("ok"));
 })
@@ -3238,14 +3239,14 @@ app.use("/",(req, res)=>{
 
 
 if(!g_args.args[2].startsWith("http") && g_args.args[2].endsWith(".js") ){
-	console.log("run " + g_args.args[2]);
+    console.log("run " + g_args.args[2]);
     eval(M.readFile("./"+g_args.args[2]));
 }else{
-	if(!g_args.args[1].startsWith("http") && g_args.args[1].endsWith(".js") ){
-	  console.log("run " + g_args.args[1]);
-	  eval(M.readFile("./"+g_args.args[1]));
-	}else{
-	   console.log("run server.js")
-	   eval(M.readFile("./server.js"));
-	}
+    if(!g_args.args[1].startsWith("http") && g_args.args[1].endsWith(".js") ){
+        console.log("run " + g_args.args[1]);
+        eval(M.readFile("./"+g_args.args[1]));
+    }else{
+        console.log("run server.js")
+        eval(M.readFile("./server.js"));
+    }
 }
